@@ -295,7 +295,7 @@ CREATE TABLE student_group_member_class_attendance (
     comment VARCHAR(1024) NULL,
     grade grade_enum NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ NULL,
+    deleted_at TIMESTAMPTZ NULL
 );
 
 -- 19. course_subject

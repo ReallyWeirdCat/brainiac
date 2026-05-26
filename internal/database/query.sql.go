@@ -23,7 +23,7 @@ RETURNING guid, username, created_at, deleted_at
 //	INSERT INTO app_user(username)
 //	VALUES ($1)
 //	RETURNING guid, username, created_at, deleted_at
-func (q *Queries) CreateAppUser(ctx context.Context, username shared.Username) (AppUser, error) {
+func (q *Queries) CreateAppUser(ctx context.Context, username string) (AppUser, error) {
 	row := q.db.QueryRow(ctx, createAppUser, username)
 	var i AppUser
 	err := row.Scan(
@@ -48,7 +48,7 @@ INSERT INTO app_user_profile(
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8
 )
-RETURNING app_user_guid, name, surname, patronymic, nickname, bio, profile_discovery, avatar_url, created_at, deleted_at
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 `
 
 type CreateAppUserProfileParams struct {
@@ -76,7 +76,7 @@ type CreateAppUserProfileParams struct {
 //	) VALUES (
 //	    $1, $2, $3, $4, $5, $6, $7, $8
 //	)
-//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, profile_discovery, avatar_url, created_at, deleted_at
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 func (q *Queries) CreateAppUserProfile(ctx context.Context, arg CreateAppUserProfileParams) (AppUserProfile, error) {
 	row := q.db.QueryRow(ctx, createAppUserProfile,
 		arg.AppUserGuid,
@@ -98,6 +98,7 @@ func (q *Queries) CreateAppUserProfile(ctx context.Context, arg CreateAppUserPro
 		&i.Bio,
 		&i.ProfileDiscovery,
 		&i.AvatarUrl,
+		&i.EditingLockedAt,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)

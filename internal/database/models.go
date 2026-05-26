@@ -12,10 +12,10 @@ import (
 )
 
 type AppUser struct {
-	Guid      uuid.UUID       `db:"guid" json:"guid"`
-	Username  shared.Username `db:"username" json:"username"`
-	CreatedAt time.Time       `db:"created_at" json:"created_at"`
-	DeletedAt *time.Time      `db:"deleted_at" json:"deleted_at"`
+	Guid      uuid.UUID  `db:"guid" json:"guid"`
+	Username  string     `db:"username" json:"username"`
+	CreatedAt time.Time  `db:"created_at" json:"created_at"`
+	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 type AppUserProfile struct {
@@ -27,6 +27,7 @@ type AppUserProfile struct {
 	Bio              *string                     `db:"bio" json:"bio"`
 	ProfileDiscovery shared.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
 	AvatarUrl        *string                     `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt  *time.Time                  `db:"editing_locked_at" json:"editing_locked_at"`
 	CreatedAt        time.Time                   `db:"created_at" json:"created_at"`
 	DeletedAt        *time.Time                  `db:"deleted_at" json:"deleted_at"`
 }
