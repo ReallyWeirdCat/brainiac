@@ -18,7 +18,7 @@ CREATE DOMAIN completion_condition_enum AS SMALLINT
 CREATE DOMAIN subject_status_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2, 3));
 
--- grade_enum: 0=unspecified, 1=very_poor, 2=poor, 3=satisfactory 4=good 5=very_good
+-- grade_enum: 0=unspecified, 1=very_poor, 2=poor, 3=satisfactory, 4=good, 5=very_good
 CREATE DOMAIN grade_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2, 3, 4, 5));
 
