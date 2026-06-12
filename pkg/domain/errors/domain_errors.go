@@ -18,7 +18,12 @@
 package errors
 
 var (
-	ErrInvalidUsername = NewDomainError("invalid username format", nil).WithType(Validation)
-	ErrInvalidEmail = NewDomainError("invalid email format", nil).WithType(Validation)
-	ErrInvalidGUID = NewDomainError("invalid GUID format", nil).WithType(Validation)
+	ErrInvalidUsername     = NewDomainError("invalid username format", nil).WithType(Validation)
+	ErrInvalidEmail        = NewDomainError("invalid email format", nil).WithType(Validation)
+	ErrInvalidGUID         = NewDomainError("invalid GUID format", nil).WithType(Validation)
+	ErrInvalidName         = NewDomainError("invalid name format", nil).WithType(Validation)
+	ErrInvalidNickname     = NewDomainError("invalid nickname format", nil).WithType(Validation)
+	ErrInvalidBio          = NewDomainError("invalid bio format", nil).WithType(Validation)
+	ErrInvalidLanguageCode = NewDomainError("invalid language code format", nil).WithType(Validation)
+	ErrInvalidHttpUrl      = NewDomainError("invalid HTTP URL format", nil).WithType(Validation)
 )

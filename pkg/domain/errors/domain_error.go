@@ -20,6 +20,7 @@ package errors
 import "fmt"
 
 type DomainErrorType int16
+
 const (
 	Unspecified DomainErrorType = iota
 	Validation
@@ -58,7 +59,7 @@ func (d DomainErrorType) String() string {
 }
 
 type DomainError struct {
-	errtype    DomainErrorType
+	errtype DomainErrorType
 	message string
 	err     error
 }
@@ -87,10 +88,10 @@ func (d DomainError) Error() string {
 }
 
 func (e DomainError) Is(target error) bool {
-    if t, ok := target.(DomainError); ok {
-        return e.errtype == t.errtype
-    }
-    return false
+	if t, ok := target.(DomainError); ok {
+		return e.errtype == t.errtype
+	}
+	return false
 }
 
 func (d DomainError) Unwrap() error {

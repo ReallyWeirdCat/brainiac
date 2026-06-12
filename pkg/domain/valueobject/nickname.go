@@ -18,9 +18,10 @@
 package valueobject
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var nicknamePattern = regexp.MustCompile(`^[\p{L}\p{N}_ ]{3,30}$`)
@@ -38,7 +39,7 @@ func NewNickname(nickname string) (Nickname, error) {
 	sanitized := strings.TrimSpace(nickname)
 
 	if !nicknamePattern.MatchString(sanitized) {
-		return Nickname{}, fmt.Errorf("nickname must be between 3 and 30 characters and only contain language characters, underscores, spaces and numbers %q", nickname)
+		return Nickname{}, errors.ErrInvalidNickname
 	}
 	return Nickname{value: sanitized}, nil
 }

@@ -20,7 +20,7 @@ package valueobject
 import (
 	"regexp"
 
-	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 // usernamePattern: only latin letters (a-z, A-Z), digits, underscores; length 3-18.
@@ -36,7 +36,7 @@ var _ ValueObject = Username{}
 // NewUsername creates a Username after validation.
 func NewUsername(name string) (Username, error) {
 	if !usernamePattern.MatchString(name) {
-		return Username{}, &domerr.ErrInvalidUsername
+		return Username{}, &errors.ErrInvalidUsername
 	}
 	return Username{value: name}, nil
 }

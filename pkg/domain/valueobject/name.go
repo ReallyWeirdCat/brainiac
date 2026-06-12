@@ -18,8 +18,9 @@
 package valueobject
 
 import (
-	"fmt"
 	"regexp"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var namePattern = regexp.MustCompile(`^[\p{L}\p{M} -]{1,70}$`)
@@ -34,7 +35,7 @@ var _ ValueObject = Name{}
 // NewName creates a Name after validation.
 func NewName(name string) (Name, error) {
 	if !namePattern.MatchString(name) {
-		return Name{}, fmt.Errorf("Names, surnames and patronymics must be between 1 and 80 characters with no special symbols, got %q", name)
+		return Name{}, errors.ErrInvalidName
 	}
 	return Name{value: name}, nil
 }

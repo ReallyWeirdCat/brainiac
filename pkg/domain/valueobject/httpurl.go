@@ -18,9 +18,10 @@
 package valueobject
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 // HttpUrl represents a validated HTTP/HTTPS URL.
@@ -37,7 +38,7 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 	sanitized := strings.TrimSpace(rawUrl)
 
 	if sanitized == "" {
-		return HttpUrl{}, fmt.Errorf("URL cannot be empty")
+		return HttpUrl{}, errors.ErrInvalidHttpUrl
 	}
 
 	// Check if URL has a scheme; if not, add https://
@@ -47,15 +48,15 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 
 	parsed, err := url.Parse(sanitized)
 	if err != nil {
-		return HttpUrl{}, fmt.Errorf("invalid URL format: %q", sanitized)
+		return HttpUrl{}, errors.ErrInvalidHttpUrl
 	}
 
 	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return HttpUrl{}, fmt.Errorf("URL must have http or https scheme, got %q", parsed.Scheme)
+		return HttpUrl{}, errors.ErrInvalidHttpUrl
 	}
 
 	if parsed.Host == "" {
-		return HttpUrl{}, fmt.Errorf("URL must contain a host, got %q", sanitized)
+		return HttpUrl{}, errors.ErrInvalidHttpUrl
 	}
 
 	// Reconstruct the URL to ensure consistent formatting

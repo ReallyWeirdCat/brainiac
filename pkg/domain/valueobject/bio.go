@@ -18,9 +18,10 @@
 package valueobject
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var urlPattern = regexp.MustCompile(`\b(?:https?|ftp|file|sftp|ws|wss)://`)
@@ -39,16 +40,16 @@ func NewBio(bio string) (Bio, error) {
 
 	// Check length
 	if len(sanitized) < 1 || len(sanitized) > 175 {
-		return Bio{}, fmt.Errorf("bios must be between 1 and 175 characters, got %d characters", len(sanitized))
+		return Bio{}, &errors.ErrInvalidBio
 	}
 
 	// Check for @ symbol
 	if strings.Contains(sanitized, "@") {
-		return Bio{}, fmt.Errorf("bios cannot contain @ symbol, got %q", sanitized)
+		return Bio{}, &errors.ErrInvalidBio
 	}
 
 	if urlPattern.MatchString(sanitized) {
-		return Bio{}, fmt.Errorf("bios must not contain URLs or emails, got %q", sanitized)
+		return Bio{}, &errors.ErrInvalidBio
 	}
 	return Bio{value: sanitized}, nil
 }

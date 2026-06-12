@@ -18,9 +18,10 @@
 package valueobject
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var languageCodePattern = regexp.MustCompile(`^[a-z]{2}$`)
@@ -38,7 +39,7 @@ func NewLanguageCode(languageCode string) (LanguageCode, error) {
 	sanitized := strings.ToLower(languageCode)
 
 	if !languageCodePattern.MatchString(sanitized) {
-		return LanguageCode{}, fmt.Errorf("%q is not a valid language code", sanitized)
+		return LanguageCode{}, errors.ErrInvalidLanguageCode
 	}
 	return LanguageCode{value: sanitized}, nil
 }
