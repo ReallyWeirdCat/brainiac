@@ -24,6 +24,8 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+var _ Entity = &AppUserProfile{}
+
 type AppUserProfile struct {
 	AppUserGUID       valueobject.GUID
 	Name              *valueobject.Name
@@ -40,6 +42,36 @@ type AppUserProfile struct {
 }
 
 func (a *AppUserProfile) IsValid() bool {
-	return a.AppUserGUID.IsValid() && a.Name.IsValid() && a.Surname.IsValid() && a.Patronymic.IsValid() && a.Nickname.IsValid() && a.Bio.IsValid() && a.PreferredLanguage.IsValid() &&
-		a.ProfileDisovery.IsValid() && a.AvatarUrl.IsValid()
+    if !a.AppUserGUID.IsValid() {
+        return false
+    }
+    // Required fields (non-nil and valid)
+    if a.Name != nil && !a.Name.IsValid() {
+        return false
+    }
+    if a.Surname != nil && !a.Surname.IsValid() {
+        return false
+    }
+    if a.Patronymic != nil && !a.Patronymic.IsValid() {
+        return false
+    }
+    if a.Nickname != nil && !a.Nickname.IsValid() {
+        return false
+    }
+    if a.Bio != nil && !a.Bio.IsValid() {
+        return false
+    }
+    if !a.PreferredLanguage.IsValid() {
+        return false
+    }
+    if !a.ProfileDisovery.IsValid() {
+        return false
+    }
+    if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {
+        return false
+    }
+    if a.CreatedAt.IsZero() {
+        return false
+    }
+    return true
 }

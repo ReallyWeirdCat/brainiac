@@ -35,6 +35,20 @@ type AppUserSession struct {
 	DeletedAt   *time.Time
 }
 
+var _ Entity = &AppUserSession{}
+
 func (a *AppUserSession) IsValid() bool {
-	return a.GUID.IsValid() && a.AppUserGUID.IsValid()
+    if !a.GUID.IsValid() {
+        return false
+    }
+    if !a.AppUserGUID.IsValid() {
+        return false
+    }
+    if a.LastSeenAt.IsZero() {
+        return false
+    }
+    if a.CreatedAt.IsZero() {
+        return false
+    }
+    return true
 }

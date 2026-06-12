@@ -20,28 +20,43 @@ package entity
 import (
 	"time"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type TOTPSecret struct {
-	AppUserGUID  valueobject.GUID
-	SecretBase32 string
-	LastUsedAt   *time.Time
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+type Notification struct {
+	GUID        valueobject.GUID
+	AppUserGUID valueobject.GUID
+	TitleI18n   valueobject.I18nText
+	ContentI18n *valueobject.I18nText
+	ResourceURL *valueobject.HttpUrl
+	Urgency     enum.UrgencyEnum
+	Meta        *valueobject.Metadata
+	SeenAt      *time.Time
+	ExpireAt    *time.Time
+	CreatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
-var _ Entity = &TOTPSecret{}
+var _ Entity = Notification{}
 
-func (t *TOTPSecret) IsValid() bool {
-    if !t.AppUserGUID.IsValid() {
+func (n Notification) IsValid() bool {
+    if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() ||
+        !n.TitleI18n.IsValid() || !n.Urgency.IsValid() {
         return false
     }
-    if len(t.SecretBase32) != 64 {
+    if n.ContentI18n != nil && !n.ContentI18n.IsValid() {
         return false
     }
-    if t.CreatedAt.IsZero() {
+    if n.ResourceURL != nil && !n.ResourceURL.IsValid() {
         return false
     }
+    if n.Meta != nil && !n.Meta.IsValid() {
+        return false
+    }
+    if n.CreatedAt.IsZero() {
+        return false
+    }
+
     return true
 }

@@ -33,6 +33,20 @@ type AppUserSuspension struct {
 	DeletedAt   *time.Time
 }
 
+var _ Entity = &AppUserSuspension{}
+
 func (a *AppUserSuspension) IsValid() bool {
-	return a.GUID.IsValid() && a.AppUserGUID.IsValid()
+    if !a.GUID.IsValid() {
+        return false
+    }
+    if !a.AppUserGUID.IsValid() {
+        return false
+    }
+    if a.Reason == "" {
+        return false
+    }
+    if a.CreatedAt.IsZero() {
+        return false
+    }
+    return true
 }

@@ -17,31 +17,6 @@
 
 package entity
 
-import (
-	"time"
-
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
-)
-
-type TOTPSecret struct {
-	AppUserGUID  valueobject.GUID
-	SecretBase32 string
-	LastUsedAt   *time.Time
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
-}
-
-var _ Entity = &TOTPSecret{}
-
-func (t *TOTPSecret) IsValid() bool {
-    if !t.AppUserGUID.IsValid() {
-        return false
-    }
-    if len(t.SecretBase32) != 64 {
-        return false
-    }
-    if t.CreatedAt.IsZero() {
-        return false
-    }
-    return true
+type Entity interface {
+	IsValid() bool
 }

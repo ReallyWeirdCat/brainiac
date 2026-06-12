@@ -30,6 +30,17 @@ type AppUser struct {
 	DeletedAt *time.Time
 }
 
+var _ Entity = &AppUser{}
+
 func (a *AppUser) IsValid() bool {
-	return a.GUID.IsValid() && a.Username.IsValid()
+    if !a.GUID.IsValid() {
+        return false
+    }
+    if !a.Username.IsValid() {
+        return false
+    }
+    if a.CreatedAt.IsZero() {
+        return false
+    }
+    return true
 }

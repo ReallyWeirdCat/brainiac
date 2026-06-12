@@ -31,11 +31,20 @@ type AppUserCredential struct {
 	DeletedAt    *time.Time
 }
 
+var _ Entity = &AppUserCredential{}
+
 func (a *AppUserCredential) IsValid() bool {
-
-	if a.PasswordHash == "" || len(a.PasswordHash) != 60 {
-		return false
-	}
-
-	return a.AppUserGUID.IsValid() && a.Email.IsValid()
+    if a.PasswordHash == "" || len(a.PasswordHash) != 60 {
+        return false
+    }
+    if !a.AppUserGUID.IsValid() {
+        return false
+    }
+    if a.Email != nil && !a.Email.IsValid() {
+        return false
+    }
+    if a.CreatedAt.IsZero() {
+        return false
+    }
+    return true
 }
