@@ -25,20 +25,20 @@ import (
 )
 
 type AppUserProfile struct {
-	AppUserGUID      valueobject.GUID
-	Name *valueobject.Name
-	Surname *valueobject.Name
-	Patronymic *valueobject.Name
-	Nickname *valueobject.Nickname
-	Bio *string  // TODO: implement value object
+	AppUserGUID       valueobject.GUID
+	Name              *valueobject.Name
+	Surname           *valueobject.Name
+	Patronymic        *valueobject.Name
+	Nickname          *valueobject.Nickname
+	Bio               *valueobject.Bio
 	PreferredLanguage valueobject.LanguageCode
-	ProfileDisovery enum.ProfileDiscoveryEnum
-	AvatarUrl *string  // TODO: implement url value object
-	EditingLockedAt *time.Time
-	CreatedAt time.Time
-	DeletedAt *time.Time
+	ProfileDisovery   enum.ProfileDiscoveryEnum
+	AvatarUrl         *valueobject.HttpUrl
+	EditingLockedAt   *time.Time
+	CreatedAt         time.Time
+	DeletedAt         *time.Time
 }
 
 func (a *AppUserProfile) IsValid() bool {
-    return a.AppUserGUID != nil
+	return a.AppUserGUID != nil
 }

@@ -81,7 +81,7 @@ func TestNewLanguageCode(t *testing.T) {
 			want:    LanguageCode{value: "ar"},
 			wantErr: false,
 		},
-		
+
 		// Valid cases with uppercasing (should be sanitized to lowercase)
 		{
 			name:    "valid uppercase becomes lowercase",
@@ -101,7 +101,7 @@ func TestNewLanguageCode(t *testing.T) {
 			want:    LanguageCode{value: "fr"},
 			wantErr: false,
 		},
-		
+
 		// Invalid cases - wrong length
 		{
 			name:    "invalid empty string",
@@ -127,7 +127,7 @@ func TestNewLanguageCode(t *testing.T) {
 			want:    LanguageCode{},
 			wantErr: true,
 		},
-		
+
 		// Invalid cases - wrong characters
 		{
 			name:    "invalid contains number",
@@ -159,7 +159,7 @@ func TestNewLanguageCode(t *testing.T) {
 			want:    LanguageCode{},
 			wantErr: true,
 		},
-		
+
 		// Invalid cases - non-Latin characters
 		{
 			name:    "invalid cyrillic letters",
@@ -179,7 +179,7 @@ func TestNewLanguageCode(t *testing.T) {
 			want:    LanguageCode{},
 			wantErr: true,
 		},
-		
+
 		// Invalid cases - whitespace
 		{
 			name:    "invalid leading space",

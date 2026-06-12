@@ -23,25 +23,35 @@ import (
 	"strings"
 )
 
-var languageCodePattern = regexp.MustCompile(`^[a-z]{2}$`)
+var urlPattern = regexp.MustCompile(`\b(?:https?|ftp|file|sftp|ws|wss)://`)
 
-// LanguageCode represents a validated language code.
-type LanguageCode struct {
+// Bio represents a validated bio.
+type Bio struct {
 	value string
 }
 
-// NewLanguageCode creates a LanguageCode after validation.
-func NewLanguageCode(languageCode string) (LanguageCode, error) {
+// NewBio creates a Bio after validation.
+func NewBio(bio string) (Bio, error) {
 
-	sanitized := strings.ToLower(languageCode)
+	sanitized := strings.TrimSpace(bio)
 
-	if !languageCodePattern.MatchString(sanitized) {
-		return LanguageCode{}, fmt.Errorf("%q is not a valid language code", sanitized)
+	// Check length
+	if len(sanitized) < 1 || len(sanitized) > 175 {
+		return Bio{}, fmt.Errorf("bios must be between 1 and 175 characters, got %d characters", len(sanitized))
 	}
-	return LanguageCode{value: sanitized}, nil
+
+	// Check for @ symbol
+	if strings.Contains(sanitized, "@") {
+		return Bio{}, fmt.Errorf("bios cannot contain @ symbol, got %q", sanitized)
+	}
+
+	if urlPattern.MatchString(sanitized) {
+		return Bio{}, fmt.Errorf("bios must not contain URLs or emails, got %q", sanitized)
+	}
+	return Bio{value: sanitized}, nil
 }
 
-// String returns the language code string.
-func (l LanguageCode) String() string {
-	return l.value
+// String returns the bio string.
+func (b Bio) String() string {
+	return b.value
 }
