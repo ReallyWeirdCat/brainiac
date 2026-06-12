@@ -41,7 +41,7 @@ func TestNewName(t *testing.T) {
 		{"valid name with multiple spaces", "John  Michael  Doe", false},
 		{"valid name with trailing space", "John ", false},
 		{"valid name with leading space", " John", false},
-		{"valid length name", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false},  // 70 characters
+		{"valid length name", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false}, // 70 characters
 		// Invalid names
 		{"empty string", "", true},
 		{"too long string", string(make([]byte, 71)), true},
@@ -60,7 +60,7 @@ func TestNewName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := NewName(tt.input)
-			
+
 			if tt.wantError {
 				if err == nil {
 					t.Errorf("NewName(%q) expected error but got none", tt.input)
@@ -83,7 +83,7 @@ func TestNameString(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create name: %v", err)
 	}
-	
+
 	if n.String() != name {
 		t.Errorf("String() = %q, want %q", n.String(), name)
 	}
@@ -95,11 +95,11 @@ func TestNameImmutability(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create name: %v", err)
 	}
-	
+
 	// Try to modify the returned value (should not affect the struct)
 	modified := n.String()
 	modified = "Jane Smith"
-	
+
 	if n.String() == modified {
 		t.Errorf("Name was modified, got %q, want %q", n.String(), original)
 	}
@@ -109,11 +109,11 @@ func TestNameEquality(t *testing.T) {
 	name1, _ := NewName("John Doe")
 	name2, _ := NewName("John Doe")
 	name3, _ := NewName("Jane Doe")
-	
+
 	if name1.String() != name2.String() {
 		t.Errorf("Names with same value should be equal, got %q and %q", name1.String(), name2.String())
 	}
-	
+
 	if name1.String() == name3.String() {
 		t.Errorf("Names with different values should not be equal, got %q and %q", name1.String(), name3.String())
 	}

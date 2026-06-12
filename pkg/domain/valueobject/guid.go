@@ -18,12 +18,12 @@
 package valueobject
 
 type Provider interface {
-    New() GUID
-    Parse(s string) (GUID, error)
+	New() GUID
+	Parse(s string) (GUID, error)
 }
 
 type GUID interface {
-    String() string
+	String() string
 	IsNil() bool
 	Equals(other GUID) bool
 	IsValid() bool

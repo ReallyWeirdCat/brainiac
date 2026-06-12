@@ -38,7 +38,7 @@ func TestNewUsername(t *testing.T) {
 		{"valid max length", "abcdefghijklmnopqr", false}, // 18 characters
 		{"valid alphanumeric", "abc123def456", false},
 		{"valid complex", "A1_B2_C3", false},
-		
+
 		// Invalid usernames
 		{"empty string", "", true},
 		{"too short", "ab", true},
@@ -83,7 +83,7 @@ func TestNewUsername(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := NewUsername(tt.input)
-			
+
 			if tt.wantError {
 				if err == nil {
 					t.Errorf("NewUsername(%q) expected error but got none", tt.input)
@@ -106,7 +106,7 @@ func TestUsernameString(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create username: %v", err)
 	}
-	
+
 	if u.String() != username {
 		t.Errorf("String() = %q, want %q", u.String(), username)
 	}
@@ -118,11 +118,11 @@ func TestUsernameImmutability(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create username: %v", err)
 	}
-	
+
 	// Try to modify the returned value
 	modified := u.String()
 	modified = "hacked_user"
-	
+
 	if u.String() == modified {
 		t.Errorf("Username was modified, got %q, want %q", u.String(), original)
 	}
@@ -132,11 +132,11 @@ func TestUsernameEquality(t *testing.T) {
 	user1, _ := NewUsername("john_doe")
 	user2, _ := NewUsername("john_doe")
 	user3, _ := NewUsername("jane_doe")
-	
+
 	if user1.String() != user2.String() {
 		t.Errorf("Usernames with same value should be equal, got %q and %q", user1.String(), user2.String())
 	}
-	
+
 	if user1.String() == user3.String() {
 		t.Errorf("Usernames with different values should not be equal, got %q and %q", user1.String(), user3.String())
 	}
@@ -146,16 +146,16 @@ func TestUsernameCaseSensitivity(t *testing.T) {
 	lowerCase, _ := NewUsername("john_doe")
 	upperCase, _ := NewUsername("JOHN_DOE")
 	mixedCase, _ := NewUsername("John_Doe")
-	
+
 	// Usernames should be case-sensitive
 	if lowerCase.String() == upperCase.String() {
 		t.Error("Usernames should be case-sensitive, but lowercase and uppercase are considered equal")
 	}
-	
+
 	if lowerCase.String() == mixedCase.String() {
 		t.Error("Usernames should be case-sensitive, but lowercase and mixed-case are considered equal")
 	}
-	
+
 	if upperCase.String() == mixedCase.String() {
 		t.Error("Usernames should be case-sensitive, but uppercase and mixed-case are considered equal")
 	}
@@ -168,20 +168,20 @@ func TestUsernameBoundaryConditions(t *testing.T) {
 	if err != nil {
 		t.Errorf("Should accept 3-character username, got error: %v", err)
 	}
-	
+
 	// Test below minimum length (2 characters)
 	_, err = NewUsername("ab")
 	if err == nil {
 		t.Error("Should reject 2-character username")
 	}
-	
+
 	// Test maximum length (18 characters)
 	maxUsername := "abcdefghijklmnopqr" // 18 characters
 	_, err = NewUsername(maxUsername)
 	if err != nil {
 		t.Errorf("Should accept 18-character username, got error: %v", err)
 	}
-	
+
 	// Test above maximum length (19 characters)
 	tooLong := maxUsername + "s" // 19 characters
 	_, err = NewUsername(tooLong)
@@ -193,11 +193,11 @@ func TestUsernameBoundaryConditions(t *testing.T) {
 func TestUsernameErrorFormat(t *testing.T) {
 	invalidUsername := "invalid username!"
 	_, err := NewUsername(invalidUsername)
-	
+
 	if err == nil {
 		t.Fatal("Expected error for invalid username")
 	}
-	
+
 	expectedErrorSubstring := "invalid username format"
 	if !contains(err.Error(), expectedErrorSubstring) {
 		t.Errorf("Error message does not contain expected text.\nGot: %q\nWant to contain: %q", err.Error(), expectedErrorSubstring)
@@ -206,7 +206,7 @@ func TestUsernameErrorFormat(t *testing.T) {
 
 // Helper function
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || 
+	return len(s) >= len(substr) && (s == substr || len(substr) == 0 ||
 		(len(s) > 0 && len(substr) > 0 && findSubstring(s, substr)))
 }
 

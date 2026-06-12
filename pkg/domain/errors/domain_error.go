@@ -21,7 +21,7 @@ import "fmt"
 
 type DomainError struct {
 	Message string
-	Err error
+	Err     error
 }
 
 func NewDomainError(message string, err error) DomainError {
@@ -29,12 +29,12 @@ func NewDomainError(message string, err error) DomainError {
 }
 
 func (e *DomainError) Error() string {
-    if e.Err != nil {
-        return fmt.Sprintf("domain error: %s: %v", e.Message, e.Err)
-    }
-    return fmt.Sprintf("domain error: %s", e.Message)
+	if e.Err != nil {
+		return fmt.Sprintf("domain error: %s: %v", e.Message, e.Err)
+	}
+	return fmt.Sprintf("domain error: %s", e.Message)
 }
 
 func (e *DomainError) Unwrap() error {
-    return e.Err
+	return e.Err
 }

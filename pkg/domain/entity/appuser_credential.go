@@ -24,18 +24,18 @@ import (
 )
 
 type AppUserCredential struct {
-	AppUserGUID valueobject.GUID
-	Email *valueobject.Email
-	PasswordHash string	
-	CreatedAt time.Time
-	DeletedAt *time.Time
+	AppUserGUID  valueobject.GUID
+	Email        *valueobject.Email
+	PasswordHash string
+	CreatedAt    time.Time
+	DeletedAt    *time.Time
 }
 
 func (a *AppUserCredential) IsValid() bool {
 
 	if a.PasswordHash == "" || len(a.PasswordHash) != 60 {
-		return false 
-	} 
+		return false
+	}
 
-	return true 
+	return true
 }

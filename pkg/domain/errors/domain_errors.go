@@ -19,6 +19,6 @@ package errors
 
 var (
 	ErrInvalidUsername = DomainError{Message: "invalid username format"}
-	ErrInvalidEmail = DomainError{Message: "invalid email format"}
-	ErrInvalidGUID = DomainError{Message: "invalid GUID format"}
+	ErrInvalidEmail    = DomainError{Message: "invalid email format"}
+	ErrInvalidGUID     = DomainError{Message: "invalid GUID format"}
 )

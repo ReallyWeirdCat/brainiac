@@ -36,24 +36,24 @@ func NewEmail(email string) (*Email, error) {
 
 	if err != nil {
 		return nil, &errors.ErrInvalidEmail
-	} 
+	}
 
 	// Extract domain from parsed email
-    parts := strings.Split(parsed.Address, "@")
-    if len(parts) != 2 {
-        return nil, &errors.ErrInvalidEmail
-    }
-    
-    domain := parts[1]
-    
-    // Check if domain contains a dot
-    if !strings.Contains(domain, ".") {
-        return nil, &errors.ErrInvalidEmail
-    }
+	parts := strings.Split(parsed.Address, "@")
+	if len(parts) != 2 {
+		return nil, &errors.ErrInvalidEmail
+	}
+
+	domain := parts[1]
+
+	// Check if domain contains a dot
+	if !strings.Contains(domain, ".") {
+		return nil, &errors.ErrInvalidEmail
+	}
 
 	return &Email{value: sanitized}, nil
 }
 
 func (e Email) String() string {
 	return e.value
-} 
+}
