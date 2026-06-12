@@ -37,5 +37,5 @@ func (a *AppUserCredential) IsValid() bool {
 		return false
 	}
 
-	return true
+	return a.AppUserGUID.IsValid() && a.Email.IsValid()
 }

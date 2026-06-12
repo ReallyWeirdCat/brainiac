@@ -50,7 +50,7 @@ func (e ProfileDiscoveryEnum) String() string {
 	}
 }
 
-func (e ProfileDiscoveryEnum) Valid() bool {
+func (e ProfileDiscoveryEnum) IsValid() bool {
 	return e >= 0 && e <= 5
 }
 

@@ -44,7 +44,7 @@ func (e CompletionConditionEnum) String() string {
 	}
 }
 
-func (e CompletionConditionEnum) Valid() bool {
+func (e CompletionConditionEnum) IsValid() bool {
 	return e >= 0 && e <= 3
 }
 

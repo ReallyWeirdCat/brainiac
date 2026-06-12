@@ -30,6 +30,8 @@ type Bio struct {
 	value string
 }
 
+var _ ValueObject = Bio{}
+
 // NewBio creates a Bio after validation.
 func NewBio(bio string) (Bio, error) {
 
@@ -54,4 +56,23 @@ func NewBio(bio string) (Bio, error) {
 // String returns the bio string.
 func (b Bio) String() string {
 	return b.value
+}
+
+// Equals returns true if the other object is a Bio with the same value.
+func (b Bio) Equals(other any) bool {
+	otherBio, ok := other.(Bio)
+	if !ok {
+		return false
+	}
+	return b.value == otherBio.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (b Bio) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the Bio is the zero value (empty string).
+func (b Bio) IsZero() bool {
+	return b.value == ""
 }

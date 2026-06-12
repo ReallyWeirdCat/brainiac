@@ -50,7 +50,7 @@ func (e GradeEnum) String() string {
 	}
 }
 
-func (e GradeEnum) Valid() bool {
+func (e GradeEnum) IsValid() bool {
 	return e >= 0 && e <= 5
 }
 

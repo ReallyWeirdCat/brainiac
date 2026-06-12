@@ -50,7 +50,7 @@ func (e RarityEnum) String() string {
 	}
 }
 
-func (e RarityEnum) Valid() bool {
+func (e RarityEnum) IsValid() bool {
 	return e >= 0 && e <= 5
 }
 

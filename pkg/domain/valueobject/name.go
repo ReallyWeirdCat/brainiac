@@ -29,6 +29,8 @@ type Name struct {
 	value string
 }
 
+var _ ValueObject = Name{}
+
 // NewName creates a Name after validation.
 func NewName(name string) (Name, error) {
 	if !namePattern.MatchString(name) {
@@ -40,4 +42,23 @@ func NewName(name string) (Name, error) {
 // String returns the name string.
 func (n Name) String() string {
 	return n.value
+}
+
+// Equals returns true if the other object is a Name with the same value.
+func (n Name) Equals(other any) bool {
+	otherName, ok := other.(Name)
+	if !ok {
+		return false
+	}
+	return n.value == otherName.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (n Name) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the Name is the zero value (empty string).
+func (n Name) IsZero() bool {
+	return n.value == ""
 }

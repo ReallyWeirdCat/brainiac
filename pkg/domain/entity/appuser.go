@@ -31,5 +31,5 @@ type AppUser struct {
 }
 
 func (a *AppUser) IsValid() bool {
-	return a.GUID != nil
+	return a.GUID.IsValid() && a.Username.IsValid()
 }

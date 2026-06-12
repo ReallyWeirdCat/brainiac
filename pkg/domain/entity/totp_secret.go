@@ -32,5 +32,9 @@ type TOTPSecret struct {
 }
 
 func (t *TOTPSecret) IsValid() bool {
-	return len(t.SecretBase32) == 64
+	if len(t.SecretBase32) != 64 {
+		return false
+	}
+
+	return t.AppUserGUID.IsValid()
 }

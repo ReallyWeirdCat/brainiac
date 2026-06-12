@@ -44,7 +44,7 @@ func (e SubjectDocTypeEnum) String() string {
 	}
 }
 
-func (e SubjectDocTypeEnum) Valid() bool {
+func (e SubjectDocTypeEnum) IsValid() bool {
 	return e >= 0 && e <= 3
 }
 

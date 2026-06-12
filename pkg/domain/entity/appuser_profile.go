@@ -40,5 +40,6 @@ type AppUserProfile struct {
 }
 
 func (a *AppUserProfile) IsValid() bool {
-	return a.AppUserGUID != nil
+	return a.AppUserGUID.IsValid() && a.Name.IsValid() && a.Surname.IsValid() && a.Patronymic.IsValid() && a.Nickname.IsValid() && a.Bio.IsValid() && a.PreferredLanguage.IsValid() &&
+		a.ProfileDisovery.IsValid() && a.AvatarUrl.IsValid()
 }

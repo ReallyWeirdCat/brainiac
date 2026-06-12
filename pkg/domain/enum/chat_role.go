@@ -41,7 +41,7 @@ func (e ChatRoleEnum) String() string {
 	}
 }
 
-func (e ChatRoleEnum) Valid() bool {
+func (e ChatRoleEnum) IsValid() bool {
 	return e >= 0 && e <= 2
 }
 

@@ -15,37 +15,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package enum
+package entity
 
-// UrgencyEnum represents urgency level (0=low, 1=normal, 2=important)
-type UrgencyEnum int16
+import (
+	"time"
 
-const (
-	LowUrgency       UrgencyEnum = 0
-	NormalUrgency    UrgencyEnum = 1
-	ImportantUrgency UrgencyEnum = 2
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-var _ Enum = (*UrgencyEnum)(nil)
-
-func (e UrgencyEnum) String() string {
-	switch e {
-	case LowUrgency:
-		return "low"
-	case NormalUrgency:
-		return "normal"
-	case ImportantUrgency:
-		return "important"
-	default:
-		return "unknown"
-	}
+type AppUserSession struct {
+	GUID        valueobject.GUID
+	AppUserGUID valueobject.GUID
+	LastIPv4    *string
+	LastIPv6    *string
+	LastAgent   *string
+	LastSeenAt  time.Time
+	ExpireAt    *time.Time
+	CreatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
-func (e UrgencyEnum) IsValid() bool {
-	return e >= 0 && e <= 2
-}
-
-// Value returns the integer value for database operations
-func (e UrgencyEnum) Value() int16 {
-	return int16(e)
+func (a *AppUserSession) IsValid() bool {
+	return a.GUID.IsValid() && a.AppUserGUID.IsValid()
 }

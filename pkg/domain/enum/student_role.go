@@ -44,7 +44,7 @@ func (e StudentRoleEnum) String() string {
 	}
 }
 
-func (e StudentRoleEnum) Valid() bool {
+func (e StudentRoleEnum) IsValid() bool {
 	return e >= 0 && e <= 3
 }
 

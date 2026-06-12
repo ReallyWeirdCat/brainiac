@@ -30,6 +30,8 @@ type Nickname struct {
 	value string
 }
 
+var _ ValueObject = Nickname{}
+
 // NewNickname creates a Nickname after validation.
 func NewNickname(nickname string) (Nickname, error) {
 
@@ -44,4 +46,23 @@ func NewNickname(nickname string) (Nickname, error) {
 // String returns the username string.
 func (n Nickname) String() string {
 	return n.value
+}
+
+// Equals returns true if the other object is a Nickname with the same value.
+func (n Nickname) Equals(other any) bool {
+	otherNick, ok := other.(Nickname)
+	if !ok {
+		return false
+	}
+	return n.value == otherNick.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (n Nickname) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the Nickname is the zero value (empty string).
+func (n Nickname) IsZero() bool {
+	return n.value == ""
 }

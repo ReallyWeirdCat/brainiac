@@ -41,7 +41,7 @@ func (e AttemptStatusEnum) String() string {
 	}
 }
 
-func (e AttemptStatusEnum) Valid() bool {
+func (e AttemptStatusEnum) IsValid() bool {
 	return e >= 0 && e <= 2
 }
 

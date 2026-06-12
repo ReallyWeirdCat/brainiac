@@ -30,6 +30,8 @@ type LanguageCode struct {
 	value string
 }
 
+var _ ValueObject = LanguageCode{}
+
 // NewLanguageCode creates a LanguageCode after validation.
 func NewLanguageCode(languageCode string) (LanguageCode, error) {
 
@@ -44,4 +46,23 @@ func NewLanguageCode(languageCode string) (LanguageCode, error) {
 // String returns the language code string.
 func (l LanguageCode) String() string {
 	return l.value
+}
+
+// Equals returns true if the other object is a LanguageCode with the same value.
+func (l LanguageCode) Equals(other any) bool {
+	otherCode, ok := other.(LanguageCode)
+	if !ok {
+		return false
+	}
+	return l.value == otherCode.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (l LanguageCode) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the LanguageCode is the zero value (empty string).
+func (l LanguageCode) IsZero() bool {
+	return l.value == ""
 }

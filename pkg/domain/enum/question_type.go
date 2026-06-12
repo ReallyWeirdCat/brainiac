@@ -45,7 +45,7 @@ func (e QuestionTypeEnum) String() string {
 	}
 }
 
-func (e QuestionTypeEnum) Valid() bool {
+func (e QuestionTypeEnum) IsValid() bool {
 	return e >= 0 && e <= 2
 }
 

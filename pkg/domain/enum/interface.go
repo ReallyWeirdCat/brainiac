@@ -19,6 +19,6 @@ package enum
 
 type Enum interface {
 	String() string
-	Valid() bool
+	IsValid() bool
 	Value() int16
 }

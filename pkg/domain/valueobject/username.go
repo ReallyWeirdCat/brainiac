@@ -31,6 +31,8 @@ type Username struct {
 	value string
 }
 
+var _ ValueObject = Username{}
+
 // NewUsername creates a Username after validation.
 func NewUsername(name string) (Username, error) {
 	if !usernamePattern.MatchString(name) {
@@ -42,4 +44,23 @@ func NewUsername(name string) (Username, error) {
 // String returns the username string.
 func (u Username) String() string {
 	return u.value
+}
+
+// Equals returns true if the other object is a Username with the same value.
+func (u Username) Equals(other any) bool {
+	otherUser, ok := other.(Username)
+	if !ok {
+		return false
+	}
+	return u.value == otherUser.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (u Username) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the Username is the zero value (empty string).
+func (u Username) IsZero() bool {
+	return u.value == ""
 }

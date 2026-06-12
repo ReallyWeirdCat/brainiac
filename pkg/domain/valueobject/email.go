@@ -28,6 +28,8 @@ type Email struct {
 	value string
 }
 
+var _ ValueObject = (*Email)(nil)
+
 func NewEmail(email string) (*Email, error) {
 
 	sanitized := strings.TrimSpace(email)
@@ -56,4 +58,30 @@ func NewEmail(email string) (*Email, error) {
 
 func (e Email) String() string {
 	return e.value
+}
+
+// Equals returns true if the other object is an *Email with the same value.
+// A nil *Email is only equal to another nil *Email.
+func (e *Email) Equals(other any) bool {
+	if e == nil {
+		return other == nil
+	}
+	otherEmail, ok := other.(*Email)
+	if !ok {
+		return false
+	}
+	if otherEmail == nil {
+		return false
+	}
+	return e.value == otherEmail.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (e *Email) IsValid() bool {
+	return e != nil
+}
+
+// IsZero returns true if the Email is nil or contains an empty value.
+func (e *Email) IsZero() bool {
+	return e == nil || e.value == ""
 }

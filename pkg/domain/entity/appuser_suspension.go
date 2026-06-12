@@ -32,3 +32,7 @@ type AppUserSuspension struct {
 	CreatedAt   time.Time
 	DeletedAt   *time.Time
 }
+
+func (a *AppUserSuspension) IsValid() bool {
+	return a.GUID.IsValid() && a.AppUserGUID.IsValid()
+}

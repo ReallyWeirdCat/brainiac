@@ -29,6 +29,8 @@ type HttpUrl struct {
 	url   url.URL
 }
 
+var _ ValueObject = HttpUrl{}
+
 // NewHttpUrl creates an HttpUrl after validation and trimming.
 // If no scheme is provided, "https://" will be added automatically.
 func NewHttpUrl(rawUrl string) (HttpUrl, error) {
@@ -65,6 +67,25 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 // String returns the URL string.
 func (h HttpUrl) String() string {
 	return h.value
+}
+
+// Equals returns true if the other object is an HttpUrl with the same value.
+func (h HttpUrl) Equals(other any) bool {
+	otherUrl, ok := other.(HttpUrl)
+	if !ok {
+		return false
+	}
+	return h.value == otherUrl.value
+}
+
+// IsValid returns true because the constructor guarantees validity.
+func (h HttpUrl) IsValid() bool {
+	return true
+}
+
+// IsZero returns true if the HttpUrl is the zero value (empty URL).
+func (h HttpUrl) IsZero() bool {
+	return h.value == ""
 }
 
 func (h HttpUrl) Url() url.URL {

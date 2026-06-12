@@ -44,7 +44,7 @@ func (e ClassTypeEnum) String() string {
 	}
 }
 
-func (e ClassTypeEnum) Valid() bool {
+func (e ClassTypeEnum) IsValid() bool {
 	return e >= 0 && e <= 3
 }
 

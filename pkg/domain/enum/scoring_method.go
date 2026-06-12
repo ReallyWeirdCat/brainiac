@@ -45,7 +45,7 @@ func (e ScoringMethodEnum) String() string {
 	}
 }
 
-func (e ScoringMethodEnum) Valid() bool {
+func (e ScoringMethodEnum) IsValid() bool {
 	return e >= 0 && e <= 2
 }
 
