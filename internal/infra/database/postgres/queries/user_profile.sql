@@ -1,8 +1,3 @@
--- name: CreateAppUser :one
-INSERT INTO app_user(username)
-VALUES ($1)
-RETURNING *;
-
 -- name: CreateAppUserProfile :one
 INSERT INTO app_user_profile(
     app_user_guid,

@@ -1,3 +1,4 @@
+-- +goose Up
 -- ============================================================
 -- DOMAIN TYPES
 -- ============================================================
@@ -606,3 +607,57 @@ CREATE TABLE daily_activity (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
+
+-- +goose Down
+DROP TABLE IF EXISTS daily_activity CASCADE;
+DROP TABLE IF EXISTS message CASCADE;
+DROP TABLE IF EXISTS chat_member CASCADE;
+DROP TABLE IF EXISTS student_achievement CASCADE;
+DROP TABLE IF EXISTS notification CASCADE;
+DROP TABLE IF EXISTS course_subject_item CASCADE;
+DROP TABLE IF EXISTS inventory_slot CASCADE;
+DROP TABLE IF EXISTS item CASCADE;
+DROP TABLE IF EXISTS student_course_subject_submission_attempt CASCADE;
+DROP TABLE IF EXISTS student_course_subject_test_attempt CASCADE;
+DROP TABLE IF EXISTS student_course_subject CASCADE;
+DROP TABLE IF EXISTS student_course_stats CASCADE;
+DROP TABLE IF EXISTS course_subject_test_pass CASCADE;
+DROP TABLE IF EXISTS course_subject_test_question CASCADE;
+DROP TABLE IF EXISTS course_subject_test CASCADE;
+DROP TABLE IF EXISTS course_subject_doc_md CASCADE;
+DROP TABLE IF EXISTS course_subject_doc CASCADE;
+DROP TABLE IF EXISTS course_subject CASCADE;
+DROP TABLE IF EXISTS student_group_member_class_attendance CASCADE;
+DROP TABLE IF EXISTS student_group_class CASCADE;
+DROP TABLE IF EXISTS student_group_course CASCADE;
+DROP TABLE IF EXISTS student_group_member CASCADE;
+DROP TABLE IF EXISTS teacher_group CASCADE;
+DROP TABLE IF EXISTS chat CASCADE;
+DROP TABLE IF EXISTS student_group CASCADE;
+DROP TABLE IF EXISTS course_language CASCADE;
+DROP TABLE IF EXISTS course CASCADE;
+DROP TABLE IF EXISTS achievement CASCADE;
+DROP TABLE IF EXISTS language CASCADE;
+DROP TABLE IF EXISTS inventory CASCADE;
+DROP TABLE IF EXISTS student_global_stats CASCADE;
+DROP TABLE IF EXISTS teacher CASCADE;
+DROP TABLE IF EXISTS totp_secret CASCADE;
+DROP TABLE IF EXISTS app_user_session CASCADE;
+DROP TABLE IF EXISTS app_user_suspension CASCADE;
+DROP TABLE IF EXISTS app_user_profile CASCADE;
+DROP TABLE IF EXISTS app_user_credential CASCADE;
+DROP TABLE IF EXISTS app_user CASCADE;
+
+DROP DOMAIN IF EXISTS student_role_enum CASCADE;
+DROP DOMAIN IF EXISTS profile_discovery_enum CASCADE;
+DROP DOMAIN IF EXISTS rarity_enum CASCADE;
+DROP DOMAIN IF EXISTS urgency_enum CASCADE;
+DROP DOMAIN IF EXISTS chat_role_enum CASCADE;
+DROP DOMAIN IF EXISTS class_type_enum CASCADE;
+DROP DOMAIN IF EXISTS attempt_status_enum CASCADE;
+DROP DOMAIN IF EXISTS subject_doc_type_enum CASCADE;
+DROP DOMAIN IF EXISTS grade_enum CASCADE;
+DROP DOMAIN IF EXISTS subject_status_enum CASCADE;
+DROP DOMAIN IF EXISTS completion_condition_enum CASCADE;
+DROP DOMAIN IF EXISTS scoring_method_enum CASCADE;
+DROP DOMAIN IF EXISTS question_type_enum CASCADE;

@@ -1,12 +1,12 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "query.sql"
-    schema: "schema.sql"
+    queries: "./internal/infra/database/postgres/queries/"
+    schema: "./internal/infra/database/postgres/migrations/"
     gen:
       go:
-        package: "database"
-        out: "."
+        package: "generated"
+        out: "./internal/infra/database/postgres/generated"
         sql_package: "pgx/v5"
         emit_db_tags: true
         emit_prepared_queries: true
@@ -15,7 +15,7 @@ sql:
         emit_pointers_for_null_types: true
         emit_enum_valid_method: true
         emit_sql_as_comment: true
-        initialisms: ["id", "json", "api", "http", "totp"]
+        initialisms: ["id", "guid", "json", "api", "http", "totp"]
         json_tags_case_style: "snake"
         omit_unused_structs: true
         overrides:
@@ -32,7 +32,7 @@ sql:
               type: "UUID"
               pointer: true
 
-          # Time
+              # Time
           - db_type: "timestamp"
             nullable: false
             go_type:
@@ -52,7 +52,7 @@ sql:
               type: "time.Time"
               pointer: true
 
-          # JSONB
+              # JSONB
           - db_type: "jsonb"
             nullable: false
             go_type:
@@ -65,159 +65,159 @@ sql:
               type: "RawMessage"
               pointer: true
 
-          # Enums
+              # Enums
           - db_type: "question_type_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "QuestionTypeEnum"
           - db_type: "question_type_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "QuestionTypeEnum"
               pointer: true
-          
+
           - db_type: "scoring_method_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ScoringMethodEnum"
           - db_type: "scoring_method_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ScoringMethodEnum"
               pointer: true
-          
+
           - db_type: "completion_condition_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "CompletionConditionEnum"
           - db_type: "completion_condition_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "CompletionConditionEnum"
               pointer: true
-          
+
           - db_type: "subject_status_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "SubjectStatusEnum"
           - db_type: "subject_status_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "SubjectStatusEnum"
               pointer: true
-          
+
           - db_type: "subject_doc_type_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "SubjectDocTypeEnum"
           - db_type: "subject_doc_type_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "SubjectDocTypeEnum"
               pointer: true
-          
+
           - db_type: "attempt_status_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "AttemptStatusEnum"
           - db_type: "attempt_status_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "AttemptStatusEnum"
               pointer: true
-          
+
           - db_type: "grade_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "GradeEnum"
           - db_type: "grade_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "GradeEnum"
               pointer: true
-          
+
           - db_type: "class_type_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ClassTypeEnum"
           - db_type: "class_type_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ClassTypeEnum"
               pointer: true
-          
+
           - db_type: "chat_role_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ChatRoleEnum"
           - db_type: "chat_role_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ChatRoleEnum"
               pointer: true
-          
+
           - db_type: "urgency_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "UrgencyEnum"
           - db_type: "urgency_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "UrgencyEnum"
               pointer: true
-          
+
           - db_type: "rarity_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "RarityEnum"
           - db_type: "rarity_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "RarityEnum"
               pointer: true
-          
+
           - db_type: "profile_discovery_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ProfileDiscoveryEnum"
           - db_type: "profile_discovery_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "ProfileDiscoveryEnum"
               pointer: true
-          
+
           - db_type: "student_role_enum"
             nullable: false
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "StudentRoleEnum"
           - db_type: "student_role_enum"
             nullable: true
             go_type:
-              import: "github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "StudentRoleEnum"
               pointer: true

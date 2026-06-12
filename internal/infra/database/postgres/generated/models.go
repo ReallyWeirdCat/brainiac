@@ -2,24 +2,32 @@
 // versions:
 //   sqlc v1.31.1
 
-package database
+package generated
 
 import (
 	"time"
 
-	"github.com/ReallyWeirdCat/brainiac/internal/domain/enum"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/google/uuid"
 )
 
 type AppUser struct {
-	Guid      uuid.UUID  `db:"guid" json:"guid"`
+	GUID      uuid.UUID  `db:"guid" json:"guid"`
 	Username  string     `db:"username" json:"username"`
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
+type AppUserCredential struct {
+	AppUserGUID  uuid.UUID  `db:"app_user_guid" json:"app_user_guid"`
+	Email        *string    `db:"email" json:"email"`
+	PasswordHash string     `db:"password_hash" json:"password_hash"`
+	CreatedAt    time.Time  `db:"created_at" json:"created_at"`
+	DeletedAt    *time.Time `db:"deleted_at" json:"deleted_at"`
+}
+
 type AppUserProfile struct {
-	AppUserGuid       uuid.UUID                 `db:"app_user_guid" json:"app_user_guid"`
+	AppUserGUID       uuid.UUID                 `db:"app_user_guid" json:"app_user_guid"`
 	Name              *string                   `db:"name" json:"name"`
 	Surname           *string                   `db:"surname" json:"surname"`
 	Patronymic        *string                   `db:"patronymic" json:"patronymic"`
