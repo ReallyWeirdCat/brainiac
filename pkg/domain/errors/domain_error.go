@@ -19,22 +19,80 @@ package errors
 
 import "fmt"
 
-type DomainError struct {
-	Message string
-	Err     error
+type DomainErrorType int16
+const (
+	Unspecified DomainErrorType = iota
+	Validation
+	NotFound
+	Conflict
+	Forbidden
+	Unauthorized
+	InvalidState
+	LimitExceeded
+	PreconditionFailed
+)
+
+func (d DomainErrorType) String() string {
+	switch d {
+	case Unspecified:
+		return "unspecified"
+	case Validation:
+		return "validation"
+	case NotFound:
+		return "not_found"
+	case Conflict:
+		return "conflict"
+	case Forbidden:
+		return "forbidden"
+	case Unauthorized:
+		return "unauthorized"
+	case InvalidState:
+		return "invalid_state"
+	case LimitExceeded:
+		return "limit_exceeded"
+	case PreconditionFailed:
+		return "precondition_failed"
+	default:
+		return "unknown"
+	}
 }
+
+type DomainError struct {
+	errtype    DomainErrorType
+	message string
+	err     error
+}
+
+var _ error = DomainError{}
 
 func NewDomainError(message string, err error) DomainError {
-	return DomainError{Message: message, Err: err}
+	return DomainError{errtype: Unspecified, message: message, err: err}
 }
 
-func (e *DomainError) Error() string {
-	if e.Err != nil {
-		return fmt.Sprintf("domain error: %s: %v", e.Message, e.Err)
+func (d DomainError) WithType(error_type DomainErrorType) DomainError {
+	clone := d
+	clone.errtype = error_type
+	return clone
+}
+
+func (d DomainError) DomainErrorType() DomainErrorType {
+	return d.errtype
+}
+
+func (d DomainError) Error() string {
+	if d.err != nil {
+		return fmt.Sprintf("domain %s error: %s: %v", d.errtype.String(), d.message, d.err)
 	}
-	return fmt.Sprintf("domain error: %s", e.Message)
+	return fmt.Sprintf("domain %s error: %s", d.errtype.String(), d.message)
 }
 
-func (e *DomainError) Unwrap() error {
-	return e.Err
+func (e DomainError) Is(target error) bool {
+    if t, ok := target.(DomainError); ok {
+        return e.errtype == t.errtype
+    }
+    return false
+}
+
+func (d DomainError) Unwrap() error {
+	return d.err
 }

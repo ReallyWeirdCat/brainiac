@@ -18,7 +18,7 @@
 package errors
 
 var (
-	ErrInvalidUsername = DomainError{Message: "invalid username format"}
-	ErrInvalidEmail    = DomainError{Message: "invalid email format"}
-	ErrInvalidGUID     = DomainError{Message: "invalid GUID format"}
+	ErrInvalidUsername = NewDomainError("invalid username format", nil).WithType(Validation)
+	ErrInvalidEmail = NewDomainError("invalid email format", nil).WithType(Validation)
+	ErrInvalidGUID = NewDomainError("invalid GUID format", nil).WithType(Validation)
 )
