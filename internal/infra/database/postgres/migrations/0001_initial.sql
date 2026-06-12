@@ -123,7 +123,6 @@ CREATE TABLE app_user_session (
 -- 6. totp_secret
 CREATE TABLE totp_secret (
     app_user_guid UUID PRIMARY KEY REFERENCES app_user(guid),
-    secret BYTEA NOT NULL,
     secret_base32 VARCHAR(64) NOT NULL,
     last_used_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
