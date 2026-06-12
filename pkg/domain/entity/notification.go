@@ -41,22 +41,22 @@ type Notification struct {
 var _ Entity = Notification{}
 
 func (n Notification) IsValid() bool {
-    if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() ||
-        !n.TitleI18n.IsValid() || !n.Urgency.IsValid() {
-        return false
-    }
-    if n.ContentI18n != nil && !n.ContentI18n.IsValid() {
-        return false
-    }
-    if n.ResourceURL != nil && !n.ResourceURL.IsValid() {
-        return false
-    }
-    if n.Meta != nil && !n.Meta.IsValid() {
-        return false
-    }
-    if n.CreatedAt.IsZero() {
-        return false
-    }
+	if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() ||
+		!n.TitleI18n.IsValid() || !n.Urgency.IsValid() {
+		return false
+	}
+	if n.ContentI18n != nil && !n.ContentI18n.IsValid() {
+		return false
+	}
+	if n.ResourceURL != nil && !n.ResourceURL.IsValid() {
+		return false
+	}
+	if n.Meta != nil && !n.Meta.IsValid() {
+		return false
+	}
+	if n.CreatedAt.IsZero() {
+		return false
+	}
 
-    return true
+	return true
 }

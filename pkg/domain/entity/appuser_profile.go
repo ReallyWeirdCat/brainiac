@@ -42,36 +42,36 @@ type AppUserProfile struct {
 }
 
 func (a *AppUserProfile) IsValid() bool {
-    if !a.AppUserGUID.IsValid() {
-        return false
-    }
-    // Required fields (non-nil and valid)
-    if a.Name != nil && !a.Name.IsValid() {
-        return false
-    }
-    if a.Surname != nil && !a.Surname.IsValid() {
-        return false
-    }
-    if a.Patronymic != nil && !a.Patronymic.IsValid() {
-        return false
-    }
-    if a.Nickname != nil && !a.Nickname.IsValid() {
-        return false
-    }
-    if a.Bio != nil && !a.Bio.IsValid() {
-        return false
-    }
-    if !a.PreferredLanguage.IsValid() {
-        return false
-    }
-    if !a.ProfileDisovery.IsValid() {
-        return false
-    }
-    if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {
-        return false
-    }
-    if a.CreatedAt.IsZero() {
-        return false
-    }
-    return true
+	if !a.AppUserGUID.IsValid() {
+		return false
+	}
+	// Required fields (non-nil and valid)
+	if a.Name != nil && !a.Name.IsValid() {
+		return false
+	}
+	if a.Surname != nil && !a.Surname.IsValid() {
+		return false
+	}
+	if a.Patronymic != nil && !a.Patronymic.IsValid() {
+		return false
+	}
+	if a.Nickname != nil && !a.Nickname.IsValid() {
+		return false
+	}
+	if a.Bio != nil && !a.Bio.IsValid() {
+		return false
+	}
+	if !a.PreferredLanguage.IsValid() {
+		return false
+	}
+	if !a.ProfileDisovery.IsValid() {
+		return false
+	}
+	if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {
+		return false
+	}
+	if a.CreatedAt.IsZero() {
+		return false
+	}
+	return true
 }

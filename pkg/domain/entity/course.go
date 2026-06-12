@@ -23,30 +23,33 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type AppUserSuspension struct {
+type Course struct {
 	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	Reason      string
-	ExpireAt    *time.Time
-	ExpiredAt   *time.Time
+	Title       *valueobject.I18nText
+	Description *valueobject.I18nText
+	Style       *valueobject.Metadata
+	Meta        *valueobject.Metadata
+	PublishedAt *time.Time
 	CreatedAt   time.Time
 	DeletedAt   *time.Time
 }
 
-var _ Entity = &AppUserSuspension{}
+var _ Entity = Course{}
 
-func (a *AppUserSuspension) IsValid() bool {
-	if !a.GUID.IsValid() {
+func (c Course) IsValid() bool {
+
+	if c.Title != nil && !c.Title.IsValid() {
 		return false
 	}
-	if !a.AppUserGUID.IsValid() {
+	if c.Description != nil && !c.Description.IsValid() {
 		return false
 	}
-	if a.Reason == "" {
+	if c.Style != nil && !c.Style.IsValid() {
 		return false
 	}
-	if a.CreatedAt.IsZero() {
+	if c.Meta != nil && !c.Meta.IsValid() {
 		return false
 	}
-	return true
+
+	return c.GUID.IsValid()
 }

@@ -25,7 +25,7 @@ import (
 )
 
 type NotificationRepository interface {
-	Save(ctx context.Context, userCredental entity.Notification) error
+	Save(ctx context.Context, notification entity.Notification) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Notification, error)
 	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.Notification, error)

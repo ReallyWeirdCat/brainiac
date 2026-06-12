@@ -15,38 +15,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package entity
+package repository
 
 import (
-	"time"
+	"context"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type AppUserSuspension struct {
-	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	Reason      string
-	ExpireAt    *time.Time
-	ExpiredAt   *time.Time
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
-}
-
-var _ Entity = &AppUserSuspension{}
-
-func (a *AppUserSuspension) IsValid() bool {
-	if !a.GUID.IsValid() {
-		return false
-	}
-	if !a.AppUserGUID.IsValid() {
-		return false
-	}
-	if a.Reason == "" {
-		return false
-	}
-	if a.CreatedAt.IsZero() {
-		return false
-	}
-	return true
+type CourseRepository interface {
+	Save(ctx context.Context, course entity.Course) error
+	Delete(ctx context.Context, guid valueobject.GUID) error
+	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Course, error)
+	ExistsByGUID(ctx context.Context, username string) (bool, error)
 }

@@ -25,7 +25,7 @@ import (
 )
 
 type AppUserSuspensionRepository interface {
-	Save(ctx context.Context, userCredental entity.AppUserSuspension) error
+	Save(ctx context.Context, userSuspension entity.AppUserSuspension) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserSuspension, error)
 	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSuspension, error)

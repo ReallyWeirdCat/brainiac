@@ -38,17 +38,17 @@ type AppUserSession struct {
 var _ Entity = &AppUserSession{}
 
 func (a *AppUserSession) IsValid() bool {
-    if !a.GUID.IsValid() {
-        return false
-    }
-    if !a.AppUserGUID.IsValid() {
-        return false
-    }
-    if a.LastSeenAt.IsZero() {
-        return false
-    }
-    if a.CreatedAt.IsZero() {
-        return false
-    }
-    return true
+	if !a.GUID.IsValid() {
+		return false
+	}
+	if !a.AppUserGUID.IsValid() {
+		return false
+	}
+	if a.LastSeenAt.IsZero() {
+		return false
+	}
+	if a.CreatedAt.IsZero() {
+		return false
+	}
+	return true
 }

@@ -25,7 +25,7 @@ import (
 )
 
 type AppUserSessionRepository interface {
-	Save(ctx context.Context, userCredental entity.AppUserSession) error
+	Save(ctx context.Context, userSession entity.AppUserSession) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserSession, error)
 	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSession, error)

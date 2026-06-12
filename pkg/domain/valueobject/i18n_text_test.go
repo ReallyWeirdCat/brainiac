@@ -46,15 +46,15 @@ func TestI18nTextFromMap(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "nil input",
-			raw:  nil,
-			want: I18nText{translations: map[string]string{}},
+			name:    "nil input",
+			raw:     nil,
+			want:    I18nText{translations: map[string]string{}},
 			wantErr: false,
 		},
 		{
-			name: "empty map",
-			raw:  map[string]string{},
-			want: I18nText{translations: map[string]string{}},
+			name:    "empty map",
+			raw:     map[string]string{},
+			want:    I18nText{translations: map[string]string{}},
 			wantErr: false,
 		},
 		{
@@ -105,12 +105,12 @@ func TestI18nText_Set(t *testing.T) {
 	validEn, _ := NewLanguageCode("en")
 	zeroLang := LanguageCode{}
 	tests := []struct {
-		name      string
-		initial   map[string]string
-		lang      LanguageCode
-		text      string
-		wantMap   map[string]string
-		wantErr   bool
+		name    string
+		initial map[string]string
+		lang    LanguageCode
+		text    string
+		wantMap map[string]string
+		wantErr bool
 	}{
 		{
 			name:    "set new key on existing map",
@@ -171,32 +171,32 @@ func TestI18nText_Get(t *testing.T) {
 	validEn, _ := NewLanguageCode("en")
 	validFr, _ := NewLanguageCode("fr")
 	tests := []struct {
-		name        string
+		name         string
 		translations map[string]string
-		lang        LanguageCode
-		wantText    string
-		wantOk      bool
+		lang         LanguageCode
+		wantText     string
+		wantOk       bool
 	}{
 		{
-			name:        "nil map",
+			name:         "nil map",
 			translations: nil,
-			lang:        validEn,
-			wantText:    "",
-			wantOk:      false,
+			lang:         validEn,
+			wantText:     "",
+			wantOk:       false,
 		},
 		{
-			name:        "key exists",
+			name:         "key exists",
 			translations: map[string]string{"en": "Hello", "fr": "Bonjour"},
-			lang:        validEn,
-			wantText:    "Hello",
-			wantOk:      true,
+			lang:         validEn,
+			wantText:     "Hello",
+			wantOk:       true,
 		},
 		{
-			name:        "key does not exist",
+			name:         "key does not exist",
 			translations: map[string]string{"en": "Hello"},
-			lang:        validFr,
-			wantText:    "",
-			wantOk:      false,
+			lang:         validFr,
+			wantText:     "",
+			wantOk:       false,
 		},
 	}
 	for _, tt := range tests {

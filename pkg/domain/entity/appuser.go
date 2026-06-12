@@ -33,14 +33,14 @@ type AppUser struct {
 var _ Entity = &AppUser{}
 
 func (a *AppUser) IsValid() bool {
-    if !a.GUID.IsValid() {
-        return false
-    }
-    if !a.Username.IsValid() {
-        return false
-    }
-    if a.CreatedAt.IsZero() {
-        return false
-    }
-    return true
+	if !a.GUID.IsValid() {
+		return false
+	}
+	if !a.Username.IsValid() {
+		return false
+	}
+	if a.CreatedAt.IsZero() {
+		return false
+	}
+	return true
 }

@@ -25,7 +25,7 @@ import (
 )
 
 type AppUserCredentialRepository interface {
-	Save(ctx context.Context, userCredental entity.AppUserCredential) error
+	Save(ctx context.Context, userCredential entity.AppUserCredential) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserCredential, error)
 	GetByUsername(ctx context.Context, username string) (*entity.AppUserCredential, error)
