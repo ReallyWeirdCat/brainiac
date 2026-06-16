@@ -20,24 +20,33 @@ package entity
 import (
 	"time"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type Course struct {
-	GUID            valueobject.GUID
-	TitleI18n       *valueobject.I18nText
-	DescriptionI18n *valueobject.I18nText
-	Style           *valueobject.Metadata
-	Meta            *valueobject.Metadata
-	PublishedAt     *time.Time
-	CreatedAt       time.Time
-	DeletedAt       *time.Time
+type CourseSubject struct {
+	GUID                valueobject.GUID
+	CourseGUID          valueobject.GUID
+	ParentGUID          *valueobject.GUID
+	TitleI18n           *valueobject.I18nText
+	DescriptionI18n     *valueobject.I18nText
+	RewardExperience    int64
+	CompletionCondition enum.CompletionConditionEnum
+	HideChildren        bool
+	Style               *valueobject.Metadata
+	Meta                *valueobject.Metadata
+	PublishedAt         *time.Time
+	CreatedAt           time.Time
+	DeletedAt           *time.Time
 }
 
 var _ Entity = Course{}
 
-func (c Course) IsValid() bool {
+func (c CourseSubject) IsValid() bool {
 
+	if c.ParentGUID != nil && (!(*c.ParentGUID).IsValid() || c.ParentGUID == &c.GUID) {
+		return false
+	}
 	if c.TitleI18n != nil && !c.TitleI18n.IsValid() {
 		return false
 	}
@@ -51,5 +60,5 @@ func (c Course) IsValid() bool {
 		return false
 	}
 
-	return c.GUID.IsValid()
+	return c.GUID.IsValid() && c.CourseGUID.IsValid() && c.CompletionCondition.IsValid()
 }

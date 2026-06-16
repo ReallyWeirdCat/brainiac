@@ -28,5 +28,5 @@ type CourseRepository interface {
 	Save(ctx context.Context, course entity.Course) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Course, error)
-	ExistsByGUID(ctx context.Context, username string) (bool, error)
+	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

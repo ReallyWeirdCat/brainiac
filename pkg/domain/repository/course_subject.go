@@ -15,41 +15,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package entity
+package repository
 
 import (
-	"time"
+	"context"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type Course struct {
-	GUID            valueobject.GUID
-	TitleI18n       *valueobject.I18nText
-	DescriptionI18n *valueobject.I18nText
-	Style           *valueobject.Metadata
-	Meta            *valueobject.Metadata
-	PublishedAt     *time.Time
-	CreatedAt       time.Time
-	DeletedAt       *time.Time
-}
-
-var _ Entity = Course{}
-
-func (c Course) IsValid() bool {
-
-	if c.TitleI18n != nil && !c.TitleI18n.IsValid() {
-		return false
-	}
-	if c.DescriptionI18n != nil && !c.DescriptionI18n.IsValid() {
-		return false
-	}
-	if c.Style != nil && !c.Style.IsValid() {
-		return false
-	}
-	if c.Meta != nil && !c.Meta.IsValid() {
-		return false
-	}
-
-	return c.GUID.IsValid()
+type CourseSubjectRepository interface {
+	Save(ctx context.Context, courseSubject entity.CourseSubject) error
+	Delete(ctx context.Context, guid valueobject.GUID) error
+	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.CourseSubject, error)
+	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }
