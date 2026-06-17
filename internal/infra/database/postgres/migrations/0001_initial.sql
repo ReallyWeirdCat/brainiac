@@ -11,7 +11,7 @@ CREATE DOMAIN question_type_enum AS SMALLINT
 CREATE DOMAIN scoring_method_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2));
 
--- completion_condition_enum: 0=manual_completion, 1=attestation_test, 2=approved_practice, 3=all
+-- completion_condition_enum: 0=manual_completion, 1=attestation_assessment, 2=approved_practice, 3=all
 CREATE DOMAIN completion_condition_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2, 3));
 
@@ -183,8 +183,8 @@ CREATE TABLE language (
     english_title VARCHAR(25) NOT NULL,
     local_title VARCHAR(50) NOT NULL,
     emoji TEXT NULL,
-    supported BOOLEAN NOT NULL,
-    beta BOOLEAN NOT NULL,
+    is_supported BOOLEAN NOT NULL,
+    is_beta BOOLEAN NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
@@ -225,8 +225,8 @@ CREATE TABLE course_language (
     course_guid UUID NOT NULL REFERENCES course(guid),
     language_guid UUID NOT NULL REFERENCES language(guid),
     calculated_support_percentage SMALLINT NULL,
-    beta BOOLEAN NOT NULL DEFAULT false,
-    new BOOLEAN NOT NULL DEFAULT false,
+    is_beta BOOLEAN NOT NULL DEFAULT false,
+    is_new BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL,
     CONSTRAINT check_calculated_support_percentage CHECK (calculated_support_percentage BETWEEN 0 AND 100)
@@ -305,7 +305,7 @@ CREATE TABLE student_group_class (
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
     objectives JSONB NULL,
-    attestation_tests_enabled BOOLEAN NOT NULL DEFAULT true,
+    attestation_assessments_enabled BOOLEAN NOT NULL DEFAULT true,
     attendance_closed_at TIMESTAMPTZ NULL,
     marks_approved_at TIMESTAMPTZ NULL,
     totp_secret BYTEA NULL,
@@ -376,9 +376,10 @@ CREATE TABLE course_subject_doc_md (
     deleted_at TIMESTAMPTZ NULL
 );
 
+CREATE INDEX idx_course_subject_doc_md_language_code_not_deleted ON course_subject_doc_md (language_code) WHERE deleted_at IS NULL;
 
--- 24. course_subject_test
-CREATE TABLE course_subject_test (
+-- 24. course_subject_assessment
+CREATE TABLE course_subject_assessment (
     guid UUID PRIMARY KEY,
     course_subject_guid UUID NOT NULL REFERENCES course_subject(guid),
     title_i18n JSONB NULL,
@@ -388,8 +389,8 @@ CREATE TABLE course_subject_test (
     hide_answer_validity BOOLEAN NOT NULL DEFAULT false,
     hide_score BOOLEAN NOT NULL DEFAULT false,
     use_timed_questions BOOLEAN NOT NULL DEFAULT false,
-    max_time SMALLINT NULL,
-    max_attempts SMALLINT NULL,
+    max_time SMALLINT NOT NULL,
+    max_attempts SMALLINT NOT NULL,
     scoring_method scoring_method_enum NOT NULL DEFAULT 0,
     required_score SMALLINT NOT NULL DEFAULT 60,
     short_questions_count SMALLINT NOT NULL DEFAULT 1,
@@ -401,18 +402,19 @@ CREATE TABLE course_subject_test (
     CONSTRAINT check_required_score CHECK (required_score BETWEEN 0 AND 100)
 );
 
--- 25. course_subject_test_question
-CREATE TABLE course_subject_test_question (
+-- 25. course_subject_assessment_question
+CREATE TABLE course_subject_assessment_question (
     guid UUID PRIMARY KEY,
-    course_subject_test_guid UUID NOT NULL REFERENCES course_subject_test(guid),
+    course_subject_assessment_guid UUID NOT NULL REFERENCES course_subject_assessment(guid),
     title_i18n JSONB NULL,
     description_i18n JSONB NULL,
     question_type question_type_enum NOT NULL DEFAULT 0,
     attachment_url VARCHAR(255) NULL,
     options JSONB NULL,
     correct_options JSONB NULL,
+    max_correct_options SMALLINT DEFAULT 1,
     is_multiple_choice BOOLEAN NOT NULL DEFAULT false,
-    max_options SMALLINT NOT NULL DEFAULT 0,
+    max_options SMALLINT NOT NULL DEFAULT 3,
     use_text_answer BOOLEAN NOT NULL DEFAULT false,
     correct_text_answer TEXT NULL,
     example_url VARCHAR(255) NULL,
@@ -421,10 +423,10 @@ CREATE TABLE course_subject_test_question (
     deleted_at TIMESTAMPTZ NULL
 );
 
--- 26. course_subject_test_pass
-CREATE TABLE course_subject_test_pass (
+-- 26. course_subject_assessment_pass
+CREATE TABLE course_subject_assessment_pass (
     guid UUID PRIMARY KEY,
-    course_subject_test_guid UUID NOT NULL REFERENCES course_subject_test(guid),
+    course_subject_assessment_guid UUID NOT NULL REFERENCES course_subject_assessment(guid),
     app_user_guid UUID NOT NULL REFERENCES app_user(guid),
     is_active BOOLEAN NOT NULL DEFAULT true,
     attempts_left SMALLINT NULL,
@@ -464,11 +466,11 @@ CREATE TABLE student_course_subject (
 
 CREATE UNIQUE INDEX idx_studentcoursesubject_unique ON student_course_subject (app_user_guid, course_subject_guid) WHERE deleted_at IS NULL;
 
--- 29. student_course_subject_test_attempt
-CREATE TABLE student_course_subject_test_attempt (
+-- 29. student_course_subject_assessment_attempt
+CREATE TABLE student_course_subject_assessment_attempt (
     guid UUID PRIMARY KEY,
     app_user_guid UUID NOT NULL REFERENCES app_user(guid),
-    course_subject_test_guid UUID NOT NULL REFERENCES course_subject_test(guid),
+    course_subject_assessment_guid UUID NOT NULL REFERENCES course_subject_assessment(guid),
     attempt_status attempt_status_enum NOT NULL DEFAULT 0,
     score SMALLINT NOT NULL DEFAULT 0,
     is_success BOOLEAN NOT NULL DEFAULT false,
@@ -477,7 +479,7 @@ CREATE TABLE student_course_subject_test_attempt (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE UNIQUE INDEX idx_studentcoursetestattempt_unique ON student_course_subject_test_attempt (app_user_guid, course_subject_test_guid) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX idx_studentcoursetestattempt_unique ON student_course_subject_assessment_attempt (app_user_guid, course_subject_assessment_guid) WHERE deleted_at IS NULL;
 
 -- 30. student_course_subject_submission_attempt
 CREATE TABLE student_course_subject_submission_attempt (
@@ -617,12 +619,12 @@ DROP TABLE IF EXISTS course_subject_item CASCADE;
 DROP TABLE IF EXISTS inventory_slot CASCADE;
 DROP TABLE IF EXISTS item CASCADE;
 DROP TABLE IF EXISTS student_course_subject_submission_attempt CASCADE;
-DROP TABLE IF EXISTS student_course_subject_test_attempt CASCADE;
+DROP TABLE IF EXISTS student_course_subject_assessment_attempt CASCADE;
 DROP TABLE IF EXISTS student_course_subject CASCADE;
 DROP TABLE IF EXISTS student_course_stats CASCADE;
-DROP TABLE IF EXISTS course_subject_test_pass CASCADE;
-DROP TABLE IF EXISTS course_subject_test_question CASCADE;
-DROP TABLE IF EXISTS course_subject_test CASCADE;
+DROP TABLE IF EXISTS course_subject_assessment_pass CASCADE;
+DROP TABLE IF EXISTS course_subject_assessment_question CASCADE;
+DROP TABLE IF EXISTS course_subject_assessment CASCADE;
 DROP TABLE IF EXISTS course_subject_doc_md CASCADE;
 DROP TABLE IF EXISTS course_subject_doc CASCADE;
 DROP TABLE IF EXISTS course_subject CASCADE;

@@ -17,14 +17,14 @@
 
 package enum
 
-// CompletionConditionEnum represents completion condition (0=manual_completion, 1=attestation_test, 2=approved_practice, 3=all)
+// CompletionConditionEnum represents completion condition (0=manual_completion, 1=attestation_assessment, 2=approved_practice, 3=all)
 type CompletionConditionEnum int16
 
 const (
-	ManualCompletion CompletionConditionEnum = 0
-	AttestationTest  CompletionConditionEnum = 1
-	ApprovedPractice CompletionConditionEnum = 2
-	AllCompletion    CompletionConditionEnum = 3
+	ManualCompletion      CompletionConditionEnum = 0
+	AttestationAssessment CompletionConditionEnum = 1
+	ApprovedPractice      CompletionConditionEnum = 2
+	AllCompletion         CompletionConditionEnum = 3
 )
 
 var _ Enum = (*CompletionConditionEnum)(nil)
@@ -33,8 +33,8 @@ func (e CompletionConditionEnum) String() string {
 	switch e {
 	case ManualCompletion:
 		return "manual_completion"
-	case AttestationTest:
-		return "attestation_test"
+	case AttestationAssessment:
+		return "attestation_assessment"
 	case ApprovedPractice:
 		return "approved_practice"
 	case AllCompletion:
