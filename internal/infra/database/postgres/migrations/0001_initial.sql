@@ -151,9 +151,9 @@ CREATE TABLE student_global_stats (
     money BIGINT NOT NULL DEFAULT 0,
     money_earned BIGINT NOT NULL DEFAULT 0,
     subjects_completed INT NOT NULL DEFAULT 0,
-    tests_completed INT NOT NULL DEFAULT 0,
-    tests_failed INT NOT NULL DEFAULT 0,
-    tests_terminated INT NOT NULL DEFAULT 0,
+    assessments_completed INT NOT NULL DEFAULT 0,
+    assessments_failed INT NOT NULL DEFAULT 0,
+    assessments_terminated INT NOT NULL DEFAULT 0,
     works_submitted INT NOT NULL DEFAULT 0,
     items_collected INT NOT NULL DEFAULT 0,
     items_used INT NOT NULL DEFAULT 0,
@@ -415,12 +415,14 @@ CREATE TABLE course_subject_assessment_question (
     max_correct_options SMALLINT DEFAULT 1,
     is_multiple_choice BOOLEAN NOT NULL DEFAULT false,
     max_options SMALLINT NOT NULL DEFAULT 3,
+    max_answer_time SMALLINT NOT NULL DEFAULT 10,
     use_text_answer BOOLEAN NOT NULL DEFAULT false,
     correct_text_answer TEXT NULL,
     example_url VARCHAR(255) NULL,
     published_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ NULL
+    deleted_at TIMESTAMPTZ NULL,
+    CONSTRAINT check_max_answer_time CHECK (max_answer_time > 10)
 );
 
 -- 26. course_subject_assessment_pass
@@ -479,7 +481,7 @@ CREATE TABLE student_course_subject_assessment_attempt (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE UNIQUE INDEX idx_studentcoursetestattempt_unique ON student_course_subject_assessment_attempt (app_user_guid, course_subject_assessment_guid) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX idx_studentcourseassessmentattempt_unique ON student_course_subject_assessment_attempt (app_user_guid, course_subject_assessment_guid) WHERE deleted_at IS NULL;
 
 -- 30. student_course_subject_submission_attempt
 CREATE TABLE student_course_subject_submission_attempt (
@@ -603,7 +605,7 @@ CREATE TABLE daily_activity (
     experience_earned BIGINT NOT NULL DEFAULT 0,
     levels_earned SMALLINT NOT NULL DEFAULT 0,
     subjects_completed SMALLINT NOT NULL DEFAULT 0,
-    tests_completed SMALLINT NOT NULL DEFAULT 0,
+    assessments_completed SMALLINT NOT NULL DEFAULT 0,
     practices_completed SMALLINT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL

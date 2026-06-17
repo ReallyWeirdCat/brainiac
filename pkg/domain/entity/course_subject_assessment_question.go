@@ -36,6 +36,7 @@ type CourseSubjectAssessmentQuestion struct {
 	MaxCorrectOptions     int16
 	IsMultipleChoice      bool
 	MaxOptions            int16
+	MaxAnswerTime         int16
 	UseTextAnswer         bool
 	CorrectTextAnswer     *valueobject.I18nText
 	ExampleUrl            *valueobject.HttpUrl
@@ -63,6 +64,12 @@ func (c CourseSubjectAssessmentQuestion) IsValid() bool {
 		return false
 	}
 	if c.ExampleUrl != nil && !c.ExampleUrl.IsValid() {
+		return false
+	}
+	if c.MaxCorrectOptions < 1 || c.MaxCorrectOptions > c.MaxOptions {
+		return false
+	}
+	if c.MaxAnswerTime < 10 && c.MaxAnswerTime != 0 {
 		return false
 	}
 
