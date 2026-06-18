@@ -24,7 +24,7 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type StudentGroupMemberAttendance struct {
+type StudentGroupMemberClassAttendance struct {
 	GUID                   valueobject.GUID
 	StudentGroupMemberGUID valueobject.GUID
 	FirstSeenAt            *time.Time
@@ -37,9 +37,9 @@ type StudentGroupMemberAttendance struct {
 	DeletedAt              *time.Time
 }
 
-var _ Entity = StudentGroupMemberAttendance{}
+var _ Entity = StudentGroupMemberClassAttendance{}
 
-func (s StudentGroupMemberAttendance) IsValid() bool {
+func (s StudentGroupMemberClassAttendance) IsValid() bool {
 	if s.ObjectivesCompletion != nil && !s.ObjectivesCompletion.IsValid() {
 		return false
 	}

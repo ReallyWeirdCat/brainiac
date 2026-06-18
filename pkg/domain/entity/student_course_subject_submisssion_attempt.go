@@ -31,6 +31,7 @@ type StudentCourseSubjectSubmissionAttempt struct {
 	Files            *valueobject.Metadata
 	StudentComment   *string
 	TeacherComment   *string
+	Meta             *valueobject.Metadata
 	CreatedAt        time.Time
 	DeletedAt        *time.Time
 }
@@ -45,6 +46,9 @@ func (s StudentCourseSubjectSubmissionAttempt) IsValid() bool {
 		return false
 	}
 	if s.TeacherComment != nil && len(*s.TeacherComment) > 2048 {
+		return false
+	}
+	if s.Meta != nil && !s.Meta.IsValid() {
 		return false
 	}
 	return s.GUID.IsValid() && s.AppUserGUID.IsValid() && s.SubmissionStatus.IsValid()

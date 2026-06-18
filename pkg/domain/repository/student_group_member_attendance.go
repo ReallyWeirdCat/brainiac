@@ -24,12 +24,12 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type StudentGroupMemberAttendance interface {
-	Save(ctx context.Context, studentGroupMemberAttendance entity.StudentGroupMemberAttendance) error
+type StudentGroupMemberClassAttendanceRepository interface {
+	Save(ctx context.Context, studentGroupMemberAttendance entity.StudentGroupMemberClassAttendance) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentGroupMemberAttendance, error)
-	GetByStudentGroupClassGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberAttendance, error)
-	GetByStudentGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberAttendance, error)
-	GetByUsername(ctx context.Context, username string) ([]*entity.StudentGroupMemberAttendance, error)
+	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentGroupMemberClassAttendance, error)
+	GetByStudentGroupClassGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
+	GetByStudentGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
+	GetByUsername(ctx context.Context, username string) ([]*entity.StudentGroupMemberClassAttendance, error)
 	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

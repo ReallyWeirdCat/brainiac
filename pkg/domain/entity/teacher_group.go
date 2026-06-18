@@ -24,16 +24,17 @@ import (
 )
 
 type TeacherGroup struct {
-	GUID             valueobject.GUID
-	TeacherGUID      valueobject.GUID
-	StudentGroupGUID valueobject.GUID
-	ActiveSince      *time.Time
-	ManageAttendace  bool
-	ManageResults    bool
-	ManageStudents   bool
-	TeacherUntil     *time.Time
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	GUID               valueobject.GUID
+	TeacherGUID        valueobject.GUID
+	StudentGroupGUID   valueobject.GUID
+	ActiveSince        *time.Time
+	ManageAttendace    bool
+	ManageResults      bool
+	ManageStudents     bool
+	ManageAchievements bool
+	TeacherUntil       *time.Time
+	CreatedAt          time.Time
+	DeletedAt          *time.Time
 }
 
 var _ Entity = TeacherGroup{}
