@@ -31,6 +31,10 @@ CREATE DOMAIN subject_doc_type_enum AS SMALLINT
 CREATE DOMAIN attempt_status_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2));
 
+-- submission_status_enum: 0=submitted, 1=approved, 2=rejected
+CREATE DOMAIN submission_status_enum AS SMALLINT
+    CHECK (VALUE IN (0, 1, 2));
+
 -- class_type_enum: 0=practice, 1=lecture, 2=attestation, 3=consult
 CREATE DOMAIN class_type_enum AS SMALLINT
     CHECK (VALUE IN (0, 1, 2, 3));
@@ -481,21 +485,23 @@ CREATE TABLE student_course_subject_assessment_attempt (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE UNIQUE INDEX idx_studentcourseassessmentattempt_unique ON student_course_subject_assessment_attempt (app_user_guid, course_subject_assessment_guid) WHERE deleted_at IS NULL;
+CREATE INDEX idx_studentcourseassessmentattempt ON student_course_subject_assessment_attempt (app_user_guid, course_subject_assessment_guid) WHERE deleted_at IS NULL;
 
 -- 30. student_course_subject_submission_attempt
 CREATE TABLE student_course_subject_submission_attempt (
     guid UUID PRIMARY KEY,
     app_user_guid UUID NOT NULL REFERENCES app_user(guid),
     course_subject_doc_guid UUID NOT NULL REFERENCES course_subject_doc(guid),
-    submission_status subject_doc_type_enum NOT NULL DEFAULT 0,
+    submission_status submission_status_enum NOT NULL DEFAULT 0,
     files JSONB NULL,
     meta JSONB NULL,
+    student_comment VARCHAR(2048) NULL,
+    teacher_comment VARCHAR(2048) NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE UNIQUE INDEX idx_studentcoursesubmissionattempt_unique ON student_course_subject_submission_attempt (app_user_guid, course_subject_doc_guid) WHERE deleted_at IS NULL;
+CREATE INDEX idx_studentcoursesubmissionattemp ON student_course_subject_submission_attempt (app_user_guid, course_subject_doc_guid) WHERE deleted_at IS NULL;
 
 -- 31. item
 CREATE TABLE item (
@@ -577,6 +583,8 @@ CREATE TABLE chat_member (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
+
+CREATE UNIQUE INDEX idx_chatmember_appuserguid_chatguid_unique ON chat_member (app_user_guid, chat_guid) WHERE deleted_at IS NULL;
 
 -- 37. message
 CREATE TABLE message (
