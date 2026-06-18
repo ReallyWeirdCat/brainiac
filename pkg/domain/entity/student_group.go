@@ -43,5 +43,5 @@ func (s StudentGroup) IsValid() bool {
 		return false
 	}
 
-	return s.GUID.IsValid()
+	return s.GUID != nil && s.GUID.IsValid()
 }

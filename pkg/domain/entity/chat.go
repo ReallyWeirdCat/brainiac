@@ -51,5 +51,5 @@ func (c Chat) IsValid() bool {
 	if c.Meta != nil && !c.Meta.IsValid() {
 		return false
 	}
-	return c.GUID.IsValid()
+	return c.GUID != nil && c.GUID.IsValid()
 }

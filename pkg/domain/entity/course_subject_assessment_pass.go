@@ -40,5 +40,8 @@ func (c CourseSubjectAssessmentPass) IsValid() bool {
 	if c.AttemptsLeft < 0 {
 		return false
 	}
+	if c.GUID == nil || c.CourseSubjectAssessmentGUID == nil {
+		return false
+	}
 	return c.GUID.IsValid() && c.CourseSubjectAssessmentGUID.IsValid()
 }

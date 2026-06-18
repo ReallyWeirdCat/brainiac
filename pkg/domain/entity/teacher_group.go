@@ -40,5 +40,8 @@ type TeacherGroup struct {
 var _ Entity = TeacherGroup{}
 
 func (t TeacherGroup) IsValid() bool {
+	if t.GUID == nil || t.TeacherGUID == nil || t.StudentGroupGUID == nil {
+		return false
+	}
 	return t.GUID.IsValid() && t.TeacherGUID.IsValid() && t.StudentGroupGUID.IsValid()
 }

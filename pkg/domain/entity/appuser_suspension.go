@@ -36,10 +36,10 @@ type AppUserSuspension struct {
 var _ Entity = &AppUserSuspension{}
 
 func (a *AppUserSuspension) IsValid() bool {
-	if !a.GUID.IsValid() {
+	if a.GUID == nil || a.GUID.IsValid() {
 		return false
 	}
-	if !a.AppUserGUID.IsValid() {
+	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
 		return false
 	}
 	if a.Reason == "" {

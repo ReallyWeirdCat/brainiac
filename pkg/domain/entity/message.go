@@ -52,5 +52,8 @@ func (m Message) IsValid() bool {
 	if m.Meta != nil && !m.Meta.IsValid() {
 		return false
 	}
+	if m.GUID == nil || m.ChatMemberGUID == nil || m.ChatGUID == nil {
+		return false
+	} 
 	return m.GUID.IsValid() && m.ChatMemberGUID.IsValid() && m.ChatMemberGUID.IsValid() && m.Urgency.IsValid()
 }

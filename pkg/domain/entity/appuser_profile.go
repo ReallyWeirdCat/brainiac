@@ -42,10 +42,9 @@ type AppUserProfile struct {
 }
 
 func (a *AppUserProfile) IsValid() bool {
-	if !a.AppUserGUID.IsValid() {
+	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
 		return false
 	}
-	// Required fields (non-nil and valid)
 	if a.Name != nil && !a.Name.IsValid() {
 		return false
 	}
@@ -64,7 +63,7 @@ func (a *AppUserProfile) IsValid() bool {
 	if !a.PreferredLanguage.IsValid() {
 		return false
 	}
-	if !a.ProfileDisovery.IsValid() {
+	if !a.ProfileDiscovery.IsValid() {
 		return false
 	}
 	if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {

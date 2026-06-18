@@ -72,6 +72,9 @@ func (c CourseSubjectAssessmentQuestion) IsValid() bool {
 	if c.MaxAnswerTime < 10 {
 		return false
 	}
+	if c.GUID == nil {
+		return false
+	}
 
 	return c.GUID.IsValid() && c.CourseSubjectAssessmentGUID.IsValid() && c.QuestionType.IsValid()
 }

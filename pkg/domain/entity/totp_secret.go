@@ -34,7 +34,7 @@ type TOTPSecret struct {
 var _ Entity = &TOTPSecret{}
 
 func (t *TOTPSecret) IsValid() bool {
-	if !t.AppUserGUID.IsValid() {
+	if t.AppUserGUID == nil || !t.AppUserGUID.IsValid() {
 		return false
 	}
 	if len(t.SecretBase32) != 64 {

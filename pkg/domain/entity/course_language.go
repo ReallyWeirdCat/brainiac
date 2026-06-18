@@ -40,6 +40,9 @@ func (c CourseLanguage) IsValid() bool {
 	if c.CalculatedSupportPercentage < 0 || c.CalculatedSupportPercentage > 100 {
 		return false
 	}
+	if c.GUID == nil || c.LanguageGUID == nil {
+		return false
+	}
 
 	return c.GUID.IsValid() && c.LanguageGUID.IsValid()
 }

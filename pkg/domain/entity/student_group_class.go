@@ -54,6 +54,9 @@ func (s StudentGroupClass) IsValid() bool {
 	if s.Room != nil && len(*s.Room) > 15 {
 		return false
 	}
+	if s.GUID == nil || s.StudentGroupGUID == nil {
+		return false
+	}
 
 	return s.GUID.IsValid() && s.StudentGroupGUID.IsValid() && s.ClassType.IsValid()
 }

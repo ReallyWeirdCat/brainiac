@@ -58,6 +58,9 @@ func (c CourseSubjectDoc) IsValid() bool {
 	if c.LiteratureMeta != nil && !c.LiteratureMeta.IsValid() {
 		return false
 	}
+	if c.GUID == nil || c.CourseSubjectGUID == nil {
+		return false
+	}
 
 	return c.GUID.IsValid() && c.CourseSubjectGUID.IsValid() && c.SubjectDocType.IsValid()
 }

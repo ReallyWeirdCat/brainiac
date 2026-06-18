@@ -35,5 +35,8 @@ type CourseSubjectDocMd struct {
 var _ Entity = CourseSubjectDocMd{}
 
 func (c CourseSubjectDocMd) IsValid() bool {
+	if c.GUID == nil {
+		return false
+	}
 	return c.GUID.IsValid() && c.LanguageCode.IsValid()
 }

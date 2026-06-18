@@ -36,5 +36,8 @@ type StudentGroupCourse struct {
 var _ Entity = StudentGroupCourse{}
 
 func (s StudentGroupCourse) IsValid() bool {
+	if s.GUID == nil || s.StudentGroupGUID == nil || s.CourseGUID == nil {
+		return false
+	}
 	return s.GUID.IsValid() && s.StudentGroupGUID.IsValid() && s.CourseGUID.IsValid()
 }

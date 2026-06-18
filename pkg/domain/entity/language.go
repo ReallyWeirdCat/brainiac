@@ -45,5 +45,8 @@ func (l Language) IsValid() bool {
 	if len(l.LocalTitle) > 50 {
 		return false
 	}
+	if l.GUID == nil {
+		return false
+	}
 	return l.GUID.IsValid() && l.LanguageCode.IsValid()
 }

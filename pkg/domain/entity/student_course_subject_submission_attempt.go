@@ -51,5 +51,8 @@ func (s StudentCourseSubjectSubmissionAttempt) IsValid() bool {
 	if s.Meta != nil && !s.Meta.IsValid() {
 		return false
 	}
+	if s.GUID == nil || s.AppUserGUID == nil {
+		return false
+	}
 	return s.GUID.IsValid() && s.AppUserGUID.IsValid() && s.SubmissionStatus.IsValid()
 }

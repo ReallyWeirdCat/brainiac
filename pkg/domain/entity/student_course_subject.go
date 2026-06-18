@@ -26,7 +26,7 @@ import (
 
 type StudentCourseSubject struct {
 	GUID              valueobject.GUID
-	CourseSubjectGUId valueobject.GUID
+	CourseSubjectGUID valueobject.GUID
 	CompletedAt       *time.Time
 	SubjectStatus     enum.SubjectStatusEnum
 	IsFavorite        bool
@@ -38,9 +38,11 @@ type StudentCourseSubject struct {
 var _ Entity = StudentCourseSubject{}
 
 func (s StudentCourseSubject) IsValid() bool {
-
 	if s.Meta != nil && !s.Meta.IsValid() {
 		return false
 	}
-	return s.GUID.IsValid() && s.CourseSubjectGUId.IsValid() && s.SubjectStatus.IsValid()
+	if s.GUID == nil || s.CourseSubjectGUID == nil {
+		return false
+	}
+	return s.GUID.IsValid() && s.CourseSubjectGUID.IsValid() && s.SubjectStatus.IsValid()
 }

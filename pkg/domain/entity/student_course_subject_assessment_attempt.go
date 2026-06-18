@@ -41,5 +41,8 @@ func (s StudentCourseSubjectAssessmentAttempt) IsValid() bool {
 	if s.Score < 0 || s.Score > 100 {
 		return false
 	}
+	if s.GUID == nil || s.AppUserGUID == nil {
+		return false
+	}
 	return s.GUID.IsValid() && s.AppUserGUID.IsValid() && s.AttemptStatus.IsValid() && s.Answers.IsValid()
 }
