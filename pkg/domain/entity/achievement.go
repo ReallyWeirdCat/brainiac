@@ -20,53 +20,46 @@ package entity
 import (
 	"time"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-var _ Entity = &AppUserProfile{}
-
-type AppUserProfile struct {
-	AppUserGUID       valueobject.GUID
-	Name              *valueobject.Name
-	Surname           *valueobject.Name
-	Patronymic        *valueobject.Name
-	Nickname          *valueobject.Nickname
-	Bio               *valueobject.Bio
-	PreferredLanguage valueobject.LanguageCode
-	ProfileDiscovery  enum.ProfileDiscoveryEnum
-	AvatarUrl         *valueobject.HttpUrl
-	EditingLockedAt   *time.Time
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+type Achievement struct {
+	GUID             valueobject.GUID
+	TitleI18n        valueobject.I18nText
+	DescriptionI18n  *valueobject.I18nText
+	ResourceURL      *valueobject.HttpUrl
+	IsHidden         bool
+	Meta             *valueobject.Metadata
+	Conditions       *valueobject.Metadata
+	RewardExperience int64
+	RewardMoney      int64
+	PublishedAt      *time.Time
+	CreatedAt        time.Time
+	DeletedAt        *time.Time
 }
 
-func (a *AppUserProfile) IsValid() bool {
-	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
+var _ Entity = &Achievement{}
+
+func (a *Achievement) IsValid() bool {
+	if a.GUID == nil || !a.GUID.IsValid() {
 		return false
 	}
-	if a.Name != nil && !a.Name.IsValid() {
+	if !a.TitleI18n.IsValid() {
 		return false
 	}
-	if a.Surname != nil && !a.Surname.IsValid() {
+	if a.DescriptionI18n != nil && !a.DescriptionI18n.IsValid() {
 		return false
 	}
-	if a.Patronymic != nil && !a.Patronymic.IsValid() {
+	if a.ResourceURL != nil && !a.ResourceURL.IsValid() {
 		return false
 	}
-	if a.Nickname != nil && !a.Nickname.IsValid() {
+	if a.Meta != nil && !a.Meta.IsValid() {
 		return false
 	}
-	if a.Bio != nil && !a.Bio.IsValid() {
+	if a.Conditions != nil && !a.Conditions.IsValid() {
 		return false
 	}
-	if !a.PreferredLanguage.IsValid() {
-		return false
-	}
-	if !a.ProfileDiscovery.IsValid() {
-		return false
-	}
-	if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {
+	if a.RewardExperience < 0 || a.RewardMoney < 0 {
 		return false
 	}
 	if a.CreatedAt.IsZero() {

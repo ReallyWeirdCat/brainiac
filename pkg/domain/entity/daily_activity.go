@@ -20,40 +20,40 @@ package entity
 import (
 	"time"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type Message struct {
-	GUID           valueobject.GUID
-	ChatMemberGUID valueobject.GUID
-	ChatGUID       valueobject.GUID
-	ResourceURL    *valueobject.HttpUrl
-	Content        *string
-	Urgency        enum.UrgencyEnum
-	Meta           *valueobject.Metadata
-	SeenBy         *valueobject.Metadata
-	EditedAt       *time.Time
-	PinnedAt       *time.Time
-	ExpireAt       *time.Time
-	CreatedAt      time.Time
-	DeletedAt      *time.Time
+type DailyActivity struct {
+	GUID                 valueobject.GUID
+	AppUserGUID          valueobject.GUID
+	Day                  time.Time
+	ExperienceEarned     int64
+	LevelsEarned         int16
+	SubjectsCompleted    int16
+	AssessmentsCompleted int16
+	PracticesCompleted   int16
+	CreatedAt            time.Time
+	DeletedAt            *time.Time
 }
 
-var _ Entity = Message{}
+var _ Entity = &DailyActivity{}
 
-func (m Message) IsValid() bool {
-	if m.ResourceURL != nil && !m.ResourceURL.IsValid() {
+func (d *DailyActivity) IsValid() bool {
+	if d.GUID == nil || !d.GUID.IsValid() {
 		return false
 	}
-	if m.Content != nil && len(*m.Content) > 1024 {
+	if d.AppUserGUID == nil || !d.AppUserGUID.IsValid() {
 		return false
 	}
-	if m.Meta != nil && !m.Meta.IsValid() {
+	if d.Day.IsZero() {
 		return false
 	}
-	if m.GUID == nil || m.ChatMemberGUID == nil || m.ChatGUID == nil {
+	if d.ExperienceEarned < 0 || d.LevelsEarned < 0 ||
+		d.SubjectsCompleted < 0 || d.AssessmentsCompleted < 0 || d.PracticesCompleted < 0 {
 		return false
 	}
-	return m.GUID.IsValid() && m.ChatMemberGUID.IsValid() && m.ChatMemberGUID.IsValid() && m.Urgency.IsValid()
+	if d.CreatedAt.IsZero() {
+		return false
+	}
+	return true
 }

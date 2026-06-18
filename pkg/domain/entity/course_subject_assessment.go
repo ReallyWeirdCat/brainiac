@@ -58,7 +58,7 @@ func (c CourseSubjectAssessment) IsValid() bool {
 		return false
 	}
 	if c.GUID == nil {
-		return  false
+		return false
 	}
 	return c.GUID.IsValid() && c.ScoringMethod.IsValid()
 }

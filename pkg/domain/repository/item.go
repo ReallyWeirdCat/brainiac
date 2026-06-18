@@ -15,45 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package entity
+package repository
 
 import (
-	"time"
+	"context"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type Message struct {
-	GUID           valueobject.GUID
-	ChatMemberGUID valueobject.GUID
-	ChatGUID       valueobject.GUID
-	ResourceURL    *valueobject.HttpUrl
-	Content        *string
-	Urgency        enum.UrgencyEnum
-	Meta           *valueobject.Metadata
-	SeenBy         *valueobject.Metadata
-	EditedAt       *time.Time
-	PinnedAt       *time.Time
-	ExpireAt       *time.Time
-	CreatedAt      time.Time
-	DeletedAt      *time.Time
-}
-
-var _ Entity = Message{}
-
-func (m Message) IsValid() bool {
-	if m.ResourceURL != nil && !m.ResourceURL.IsValid() {
-		return false
-	}
-	if m.Content != nil && len(*m.Content) > 1024 {
-		return false
-	}
-	if m.Meta != nil && !m.Meta.IsValid() {
-		return false
-	}
-	if m.GUID == nil || m.ChatMemberGUID == nil || m.ChatGUID == nil {
-		return false
-	}
-	return m.GUID.IsValid() && m.ChatMemberGUID.IsValid() && m.ChatMemberGUID.IsValid() && m.Urgency.IsValid()
+type ItemRepository interface {
+	Save(ctx context.Context, item entity.Item) error
+	Delete(ctx context.Context, guid valueobject.GUID) error
+	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Item, error)
+	GetByRarity(ctx context.Context, rarity enum.RarityEnum) ([]*entity.Item, error)
+	GetPublished(ctx context.Context) ([]*entity.Item, error)
+	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

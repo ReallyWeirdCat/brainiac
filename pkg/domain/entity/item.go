@@ -24,52 +24,60 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-var _ Entity = &AppUserProfile{}
-
-type AppUserProfile struct {
-	AppUserGUID       valueobject.GUID
-	Name              *valueobject.Name
-	Surname           *valueobject.Name
-	Patronymic        *valueobject.Name
-	Nickname          *valueobject.Nickname
-	Bio               *valueobject.Bio
-	PreferredLanguage valueobject.LanguageCode
-	ProfileDiscovery  enum.ProfileDiscoveryEnum
-	AvatarUrl         *valueobject.HttpUrl
-	EditingLockedAt   *time.Time
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+type Item struct {
+	GUID            valueobject.GUID
+	TitleI18n       valueobject.I18nText
+	DescriptionI18n *valueobject.I18nText
+	ResourceURL     *valueobject.HttpUrl
+	Meta            valueobject.Metadata
+	StackSize       int16
+	Rarity          enum.RarityEnum
+	AllowExchange   bool
+	ShopPrice       *int64
+	OneTimePurchase bool
+	ShopQuantity    *int16
+	LevelRequired   *int16
+	OnSaleSince     *time.Time
+	OnSaleUntil     *time.Time
+	PublishedAt     *time.Time
+	CreatedAt       time.Time
+	DeletedAt       *time.Time
 }
 
-func (a *AppUserProfile) IsValid() bool {
-	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
+var _ Entity = &Item{}
+
+func (i *Item) IsValid() bool {
+	if i.GUID == nil || !i.GUID.IsValid() {
 		return false
 	}
-	if a.Name != nil && !a.Name.IsValid() {
+	if !i.TitleI18n.IsValid() {
 		return false
 	}
-	if a.Surname != nil && !a.Surname.IsValid() {
+	if i.DescriptionI18n != nil && !i.DescriptionI18n.IsValid() {
 		return false
 	}
-	if a.Patronymic != nil && !a.Patronymic.IsValid() {
+	if i.ResourceURL != nil && !i.ResourceURL.IsValid() {
 		return false
 	}
-	if a.Nickname != nil && !a.Nickname.IsValid() {
+	if !i.Meta.IsValid() {
 		return false
 	}
-	if a.Bio != nil && !a.Bio.IsValid() {
+	if i.StackSize < 1 {
 		return false
 	}
-	if !a.PreferredLanguage.IsValid() {
+	if !i.Rarity.IsValid() {
 		return false
 	}
-	if !a.ProfileDiscovery.IsValid() {
+	if i.ShopPrice != nil && *i.ShopPrice < 0 {
 		return false
 	}
-	if a.AvatarUrl != nil && !a.AvatarUrl.IsValid() {
+	if i.ShopQuantity != nil && *i.ShopQuantity < 0 {
 		return false
 	}
-	if a.CreatedAt.IsZero() {
+	if i.LevelRequired != nil && *i.LevelRequired < 0 {
+		return false
+	}
+	if i.CreatedAt.IsZero() {
 		return false
 	}
 	return true
