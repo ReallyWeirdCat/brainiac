@@ -28,7 +28,7 @@ type StudentCourseSubjectAssessmentAttemptRepository interface {
 	Save(ctx context.Context, studentCourseSubjectAssessmentAttempt entity.StudentCourseSubjectAssessmentAttempt) error
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentCourseSubjectAssessmentAttempt, error)
-	GetBYStudentGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectAssessmentAttempt, error)
+	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectAssessmentAttempt, error)
 	GetByCourseSubjectAssessment(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectAssessmentAttempt, error)
 	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

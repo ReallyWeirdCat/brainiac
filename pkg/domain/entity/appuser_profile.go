@@ -34,7 +34,7 @@ type AppUserProfile struct {
 	Nickname          *valueobject.Nickname
 	Bio               *valueobject.Bio
 	PreferredLanguage valueobject.LanguageCode
-	ProfileDisovery   enum.ProfileDiscoveryEnum
+	ProfileDiscovery   enum.ProfileDiscoveryEnum
 	AvatarUrl         *valueobject.HttpUrl
 	EditingLockedAt   *time.Time
 	CreatedAt         time.Time

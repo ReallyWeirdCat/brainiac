@@ -327,6 +327,7 @@ CREATE TABLE student_group_member_class_attendance (
     first_seen_at TIMESTAMPTZ NULL,
     last_seen_at TIMESTAMPTZ NULL,
     present_at TIMESTAMPTZ NULL,
+    objectives_completion JSONB NULL,
     comment VARCHAR(1024) NULL,
     grade grade_enum NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

@@ -29,7 +29,7 @@ type StudentCourseSubjectSubmissionAttemptRepository interface {
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentCourseSubjectSubmissionAttempt, error)
 	GetByCourseSubjectDocGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectSubmissionAttempt, error)
-	GeyByStudentGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectSubmissionAttempt, error)
+	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentCourseSubjectSubmissionAttempt, error)
 	GeyByUsername(ctx context.Context, username string) ([]*entity.StudentCourseSubjectSubmissionAttempt, error)
 	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

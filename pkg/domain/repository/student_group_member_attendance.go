@@ -29,7 +29,7 @@ type StudentGroupMemberClassAttendanceRepository interface {
 	Delete(ctx context.Context, guid valueobject.GUID) error
 	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentGroupMemberClassAttendance, error)
 	GetByStudentGroupClassGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
-	GetByStudentGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
+	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
 	GetByUsername(ctx context.Context, username string) ([]*entity.StudentGroupMemberClassAttendance, error)
 	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

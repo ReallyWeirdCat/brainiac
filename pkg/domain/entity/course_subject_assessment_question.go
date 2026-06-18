@@ -25,24 +25,24 @@ import (
 )
 
 type CourseSubjectAssessmentQuestion struct {
-	GUID                  valueobject.GUID
-	CourseSubjectTestGUID valueobject.GUID
-	TitleI18n             *valueobject.I18nText
-	DescriptionI18n       *valueobject.I18nText
-	QuestionType          *enum.QuestionTypeEnum
-	AttachmentURL         *valueobject.HttpUrl
-	Options               *valueobject.I18nText
-	CorrectOptions        *valueobject.I18nText
-	MaxCorrectOptions     int16
-	IsMultipleChoice      bool
-	MaxOptions            int16
-	MaxAnswerTime         int16
-	UseTextAnswer         bool
-	CorrectTextAnswer     *valueobject.I18nText
-	ExampleUrl            *valueobject.HttpUrl
-	PublishedAt           *time.Time
-	CreatedAt             time.Time
-	DeletedAt             *time.Time
+	GUID                        valueobject.GUID
+	CourseSubjectAssessmentGUID valueobject.GUID
+	TitleI18n                   *valueobject.I18nText
+	DescriptionI18n             *valueobject.I18nText
+	QuestionType                enum.QuestionTypeEnum
+	AttachmentURL               *valueobject.HttpUrl
+	Options                     *valueobject.I18nText
+	CorrectOptions              *valueobject.I18nText
+	MaxCorrectOptions           int16
+	IsMultipleChoice            bool
+	MaxOptions                  int16
+	MaxAnswerTime               int16
+	UseTextAnswer               bool
+	CorrectTextAnswer           *valueobject.I18nText
+	ExampleUrl                  *valueobject.HttpUrl
+	PublishedAt                 *time.Time
+	CreatedAt                   time.Time
+	DeletedAt                   *time.Time
 }
 
 var _ Entity = CourseSubjectAssessment{}
@@ -69,9 +69,9 @@ func (c CourseSubjectAssessmentQuestion) IsValid() bool {
 	if c.MaxCorrectOptions < 1 || c.MaxCorrectOptions > c.MaxOptions {
 		return false
 	}
-	if c.MaxAnswerTime < 10 && c.MaxAnswerTime != 0 {
+	if c.MaxAnswerTime < 10 {
 		return false
 	}
 
-	return c.GUID.IsValid() && c.CourseSubjectTestGUID.IsValid() && c.QuestionType.IsValid()
+	return c.GUID.IsValid() && c.CourseSubjectAssessmentGUID.IsValid() && c.QuestionType.IsValid()
 }
