@@ -15,23 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
+package ports
 
-import "github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+import (
+	"context"
+	"time"
+)
 
-type PasswordHasher interface {
-	Hash(password string) (string, error)
-	Compare(hashedPassword, password string) error
-}
+type Cache interface {
+	Get(ctx context.Context, key string) (string, bool, error)
 
-type TokenGenerator interface {
-	IssueAccessToken(userGUID, sessionGUID string) (string, error)
-	IssueRefreshToken(userGUID, sessionGUID string) (string, error)
-	IssueTOTPToken(userGUID string) (string, error)
-}
+	Set(ctx context.Context, key string, value string, ttl time.Duration) error
 
-type TokenValidator interface {
-	ValidateAccessToken(tokenString string) (*ports.TokenClaims, error)
-	ValidateRefreshToken(tokenString string) (*ports.TokenClaims, error)
-	ValidateTOTPToken(tokenString string) (*ports.TokenClaims, error)
+	// SetNX sets a value only if the key does not exist (atomic lock).
+	// Returns true if the lock was acquired, false if the key already exists.
+	SetNX(ctx context.Context, key string, value string, ttl time.Duration) (bool, error)
+
+	Delete(ctx context.Context, key string) error
 }

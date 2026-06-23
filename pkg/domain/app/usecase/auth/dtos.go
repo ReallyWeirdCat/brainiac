@@ -17,8 +17,6 @@
 
 package auth
 
-import "time"
-
 // RegisterRequest contains the data needed to register a new user.
 type RegisterRequest struct {
 	Username string `json:"username"`
@@ -60,14 +58,4 @@ type ConfirmTOTPResponse struct {
 	GUID     string `json:"guid"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
-}
-
-// TokenClaims represents claims of a JWT token.
-type TokenClaims struct {
-	TokenGUID   string    `json:"jti"`
-	SessionGUID string    `json:"sid"`
-	UserGUID    string    `json:"sub"`
-	Scope       string    `json:"scope"`
-	IssuedAt    time.Time `json:"iat"`
-	ExpiresAt   time.Time `json:"exp"`
 }

@@ -15,23 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
-
-import "github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+package ports
 
 type PasswordHasher interface {
 	Hash(password string) (string, error)
 	Compare(hashedPassword, password string) error
-}
-
-type TokenGenerator interface {
-	IssueAccessToken(userGUID, sessionGUID string) (string, error)
-	IssueRefreshToken(userGUID, sessionGUID string) (string, error)
-	IssueTOTPToken(userGUID string) (string, error)
-}
-
-type TokenValidator interface {
-	ValidateAccessToken(tokenString string) (*ports.TokenClaims, error)
-	ValidateRefreshToken(tokenString string) (*ports.TokenClaims, error)
-	ValidateTOTPToken(tokenString string) (*ports.TokenClaims, error)
 }

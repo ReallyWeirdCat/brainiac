@@ -15,12 +15,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package app
+package ports
 
-import "context"
+import "time"
 
-type UnitOfWork interface {
-	Begin(ctx context.Context) (context.Context, error)
-	Commit(ctx context.Context) error
-	Rollback(ctx context.Context) error
+type TokenGenerator interface {
+	IssueAccessToken(userGUID, sessionGUID string) (string, error)
+	IssueRefreshToken(userGUID, sessionGUID string) (string, error)
+	IssueTOTPToken(userGUID string) (string, error)
+}
+
+type TokenValidator interface {
+	ValidateAccessToken(tokenString string) (*TokenClaims, error)
+	ValidateRefreshToken(tokenString string) (*TokenClaims, error)
+	ValidateTOTPToken(tokenString string) (*TokenClaims, error)
+}
+
+// TokenClaims represents claims of a JWT token.
+type TokenClaims struct {
+	TokenGUID   string    `json:"jti"`
+	SessionGUID string    `json:"sid"`
+	UserGUID    string    `json:"sub"`
+	Scope       string    `json:"scope"`
+	IssuedAt    time.Time `json:"iat"`
+	ExpiresAt   time.Time `json:"exp"`
 }

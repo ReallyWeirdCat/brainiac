@@ -15,21 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package app
+package ports
 
-import (
-	"context"
-	"time"
-)
+import "context"
 
-type Cache interface {
-	Get(ctx context.Context, key string) (string, bool, error)
-
-	Set(ctx context.Context, key string, value string, ttl time.Duration) error
-
-	// SetNX sets a value only if the key does not exist (atomic lock).
-	// Returns true if the lock was acquired, false if the key already exists.
-	SetNX(ctx context.Context, key string, value string, ttl time.Duration) (bool, error)
-
-	Delete(ctx context.Context, key string) error
+type UnitOfWork interface {
+	Begin(ctx context.Context) (context.Context, error)
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
 }
