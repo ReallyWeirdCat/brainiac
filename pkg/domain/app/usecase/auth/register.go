@@ -16,3 +16,43 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package auth
+
+import (
+	"context"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
+)
+
+type RegisterUsecase struct {
+	userRepo       repository.AppUserRepository
+	credentialRepo repository.AppUserCredentialRepository
+	profileRepo    repository.AppUserProfileRepository
+	uow            ports.UnitOfWork
+	hasher         ports.PasswordHasher
+	tokenGenerator ports.TokenGenerator
+}
+
+func NewRegisterUseCase(
+	userRepo repository.AppUserRepository,
+	credentialRepo repository.AppUserCredentialRepository,
+	profileRepo repository.AppUserProfileRepository,
+	uow ports.UnitOfWork,
+	hasher ports.PasswordHasher,
+	tokenGenerator ports.TokenGenerator,
+	tokenValidator ports.TokenValidator,
+) *RegisterUsecase {
+	return &RegisterUsecase{
+		userRepo:       userRepo,
+		credentialRepo: credentialRepo,
+		profileRepo:    profileRepo,
+		uow:            uow,
+		hasher:         hasher,
+		tokenGenerator: tokenGenerator,
+	}
+}
+
+func (r *RegisterUsecase) Execute(ctx context.Context, req RegisterRequest) (RegisterResponse, error) {
+	// TODO:
+	panic("not implemented")
+}

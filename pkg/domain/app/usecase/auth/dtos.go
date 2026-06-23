@@ -36,16 +36,14 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-// LoginSuccessResponse returns the authenticated user's info and a session token.
-type LoginSuccessResponse struct {
-	GUID     string `json:"guid"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
-}
-
-// LoginTOTPRequiredResponse returns a temporary token needed for TOTP confirmation
-type LoginTOTPRequiredResponse struct {
-	TempTOTPToken string `json:"temp_totp_token"`
+// LoginResponse returns user's info and a session token on success login attempt.
+// If TOTP is enabled, a temporary token for TOTP confirmation is returned instead.
+type LoginResponse struct {
+	GUID          string `json:"guid,omitempty"`
+	Username      string `json:"username,omitempty"`
+	Token         string `json:"token,omitempty"`
+	TempTOTPToken string `json:"temp_totp_token,omitempty"`
+	TOTPRequired  bool   `json:"totp_required"`
 }
 
 // ConfirmTOTPRequest is a struct for requesting TOTP confirmation.

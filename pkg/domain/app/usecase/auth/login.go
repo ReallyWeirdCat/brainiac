@@ -16,3 +16,40 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package auth
+
+import (
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
+)
+
+type LoginUsecase struct {
+	userRepo       repository.AppUserRepository
+	credentialRepo repository.AppUserCredentialRepository
+	profileRepo    repository.AppUserProfileRepository
+	uow            ports.UnitOfWork
+	hasher         ports.PasswordHasher
+	tokenGenerator ports.TokenGenerator
+}
+
+func NewLoginUsecase(
+	userRepo repository.AppUserRepository,
+	credentialRepo repository.AppUserCredentialRepository,
+	profileRepo repository.AppUserProfileRepository,
+	uow ports.UnitOfWork,
+	hasher ports.PasswordHasher,
+	tokenGenerator ports.TokenGenerator,
+) *LoginUsecase {
+	return &LoginUsecase{
+		userRepo:       userRepo,
+		credentialRepo: credentialRepo,
+		profileRepo:    profileRepo,
+		uow:            uow,
+		hasher:         hasher,
+		tokenGenerator: tokenGenerator,
+	}
+}
+
+func (u *LoginUsecase) Execute(req LoginRequest) (LoginResponse, error) {
+	// TODO:
+	panic("not implemented")
+}
