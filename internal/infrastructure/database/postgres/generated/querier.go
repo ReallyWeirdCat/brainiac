@@ -15,7 +15,7 @@ type Querier interface {
 	//
 	//  INSERT INTO app_user(username)
 	//  VALUES ($1)
-	//  RETURNING guid, username, created_at, deleted_at
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	CreateAppUser(ctx context.Context, username string) (AppUser, error)
 	//CreateAppUserCredential
 	//
@@ -53,13 +53,13 @@ type Querier interface {
 	ExistsAppUserByUsername(ctx context.Context, username string) (bool, error)
 	//GetAppUserByGUID
 	//
-	//  SELECT guid, username, created_at, deleted_at FROM app_user
+	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 	//  WHERE guid = $1
 	//  LIMIT 1
 	GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser, error)
 	//GetAppUserByUsername
 	//
-	//  SELECT guid, username, created_at, deleted_at FROM app_user
+	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 	//  WHERE username = $1
 	//  LIMIT 1
 	GetAppUserByUsername(ctx context.Context, username string) (AppUser, error)
@@ -84,12 +84,12 @@ type Querier interface {
 	HardDeleteAppUserCredential(ctx context.Context, appUserGuid uuid.UUID) error
 	//SaveAppUser
 	//
-	//  INSERT INTO app_user (guid, username, created_at)
-	//  VALUES ($1, $2, $3)
+	//  INSERT INTO app_user (guid, username, activated_at, created_at)
+	//  VALUES ($1, $2, $3, $4)
 	//  ON CONFLICT (guid)
 	//  DO UPDATE SET
 	//      username = EXCLUDED.username
-	//  RETURNING guid, username, created_at, deleted_at
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error)
 	//SoftDeleteAppUserCredential
 	//

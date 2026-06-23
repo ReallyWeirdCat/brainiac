@@ -15,33 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package entity
+package repository
 
 import (
-	"time"
+	"context"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type AppUser struct {
-	GUID        valueobject.GUID     `json:"guid"`
-	Username    valueobject.Username `json:"username"`
-	ActivatedAt *time.Time           `json:"activated_at"`
-	CreatedAt   time.Time            `json:"created_at"`
-	DeletedAt   *time.Time           `json:"deleted_at,omitempty"`
-}
-
-var _ Entity = &AppUser{}
-
-func (a *AppUser) IsValid() bool {
-	if a.GUID == nil || !a.GUID.IsValid() {
-		return false
-	}
-	if !a.Username.IsValid() {
-		return false
-	}
-	if a.CreatedAt.IsZero() {
-		return false
-	}
-	return true
+type RegistrationInviteRepository interface {
+	Save(ctx context.Context, registrationInvite entity.RegistrationInvite) error
+	Delete(ctx context.Context, guid valueobject.GUID) error
+	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.RegistrationInvite, error)
+	GetByInviteCode(ctx context.Context, guid valueobject.GUID) (*entity.RegistrationInvite, error)
+	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) (*entity.RegistrationInvite, error)
+	GetByUsername(ctx context.Context, username string) (*entity.RegistrationInvite, error)
+	ExistsByUsername(ctx context.Context, username string) (bool, error)
 }

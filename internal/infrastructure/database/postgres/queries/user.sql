@@ -4,8 +4,8 @@ VALUES ($1)
 RETURNING *;
 
 -- name: SaveAppUser :one
-INSERT INTO app_user (guid, username, created_at)
-VALUES ($1, $2, $3)
+INSERT INTO app_user (guid, username, activated_at, created_at)
+VALUES ($1, $2, $3, $4)
 ON CONFLICT (guid) 
 DO UPDATE SET 
     username = EXCLUDED.username

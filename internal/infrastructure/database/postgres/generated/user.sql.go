@@ -15,20 +15,21 @@ import (
 const createAppUser = `-- name: CreateAppUser :one
 INSERT INTO app_user(username)
 VALUES ($1)
-RETURNING guid, username, created_at, deleted_at
+RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
 // CreateAppUser
 //
 //	INSERT INTO app_user(username)
 //	VALUES ($1)
-//	RETURNING guid, username, created_at, deleted_at
+//	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) CreateAppUser(ctx context.Context, username string) (AppUser, error) {
 	row := q.db.QueryRow(ctx, createAppUser, username)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
 		&i.Username,
+		&i.ActivatedAt,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)
@@ -70,14 +71,14 @@ func (q *Queries) ExistsAppUserByUsername(ctx context.Context, username string) 
 }
 
 const getAppUserByGUID = `-- name: GetAppUserByGUID :one
-SELECT guid, username, created_at, deleted_at FROM app_user
+SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 WHERE guid = $1
 LIMIT 1
 `
 
 // GetAppUserByGUID
 //
-//	SELECT guid, username, created_at, deleted_at FROM app_user
+//	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 //	WHERE guid = $1
 //	LIMIT 1
 func (q *Queries) GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser, error) {
@@ -86,6 +87,7 @@ func (q *Queries) GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser
 	err := row.Scan(
 		&i.GUID,
 		&i.Username,
+		&i.ActivatedAt,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)
@@ -93,14 +95,14 @@ func (q *Queries) GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser
 }
 
 const getAppUserByUsername = `-- name: GetAppUserByUsername :one
-SELECT guid, username, created_at, deleted_at FROM app_user
+SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 WHERE username = $1
 LIMIT 1
 `
 
 // GetAppUserByUsername
 //
-//	SELECT guid, username, created_at, deleted_at FROM app_user
+//	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 //	WHERE username = $1
 //	LIMIT 1
 func (q *Queries) GetAppUserByUsername(ctx context.Context, username string) (AppUser, error) {
@@ -109,6 +111,7 @@ func (q *Queries) GetAppUserByUsername(ctx context.Context, username string) (Ap
 	err := row.Scan(
 		&i.GUID,
 		&i.Username,
+		&i.ActivatedAt,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)
@@ -116,34 +119,41 @@ func (q *Queries) GetAppUserByUsername(ctx context.Context, username string) (Ap
 }
 
 const saveAppUser = `-- name: SaveAppUser :one
-INSERT INTO app_user (guid, username, created_at)
-VALUES ($1, $2, $3)
+INSERT INTO app_user (guid, username, activated_at, created_at)
+VALUES ($1, $2, $3, $4)
 ON CONFLICT (guid) 
 DO UPDATE SET 
     username = EXCLUDED.username
-RETURNING guid, username, created_at, deleted_at
+RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
 type SaveAppUserParams struct {
-	GUID      uuid.UUID `db:"guid" json:"guid"`
-	Username  string    `db:"username" json:"username"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	GUID        uuid.UUID `db:"guid" json:"guid"`
+	Username    string    `db:"username" json:"username"`
+	ActivatedAt time.Time `db:"activated_at" json:"activated_at"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 }
 
 // SaveAppUser
 //
-//	INSERT INTO app_user (guid, username, created_at)
-//	VALUES ($1, $2, $3)
+//	INSERT INTO app_user (guid, username, activated_at, created_at)
+//	VALUES ($1, $2, $3, $4)
 //	ON CONFLICT (guid)
 //	DO UPDATE SET
 //	    username = EXCLUDED.username
-//	RETURNING guid, username, created_at, deleted_at
+//	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error) {
-	row := q.db.QueryRow(ctx, saveAppUser, arg.GUID, arg.Username, arg.CreatedAt)
+	row := q.db.QueryRow(ctx, saveAppUser,
+		arg.GUID,
+		arg.Username,
+		arg.ActivatedAt,
+		arg.CreatedAt,
+	)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
 		&i.Username,
+		&i.ActivatedAt,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)

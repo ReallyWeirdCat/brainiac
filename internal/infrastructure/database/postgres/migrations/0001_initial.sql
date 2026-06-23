@@ -67,6 +67,7 @@ CREATE DOMAIN student_role_enum AS SMALLINT
 CREATE TABLE app_user (
     guid UUID PRIMARY KEY,
     username VARCHAR(18) NOT NULL,
+    activated_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
@@ -619,7 +620,28 @@ CREATE TABLE daily_activity (
     deleted_at TIMESTAMPTZ NULL
 );
 
+-- 39. registration_invite
+CREATE TABLE registration_invite (
+    app_user_guid UUID PRIMARY KEY REFERENCES app_user(guid),
+    invited_by_app_user_guid UUID NOT NULL REFERENCES app_user(guid),
+    invite_code UUID NOT NULL,
+    message TEXT NULL,
+    name VARCHAR(100) NULL,
+    surname VARCHAR(100) NULL,
+    patronymic VARCHAR(100) NULL,
+    nickname VARCHAR(32) NULL,
+    username VARCHAR(18) NULL,
+    student_groups JSONB NULL,
+    teacher_groups JSONB NULL,
+    chats JSONB NULL,
+    expire_at TIMESTAMPTZ NOT NULL DEFAULT now() + '7d',
+    used_at TIMESTAMPTZ NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ NULL
+);
+
 -- +goose Down
+DROP TABLE IF EXISTS registration_invite CASCADE;
 DROP TABLE IF EXISTS daily_activity CASCADE;
 DROP TABLE IF EXISTS message CASCADE;
 DROP TABLE IF EXISTS chat_member CASCADE;

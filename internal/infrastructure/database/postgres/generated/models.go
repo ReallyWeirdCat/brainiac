@@ -12,10 +12,11 @@ import (
 )
 
 type AppUser struct {
-	GUID      uuid.UUID  `db:"guid" json:"guid"`
-	Username  string     `db:"username" json:"username"`
-	CreatedAt time.Time  `db:"created_at" json:"created_at"`
-	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
+	GUID        uuid.UUID  `db:"guid" json:"guid"`
+	Username    string     `db:"username" json:"username"`
+	ActivatedAt time.Time  `db:"activated_at" json:"activated_at"`
+	CreatedAt   time.Time  `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 type AppUserCredential struct {
