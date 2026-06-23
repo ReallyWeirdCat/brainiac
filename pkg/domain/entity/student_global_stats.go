@@ -24,25 +24,25 @@ import (
 )
 
 type StudentGlobalStats struct {
-	AppUserGUID           valueobject.GUID
-	Level                 int16
-	OtherExperience       int64
-	Money                 int64
-	MoneyEarned           int64
-	SubjectsCompleted     int32
-	AssessmentsCompleted  int32
-	AssessmentsFailed     int32
-	AssessmentsTerminated int32
-	WorksSubmitted        int32
-	ItemsCollected        int32
-	ItemsUsed             int32
-	ItemsSold             int32
-	ItemsExchanged        int32
-	BoxesOpened           int32
-	MaxDailyStreak        int32
-	MessagesSent          int32
-	CreatedAt             time.Time
-	DeletedAt             *time.Time
+	AppUserGUID           valueobject.GUID `json:"app_user_guid"`
+	Level                 int16            `json:"level"`
+	OtherExperience       int64            `json:"other_experience"`
+	Money                 int64            `json:"money"`
+	MoneyEarned           int64            `json:"money_earned"`
+	SubjectsCompleted     int32            `json:"subjects_completed"`
+	AssessmentsCompleted  int32            `json:"assessments_completed"`
+	AssessmentsFailed     int32            `json:"assessments_failed"`
+	AssessmentsTerminated int32            `json:"assessments_terminated"`
+	WorksSubmitted        int32            `json:"works_submitted"`
+	ItemsCollected        int32            `json:"items_collected"`
+	ItemsUsed             int32            `json:"items_used"`
+	ItemsSold             int32            `json:"items_sold"`
+	ItemsExchanged        int32            `json:"items_exchanged"`
+	BoxesOpened           int32            `json:"boxes_opened"`
+	MaxDailyStreak        int32            `json:"max_daily_streak"`
+	MessagesSent          int32            `json:"messages_sent"`
+	CreatedAt             time.Time        `json:"created_at"`
+	DeletedAt             *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &StudentGlobalStats{}

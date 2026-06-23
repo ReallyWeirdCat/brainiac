@@ -24,10 +24,10 @@ import (
 )
 
 type Inventory struct {
-	AppUserGUID valueobject.GUID
-	MaxSlots    int16
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	AppUserGUID valueobject.GUID `json:"app_user_guid"`
+	MaxSlots    int16            `json:"max_slots"`
+	CreatedAt   time.Time        `json:"created_at"`
+	DeletedAt   *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &Inventory{}

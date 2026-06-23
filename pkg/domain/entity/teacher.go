@@ -24,20 +24,20 @@ import (
 )
 
 type Teacher struct {
-	AppUserGUID      valueobject.GUID
-	ActiveSince      *time.Time
-	ManageStudents   bool
-	ManageAttendance bool
-	ManageResults    bool
-	ManageCourses    bool
-	IsAdmin          bool
-	ContactInfo      valueobject.Metadata
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	AppUserGUID      valueobject.GUID     `json:"app_user_guid"`
+	ActiveSince      *time.Time           `json:"active_since,omitempty"`
+	ManageStudents   bool                 `json:"manage_students"`
+	ManageAttendance bool                 `json:"manage_attendance"`
+	ManageResults    bool                 `json:"manage_results"`
+	ManageCourses    bool                 `json:"manage_courses"`
+	IsAdmin          bool                 `json:"is_admin"`
+	ContactInfo      valueobject.Metadata `json:"contact_info"`
+	CreatedAt        time.Time            `json:"created_at"`
+	DeletedAt        *time.Time           `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Teacher{}
 
 func (t Teacher) IsValid() bool {
-	return s.AppUserGUID != nil && t.AppUserGUID.IsValid() && t.ContactInfo.IsValid()
+	return t.AppUserGUID != nil && t.AppUserGUID.IsValid() && t.ContactInfo.IsValid()
 }

@@ -25,24 +25,24 @@ import (
 )
 
 type CourseSubjectAssessmentQuestion struct {
-	GUID                        valueobject.GUID
-	CourseSubjectAssessmentGUID valueobject.GUID
-	TitleI18n                   *valueobject.I18nText
-	DescriptionI18n             *valueobject.I18nText
-	QuestionType                enum.QuestionTypeEnum
-	AttachmentURL               *valueobject.HttpUrl
-	Options                     *valueobject.I18nText
-	CorrectOptions              *valueobject.I18nText
-	MaxCorrectOptions           int16
-	IsMultipleChoice            bool
-	MaxOptions                  int16
-	MaxAnswerTime               int16
-	UseTextAnswer               bool
-	CorrectTextAnswer           *valueobject.I18nText
-	ExampleUrl                  *valueobject.HttpUrl
-	PublishedAt                 *time.Time
-	CreatedAt                   time.Time
-	DeletedAt                   *time.Time
+	GUID                        valueobject.GUID      `json:"guid"`
+	CourseSubjectAssessmentGUID valueobject.GUID      `json:"course_subject_assessment_guid"`
+	TitleI18n                   *valueobject.I18nText `json:"title_i18n,omitempty"`
+	DescriptionI18n             *valueobject.I18nText `json:"description_i18n,omitempty"`
+	QuestionType                enum.QuestionTypeEnum `json:"question_type"`
+	AttachmentURL               *valueobject.HttpUrl  `json:"attachment_url,omitempty"`
+	Options                     *valueobject.I18nText `json:"options,omitempty"`
+	CorrectOptions              *valueobject.I18nText `json:"correct_options,omitempty"`
+	MaxCorrectOptions           int16                 `json:"max_correct_options"`
+	IsMultipleChoice            bool                  `json:"is_multiple_choice"`
+	MaxOptions                  int16                 `json:"max_options"`
+	MaxAnswerTime               int16                 `json:"max_answer_time"`
+	UseTextAnswer               bool                  `json:"use_text_answer"`
+	CorrectTextAnswer           *valueobject.I18nText `json:"correct_text_answer,omitempty"`
+	ExampleUrl                  *valueobject.HttpUrl  `json:"example_url,omitempty"`
+	PublishedAt                 *time.Time            `json:"published_at,omitempty"`
+	CreatedAt                   time.Time             `json:"created_at"`
+	DeletedAt                   *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = CourseSubjectAssessment{}

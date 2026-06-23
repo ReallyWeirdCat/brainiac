@@ -24,15 +24,15 @@ import (
 )
 
 type Language struct {
-	GUID         valueobject.GUID
-	LanguageCode valueobject.LanguageCode
-	EnglishTitle string
-	LocalTitle   string
-	Emoji        *string
-	IsSupported  bool
-	IsBeta       bool
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+	GUID         valueobject.GUID         `json:"guid"`
+	LanguageCode valueobject.LanguageCode `json:"language_code"`
+	EnglishTitle string                   `json:"english_title"`
+	LocalTitle   string                   `json:"local_title"`
+	Emoji        *string                  `json:"emoji,omitempty"`
+	IsSupported  bool                     `json:"is_supported"`
+	IsBeta       bool                     `json:"is_beta"`
+	CreatedAt    time.Time                `json:"created_at"`
+	DeletedAt    *time.Time               `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Language{}

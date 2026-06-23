@@ -24,12 +24,12 @@ import (
 )
 
 type CourseSubjectDocMd struct {
-	GUID         valueobject.GUID
-	LanguageCode valueobject.LanguageCode
-	Md           []byte
-	PublishedAt  *time.Time
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+	GUID         valueobject.GUID         `json:"guid"`
+	LanguageCode valueobject.LanguageCode `json:"language_code"`
+	Md           []byte                   `json:"md"`
+	PublishedAt  *time.Time               `json:"published_at,omitempty"`
+	CreatedAt    time.Time                `json:"created_at"`
+	DeletedAt    *time.Time               `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = CourseSubjectDocMd{}

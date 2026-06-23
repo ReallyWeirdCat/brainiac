@@ -25,16 +25,16 @@ import (
 )
 
 type StudentGroupMemberClassAttendance struct {
-	GUID                   valueobject.GUID
-	StudentGroupMemberGUID valueobject.GUID
-	FirstSeenAt            *time.Time
-	LastSeenAt             *time.Time
-	PresentAt              *time.Time
-	ObjectivesCompletion   *valueobject.Metadata
-	Comment                *string
-	Grade                  enum.GradeEnum
-	CreatedAt              time.Time
-	DeletedAt              *time.Time
+	GUID                   valueobject.GUID      `json:"guid"`
+	StudentGroupMemberGUID valueobject.GUID      `json:"student_group_member_guid"`
+	FirstSeenAt            *time.Time            `json:"first_seen_at,omitempty"`
+	LastSeenAt             *time.Time            `json:"last_seen_at,omitempty"`
+	PresentAt              *time.Time            `json:"present_at,omitempty"`
+	ObjectivesCompletion   *valueobject.Metadata `json:"objectives_completion,omitempty"`
+	Comment                *string               `json:"comment,omitempty"`
+	Grade                  enum.GradeEnum        `json:"grade"`
+	CreatedAt              time.Time             `json:"created_at"`
+	DeletedAt              *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentGroupMemberClassAttendance{}

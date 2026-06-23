@@ -25,19 +25,19 @@ import (
 )
 
 type CourseSubject struct {
-	GUID                valueobject.GUID
-	CourseGUID          valueobject.GUID
-	ParentGUID          *valueobject.GUID
-	TitleI18n           *valueobject.I18nText
-	DescriptionI18n     *valueobject.I18nText
-	RewardExperience    int64
-	CompletionCondition enum.CompletionConditionEnum
-	HideChildren        bool
-	Style               *valueobject.Metadata
-	Meta                *valueobject.Metadata
-	PublishedAt         *time.Time
-	CreatedAt           time.Time
-	DeletedAt           *time.Time
+	GUID                valueobject.GUID             `json:"guid"`
+	CourseGUID          valueobject.GUID             `json:"course_guid"`
+	ParentGUID          *valueobject.GUID            `json:"parent_guid,omitempty"`
+	TitleI18n           *valueobject.I18nText        `json:"title_i18n,omitempty"`
+	DescriptionI18n     *valueobject.I18nText        `json:"description_i18n,omitempty"`
+	RewardExperience    int64                        `json:"reward_experience"`
+	CompletionCondition enum.CompletionConditionEnum `json:"completion_condition"`
+	HideChildren        bool                         `json:"hide_children"`
+	Style               *valueobject.Metadata        `json:"style,omitempty"`
+	Meta                *valueobject.Metadata        `json:"meta,omitempty"`
+	PublishedAt         *time.Time                   `json:"published_at,omitempty"`
+	CreatedAt           time.Time                    `json:"created_at"`
+	DeletedAt           *time.Time                   `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Course{}

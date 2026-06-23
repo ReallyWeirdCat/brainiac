@@ -24,13 +24,13 @@ import (
 )
 
 type StudentGroupCourse struct {
-	GUID             valueobject.GUID
-	StudentGroupGUID valueobject.GUID
-	CourseGUID       valueobject.GUID
-	FullAccess       bool
-	CloseSubmissions bool
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	GUID             valueobject.GUID `json:"guid"`
+	StudentGroupGUID valueobject.GUID `json:"student_group_guid"`
+	CourseGUID       valueobject.GUID `json:"course_guid"`
+	FullAccess       bool             `json:"full_access"`
+	CloseSubmissions bool             `json:"close_submissions"`
+	CreatedAt        time.Time        `json:"created_at"`
+	DeletedAt        *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentGroupCourse{}

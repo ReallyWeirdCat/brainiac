@@ -24,11 +24,11 @@ import (
 )
 
 type StudentAchievement struct {
-	GUID            valueobject.GUID
-	AppUserGUID     valueobject.GUID
-	AchievementGUID valueobject.GUID
-	CreatedAt       time.Time
-	DeletedAt       *time.Time
+	GUID            valueobject.GUID `json:"guid"`
+	AppUserGUID     valueobject.GUID `json:"app_user_guid"`
+	AchievementGUID valueobject.GUID `json:"achievement_guid"`
+	CreatedAt       time.Time        `json:"created_at"`
+	DeletedAt       *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &StudentAchievement{}

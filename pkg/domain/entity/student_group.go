@@ -24,12 +24,12 @@ import (
 )
 
 type StudentGroup struct {
-	GUID               valueobject.GUID
-	Title              string
-	Description        *string
-	EnableGamification bool
-	CreatedAt          time.Time
-	DeletedAt          *time.Time
+	GUID               valueobject.GUID `json:"guid"`
+	Title              string           `json:"title"`
+	Description        *string          `json:"description,omitempty"`
+	EnableGamification bool             `json:"enable_gamification"`
+	CreatedAt          time.Time        `json:"created_at"`
+	DeletedAt          *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentGroup{}

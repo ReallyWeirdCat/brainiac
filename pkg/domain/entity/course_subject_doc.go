@@ -25,18 +25,18 @@ import (
 )
 
 type CourseSubjectDoc struct {
-	GUID              valueobject.GUID
-	CourseSubjectGUID valueobject.GUID
-	TitleI18n         *valueobject.I18nText
-	DescriptionI18n   *valueobject.I18nText
-	SubjectDocType    enum.SubjectDocTypeEnum
-	ExampleMeta       *valueobject.Metadata
-	SubmissionMeta    *valueobject.Metadata
-	LiteratureMeta    *valueobject.Metadata
-	DocIndex          int16
-	PublishedAt       *time.Time
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+	GUID              valueobject.GUID        `json:"guid"`
+	CourseSubjectGUID valueobject.GUID        `json:"course_subject_guid"`
+	TitleI18n         *valueobject.I18nText   `json:"title_i18n,omitempty"`
+	DescriptionI18n   *valueobject.I18nText   `json:"description_i18n,omitempty"`
+	SubjectDocType    enum.SubjectDocTypeEnum `json:"subject_doc_type"`
+	ExampleMeta       *valueobject.Metadata   `json:"example_meta,omitempty"`
+	SubmissionMeta    *valueobject.Metadata   `json:"submission_meta,omitempty"`
+	LiteratureMeta    *valueobject.Metadata   `json:"literature_meta,omitempty"`
+	DocIndex          int16                   `json:"doc_index"`
+	PublishedAt       *time.Time              `json:"published_at,omitempty"`
+	CreatedAt         time.Time               `json:"created_at"`
+	DeletedAt         *time.Time              `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = CourseSubjectDoc{}

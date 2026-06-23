@@ -25,19 +25,19 @@ import (
 )
 
 type Message struct {
-	GUID           valueobject.GUID
-	ChatMemberGUID valueobject.GUID
-	ChatGUID       valueobject.GUID
-	ResourceURL    *valueobject.HttpUrl
-	Content        *string
-	Urgency        enum.UrgencyEnum
-	Meta           *valueobject.Metadata
-	SeenBy         *valueobject.Metadata
-	EditedAt       *time.Time
-	PinnedAt       *time.Time
-	ExpireAt       *time.Time
-	CreatedAt      time.Time
-	DeletedAt      *time.Time
+	GUID           valueobject.GUID      `json:"guid"`
+	ChatMemberGUID valueobject.GUID      `json:"chat_member_guid"`
+	ChatGUID       valueobject.GUID      `json:"chat_guid"`
+	ResourceURL    *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	Content        *string               `json:"content,omitempty"`
+	Urgency        enum.UrgencyEnum      `json:"urgency"`
+	Meta           *valueobject.Metadata `json:"meta,omitempty"`
+	SeenBy         *valueobject.Metadata `json:"seen_by,omitempty"`
+	EditedAt       *time.Time            `json:"edited_at,omitempty"`
+	PinnedAt       *time.Time            `json:"pinned_at,omitempty"`
+	ExpireAt       *time.Time            `json:"expire_at,omitempty"`
+	CreatedAt      time.Time             `json:"created_at"`
+	DeletedAt      *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Message{}

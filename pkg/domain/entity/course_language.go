@@ -24,13 +24,13 @@ import (
 )
 
 type CourseLanguage struct {
-	GUID                        valueobject.GUID
-	LanguageGUID                valueobject.GUID
-	CalculatedSupportPercentage int16
-	IsBeta                      bool
-	IsNew                       bool
-	CreatedAt                   time.Time
-	DeletedAt                   *time.Time
+	GUID                        valueobject.GUID `json:"guid"`
+	LanguageGUID                valueobject.GUID `json:"language_guid"`
+	CalculatedSupportPercentage int16            `json:"calculated_support_percentage"`
+	IsBeta                      bool             `json:"is_beta"`
+	IsNew                       bool             `json:"is_new"`
+	CreatedAt                   time.Time        `json:"created_at"`
+	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = CourseLanguage{}

@@ -24,18 +24,18 @@ import (
 )
 
 type Achievement struct {
-	GUID             valueobject.GUID
-	TitleI18n        valueobject.I18nText
-	DescriptionI18n  *valueobject.I18nText
-	ResourceURL      *valueobject.HttpUrl
-	IsHidden         bool
-	Meta             *valueobject.Metadata
-	Conditions       *valueobject.Metadata
-	RewardExperience int64
-	RewardMoney      int64
-	PublishedAt      *time.Time
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	GUID             valueobject.GUID      `json:"guid"`
+	TitleI18n        valueobject.I18nText  `json:"title_i18n"`
+	DescriptionI18n  *valueobject.I18nText `json:"description_i18n,omitempty"`
+	ResourceURL      *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	IsHidden         bool                  `json:"is_hidden"`
+	Meta             *valueobject.Metadata `json:"meta,omitempty"`
+	Conditions       *valueobject.Metadata `json:"conditions,omitempty"`
+	RewardExperience int64                 `json:"reward_experience"`
+	RewardMoney      int64                 `json:"reward_money"`
+	PublishedAt      *time.Time            `json:"published_at,omitempty"`
+	CreatedAt        time.Time             `json:"created_at"`
+	DeletedAt        *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &Achievement{}

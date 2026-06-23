@@ -24,10 +24,10 @@ import (
 )
 
 type AppUser struct {
-	GUID      valueobject.GUID
-	Username  valueobject.Username
-	CreatedAt time.Time
-	DeletedAt *time.Time
+	GUID      valueobject.GUID     `json:"guid"`
+	Username  valueobject.Username `json:"username"`
+	CreatedAt time.Time            `json:"created_at"`
+	DeletedAt *time.Time           `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &AppUser{}

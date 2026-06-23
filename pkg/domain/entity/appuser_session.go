@@ -24,15 +24,15 @@ import (
 )
 
 type AppUserSession struct {
-	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	LastIPv4    *string
-	LastIPv6    *string
-	LastAgent   *string
-	LastSeenAt  time.Time
-	ExpireAt    *time.Time
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	GUID        valueobject.GUID `json:"guid"`
+	AppUserGUID valueobject.GUID `json:"app_user_guid"`
+	LastIPv4    *string          `json:"last_ipv4,omitempty"`
+	LastIPv6    *string          `json:"last_ipv6,omitempty"`
+	LastAgent   *string          `json:"last_agent,omitempty"`
+	LastSeenAt  time.Time        `json:"last_seen_at"`
+	ExpireAt    *time.Time       `json:"expire_at,omitempty"`
+	CreatedAt   time.Time        `json:"created_at"`
+	DeletedAt   *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &AppUserSession{}

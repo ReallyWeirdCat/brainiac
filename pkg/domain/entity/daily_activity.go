@@ -24,16 +24,16 @@ import (
 )
 
 type DailyActivity struct {
-	GUID                 valueobject.GUID
-	AppUserGUID          valueobject.GUID
-	Day                  time.Time
-	ExperienceEarned     int64
-	LevelsEarned         int16
-	SubjectsCompleted    int16
-	AssessmentsCompleted int16
-	PracticesCompleted   int16
-	CreatedAt            time.Time
-	DeletedAt            *time.Time
+	GUID                 valueobject.GUID `json:"guid"`
+	AppUserGUID          valueobject.GUID `json:"app_user_guid"`
+	Day                  time.Time        `json:"day"`
+	ExperienceEarned     int64            `json:"experience_earned"`
+	LevelsEarned         int16            `json:"levels_earned"`
+	SubjectsCompleted    int16            `json:"subjects_completed"`
+	AssessmentsCompleted int16            `json:"assessments_completed"`
+	PracticesCompleted   int16            `json:"practices_completed"`
+	CreatedAt            time.Time        `json:"created_at"`
+	DeletedAt            *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &DailyActivity{}

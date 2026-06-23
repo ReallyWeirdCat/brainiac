@@ -25,14 +25,14 @@ import (
 )
 
 type StudentCourseSubject struct {
-	GUID              valueobject.GUID
-	CourseSubjectGUID valueobject.GUID
-	CompletedAt       *time.Time
-	SubjectStatus     enum.SubjectStatusEnum
-	IsFavorite        bool
-	Meta              *valueobject.Metadata
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+	GUID              valueobject.GUID       `json:"guid"`
+	CourseSubjectGUID valueobject.GUID       `json:"course_subject_guid"`
+	CompletedAt       *time.Time             `json:"completed_at,omitempty"`
+	SubjectStatus     enum.SubjectStatusEnum `json:"subject_status"`
+	IsFavorite        bool                   `json:"is_favorite"`
+	Meta              *valueobject.Metadata  `json:"meta,omitempty"`
+	CreatedAt         time.Time              `json:"created_at"`
+	DeletedAt         *time.Time             `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentCourseSubject{}

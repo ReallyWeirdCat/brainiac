@@ -24,12 +24,12 @@ import (
 )
 
 type CourseSubjectItem struct {
-	GUID              valueobject.GUID
-	CourseSubjectGUID valueobject.GUID
-	ItemGUID          valueobject.GUID
-	Amount            int16
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+	GUID              valueobject.GUID `json:"guid"`
+	CourseSubjectGUID valueobject.GUID `json:"course_subject_guid"`
+	ItemGUID          valueobject.GUID `json:"item_guid"`
+	Amount            int16            `json:"amount"`
+	CreatedAt         time.Time        `json:"created_at"`
+	DeletedAt         *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &CourseSubjectItem{}

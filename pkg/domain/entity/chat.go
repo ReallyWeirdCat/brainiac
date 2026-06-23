@@ -24,16 +24,16 @@ import (
 )
 
 type Chat struct {
-	GUID               valueobject.GUID
-	Title              string
-	Topic              *string
-	AvatarURL          *valueobject.HttpUrl
-	StudentsCanText    bool
-	StudentsSeeMembers bool
-	PreserveMessages   bool
-	Meta               *valueobject.Metadata
-	CreatedAt          time.Time
-	DeletedAt          *time.Time
+	GUID               valueobject.GUID      `json:"guid"`
+	Title              string                `json:"title"`
+	Topic              *string               `json:"topic,omitempty"`
+	AvatarURL          *valueobject.HttpUrl  `json:"avatar_url,omitempty"`
+	StudentsCanText    bool                  `json:"students_can_text"`
+	StudentsSeeMembers bool                  `json:"students_see_members"`
+	PreserveMessages   bool                  `json:"preserve_messages"`
+	Meta               *valueobject.Metadata `json:"meta,omitempty"`
+	CreatedAt          time.Time             `json:"created_at"`
+	DeletedAt          *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Chat{}

@@ -25,20 +25,20 @@ import (
 )
 
 type StudentGroupClass struct {
-	GUID                          valueobject.GUID
-	StudentGroupGUID              valueobject.GUID
-	Title                         string
-	StartTime                     time.Time
-	EndTime                       time.Time
-	Objectives                    *valueobject.Metadata
-	AttestationAssessmentsEnabled bool
-	AttendanceClosedAt            *time.Time
-	MarksApprovedAt               *time.Time
-	TOTPSecret                    []byte
-	Room                          *string
-	ClassType                     enum.ClassTypeEnum
-	CreatedAt                     time.Time
-	DeletedAt                     *time.Time
+	GUID                          valueobject.GUID      `json:"guid"`
+	StudentGroupGUID              valueobject.GUID      `json:"student_group_guid"`
+	Title                         string                `json:"title"`
+	StartTime                     time.Time             `json:"start_time"`
+	EndTime                       time.Time             `json:"end_time"`
+	Objectives                    *valueobject.Metadata `json:"objectives,omitempty"`
+	AttestationAssessmentsEnabled bool                  `json:"attestation_assessments_enabled"`
+	AttendanceClosedAt            *time.Time            `json:"attendance_closed_at,omitempty"`
+	MarksApprovedAt               *time.Time            `json:"marks_approved_at,omitempty"`
+	TOTPSecret                    []byte                `json:"totp_secret,omitempty"`
+	Room                          *string               `json:"room,omitempty"`
+	ClassType                     enum.ClassTypeEnum    `json:"class_type"`
+	CreatedAt                     time.Time             `json:"created_at"`
+	DeletedAt                     *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentGroupClass{}

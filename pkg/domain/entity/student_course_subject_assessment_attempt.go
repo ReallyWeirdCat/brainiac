@@ -25,14 +25,14 @@ import (
 )
 
 type StudentCourseSubjectAssessmentAttempt struct {
-	GUID          valueobject.GUID
-	AppUserGUID   valueobject.GUID
-	AttemptStatus enum.AttemptStatusEnum
-	Score         int16
-	IsSuccess     bool
-	Answers       valueobject.Metadata
-	CreatedAt     time.Time
-	DeletedAt     *time.Time
+	GUID          valueobject.GUID       `json:"guid"`
+	AppUserGUID   valueobject.GUID       `json:"app_user_guid"`
+	AttemptStatus enum.AttemptStatusEnum `json:"attempt_status"`
+	Score         int16                  `json:"score"`
+	IsSuccess     bool                   `json:"is_success"`
+	Answers       valueobject.Metadata   `json:"answers"`
+	CreatedAt     time.Time              `json:"created_at"`
+	DeletedAt     *time.Time             `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentCourseSubjectAssessmentAttempt{}

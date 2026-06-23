@@ -25,14 +25,14 @@ import (
 )
 
 type StudentGroupMember struct {
-	GUID                 valueobject.GUID
-	AppUserGUID          valueobject.GUID
-	StudentRole          enum.StudentRoleEnum
-	Notes                *string
-	Team                 *string
-	TeamResponsibilities *valueobject.Metadata
-	CreatedAt            time.Time
-	DeletedAt            *time.Time
+	GUID                 valueobject.GUID      `json:"guid"`
+	AppUserGUID          valueobject.GUID      `json:"app_user_guid"`
+	StudentRole          enum.StudentRoleEnum  `json:"student_role"`
+	Notes                *string               `json:"notes,omitempty"`
+	Team                 *string               `json:"team,omitempty"`
+	TeamResponsibilities *valueobject.Metadata `json:"team_responsibilities,omitempty"`
+	CreatedAt            time.Time             `json:"created_at"`
+	DeletedAt            *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentGroupMember{}

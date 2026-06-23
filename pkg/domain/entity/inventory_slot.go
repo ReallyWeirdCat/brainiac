@@ -24,14 +24,14 @@ import (
 )
 
 type InventorySlot struct {
-	GUID             valueobject.GUID
-	InventoryGUID    valueobject.GUID
-	ItemGUID         valueobject.GUID
-	Amount           int16
-	AmountInExchange int16
-	ExpireAt         *time.Time
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	GUID             valueobject.GUID `json:"guid"`
+	InventoryGUID    valueobject.GUID `json:"inventory_guid"`
+	ItemGUID         valueobject.GUID `json:"item_guid"`
+	Amount           int16            `json:"amount"`
+	AmountInExchange int16            `json:"amount_in_exchange"`
+	ExpireAt         *time.Time       `json:"expire_at,omitempty"`
+	CreatedAt        time.Time        `json:"created_at"`
+	DeletedAt        *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &InventorySlot{}

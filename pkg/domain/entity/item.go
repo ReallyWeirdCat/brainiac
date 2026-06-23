@@ -25,23 +25,23 @@ import (
 )
 
 type Item struct {
-	GUID            valueobject.GUID
-	TitleI18n       valueobject.I18nText
-	DescriptionI18n *valueobject.I18nText
-	ResourceURL     *valueobject.HttpUrl
-	Meta            valueobject.Metadata
-	StackSize       int16
-	Rarity          enum.RarityEnum
-	AllowExchange   bool
-	ShopPrice       *int64
-	OneTimePurchase bool
-	ShopQuantity    *int16
-	LevelRequired   *int16
-	OnSaleSince     *time.Time
-	OnSaleUntil     *time.Time
-	PublishedAt     *time.Time
-	CreatedAt       time.Time
-	DeletedAt       *time.Time
+	GUID            valueobject.GUID      `json:"guid"`
+	TitleI18n       valueobject.I18nText  `json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `json:"description_i18n,omitempty"`
+	ResourceURL     *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	Meta            valueobject.Metadata  `json:"meta"`
+	StackSize       int16                 `json:"stack_size"`
+	Rarity          enum.RarityEnum       `json:"rarity"`
+	AllowExchange   bool                  `json:"allow_exchange"`
+	ShopPrice       *int64                `json:"shop_price,omitempty"`
+	OneTimePurchase bool                  `json:"one_time_purchase"`
+	ShopQuantity    *int16                `json:"shop_quantity,omitempty"`
+	LevelRequired   *int16                `json:"level_required,omitempty"`
+	OnSaleSince     *time.Time            `json:"on_sale_since,omitempty"`
+	OnSaleUntil     *time.Time            `json:"on_sale_until,omitempty"`
+	PublishedAt     *time.Time            `json:"published_at,omitempty"`
+	CreatedAt       time.Time             `json:"created_at"`
+	DeletedAt       *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &Item{}

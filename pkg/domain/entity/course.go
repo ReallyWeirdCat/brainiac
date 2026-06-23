@@ -24,14 +24,14 @@ import (
 )
 
 type Course struct {
-	GUID            valueobject.GUID
-	TitleI18n       *valueobject.I18nText
-	DescriptionI18n *valueobject.I18nText
-	Style           *valueobject.Metadata
-	Meta            *valueobject.Metadata
-	PublishedAt     *time.Time
-	CreatedAt       time.Time
-	DeletedAt       *time.Time
+	GUID            valueobject.GUID      `json:"guid"`
+	TitleI18n       *valueobject.I18nText `json:"title_i18n,omitempty"`
+	DescriptionI18n *valueobject.I18nText `json:"description_i18n,omitempty"`
+	Style           *valueobject.Metadata `json:"style,omitempty"`
+	Meta            *valueobject.Metadata `json:"meta,omitempty"`
+	PublishedAt     *time.Time            `json:"published_at,omitempty"`
+	CreatedAt       time.Time             `json:"created_at"`
+	DeletedAt       *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Course{}

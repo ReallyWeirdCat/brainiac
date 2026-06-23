@@ -24,14 +24,14 @@ import (
 )
 
 type StudentCourseStats struct {
-	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	CourseGUID  valueobject.GUID
-	Experience  int64
-	Level       int16
-	Meta        *valueobject.Metadata
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	GUID        valueobject.GUID      `json:"guid"`
+	AppUserGUID valueobject.GUID      `json:"app_user_guid"`
+	CourseGUID  valueobject.GUID      `json:"course_guid"`
+	Experience  int64                 `json:"experience"`
+	Level       int16                 `json:"level"`
+	Meta        *valueobject.Metadata `json:"meta"`
+	CreatedAt   time.Time             `json:"created_at"`
+	DeletedAt   *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &StudentCourseStats{}

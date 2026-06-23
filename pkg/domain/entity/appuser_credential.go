@@ -24,11 +24,11 @@ import (
 )
 
 type AppUserCredential struct {
-	AppUserGUID  valueobject.GUID
-	Email        *valueobject.Email
-	PasswordHash string
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+	AppUserGUID  valueobject.GUID   `json:"app_user_guid"`
+	Email        *valueobject.Email `json:"email,omitempty"`
+	PasswordHash string             `json:"-"`
+	CreatedAt    time.Time          `json:"created_at"`
+	DeletedAt    *time.Time         `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &AppUserCredential{}

@@ -24,13 +24,13 @@ import (
 )
 
 type AppUserSuspension struct {
-	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	Reason      string
-	ExpireAt    *time.Time
-	ExpiredAt   *time.Time
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	GUID        valueobject.GUID `json:"guid"`
+	AppUserGUID valueobject.GUID `json:"app_user_guid"`
+	Reason      string           `json:"reason"`
+	ExpireAt    *time.Time       `json:"expire_at,omitempty"`
+	ExpiredAt   *time.Time       `json:"expired_at,omitempty"`
+	CreatedAt   time.Time        `json:"created_at"`
+	DeletedAt   *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &AppUserSuspension{}

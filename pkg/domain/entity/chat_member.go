@@ -25,16 +25,16 @@ import (
 )
 
 type ChatMember struct {
-	GUID           valueobject.GUID
-	AppUserGUID    valueobject.GUID
-	ChatGUID       valueobject.GUID
-	ChatRole       enum.ChatRoleEnum
-	Name           *string
-	CustomRoleName *string
-	LeftAt         *time.Time
-	SeenAt         *time.Time
-	CreatedAt      time.Time
-	DeletedAt      time.Time
+	GUID           valueobject.GUID  `json:"guid"`
+	AppUserGUID    valueobject.GUID  `json:"app_user_guid"`
+	ChatGUID       valueobject.GUID  `json:"chat_guid"`
+	ChatRole       enum.ChatRoleEnum `json:"chat_role"`
+	Name           *string           `json:"name,omitempty"`
+	CustomRoleName *string           `json:"custom_role_name,omitempty"`
+	LeftAt         *time.Time        `json:"left_at,omitempty"`
+	SeenAt         *time.Time        `json:"seen_at,omitempty"`
+	CreatedAt      time.Time         `json:"created_at"`
+	DeletedAt      time.Time         `json:"deleted_at"`
 }
 
 var _ Entity = ChatMember{}

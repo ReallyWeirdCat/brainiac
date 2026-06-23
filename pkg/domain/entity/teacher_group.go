@@ -24,17 +24,17 @@ import (
 )
 
 type TeacherGroup struct {
-	GUID               valueobject.GUID
-	TeacherGUID        valueobject.GUID
-	StudentGroupGUID   valueobject.GUID
-	ActiveSince        *time.Time
-	ManageAttendace    bool
-	ManageResults      bool
-	ManageStudents     bool
-	ManageAchievements bool
-	TeacherUntil       *time.Time
-	CreatedAt          time.Time
-	DeletedAt          *time.Time
+	GUID               valueobject.GUID `json:"guid"`
+	TeacherGUID        valueobject.GUID `json:"teacher_guid"`
+	StudentGroupGUID   valueobject.GUID `json:"student_group_guid"`
+	ActiveSince        *time.Time       `json:"active_since,omitempty"`
+	ManageAttendace    bool             `json:"manage_attendance"`
+	ManageResults      bool             `json:"manage_results"`
+	ManageStudents     bool             `json:"manage_students"`
+	ManageAchievements bool             `json:"manage_achievements"`
+	TeacherUntil       *time.Time       `json:"teacher_until,omitempty"`
+	CreatedAt          time.Time        `json:"created_at"`
+	DeletedAt          *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = TeacherGroup{}

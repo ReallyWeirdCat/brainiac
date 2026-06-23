@@ -25,17 +25,17 @@ import (
 )
 
 type Notification struct {
-	GUID        valueobject.GUID
-	AppUserGUID valueobject.GUID
-	TitleI18n   valueobject.I18nText
-	ContentI18n *valueobject.I18nText
-	ResourceURL *valueobject.HttpUrl
-	Urgency     enum.UrgencyEnum
-	Meta        *valueobject.Metadata
-	SeenAt      *time.Time
-	ExpireAt    *time.Time
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	GUID        valueobject.GUID      `json:"guid"`
+	AppUserGUID valueobject.GUID      `json:"app_user_guid"`
+	TitleI18n   valueobject.I18nText  `json:"title_i18n"`
+	ContentI18n *valueobject.I18nText `json:"content_i18n,omitempty"`
+	ResourceURL *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	Urgency     enum.UrgencyEnum      `json:"urgency"`
+	Meta        *valueobject.Metadata `json:"meta,omitempty"`
+	SeenAt      *time.Time            `json:"seen_at,omitempty"`
+	ExpireAt    *time.Time            `json:"expire_at,omitempty"`
+	CreatedAt   time.Time             `json:"created_at"`
+	DeletedAt   *time.Time            `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = Notification{}

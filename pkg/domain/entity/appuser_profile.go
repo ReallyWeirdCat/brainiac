@@ -27,18 +27,18 @@ import (
 var _ Entity = &AppUserProfile{}
 
 type AppUserProfile struct {
-	AppUserGUID       valueobject.GUID
-	Name              *valueobject.Name
-	Surname           *valueobject.Name
-	Patronymic        *valueobject.Name
-	Nickname          *valueobject.Nickname
-	Bio               *valueobject.Bio
-	PreferredLanguage valueobject.LanguageCode
-	ProfileDiscovery  enum.ProfileDiscoveryEnum
-	AvatarUrl         *valueobject.HttpUrl
-	EditingLockedAt   *time.Time
-	CreatedAt         time.Time
-	DeletedAt         *time.Time
+	AppUserGUID       valueobject.GUID          `json:"app_user_guid"`
+	Name              *valueobject.Name         `json:"name,omitempty"`
+	Surname           *valueobject.Name         `json:"surname,omitempty"`
+	Patronymic        *valueobject.Name         `json:"patronymic,omitempty"`
+	Nickname          *valueobject.Nickname     `json:"nickname,omitempty"`
+	Bio               *valueobject.Bio          `json:"bio,omitempty"`
+	PreferredLanguage valueobject.LanguageCode  `json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `json:"avatar_url,omitempty"`
+	EditingLockedAt   *time.Time                `json:"editing_locked_at,omitempty"`
+	CreatedAt         time.Time                 `json:"created_at"`
+	DeletedAt         *time.Time                `json:"deleted_at,omitempty"`
 }
 
 func (a *AppUserProfile) IsValid() bool {

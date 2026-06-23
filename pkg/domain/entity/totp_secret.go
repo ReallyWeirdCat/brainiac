@@ -24,11 +24,11 @@ import (
 )
 
 type TOTPSecret struct {
-	AppUserGUID  valueobject.GUID
-	SecretBase32 string
-	LastUsedAt   *time.Time
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+	AppUserGUID  valueobject.GUID `json:"app_user_guid"`
+	SecretBase32 string           `json:"-"`
+	LastUsedAt   *time.Time       `json:"last_used_at,omitempty"`
+	CreatedAt    time.Time        `json:"created_at"`
+	DeletedAt    *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &TOTPSecret{}

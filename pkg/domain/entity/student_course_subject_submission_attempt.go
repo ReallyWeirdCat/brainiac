@@ -25,15 +25,15 @@ import (
 )
 
 type StudentCourseSubjectSubmissionAttempt struct {
-	GUID             valueobject.GUID
-	AppUserGUID      valueobject.GUID
-	SubmissionStatus enum.SubmissionStatusEnum
-	Files            *valueobject.Metadata
-	StudentComment   *string
-	TeacherComment   *string
-	Meta             *valueobject.Metadata
-	CreatedAt        time.Time
-	DeletedAt        *time.Time
+	GUID             valueobject.GUID          `json:"guid"`
+	AppUserGUID      valueobject.GUID          `json:"app_user_guid"`
+	SubmissionStatus enum.SubmissionStatusEnum `json:"submission_status"`
+	Files            *valueobject.Metadata     `json:"files,omitempty"`
+	StudentComment   *string                   `json:"student_comment,omitempty"`
+	TeacherComment   *string                   `json:"teacher_comment,omitempty"`
+	Meta             *valueobject.Metadata     `json:"meta,omitempty"`
+	CreatedAt        time.Time                 `json:"created_at"`
+	DeletedAt        *time.Time                `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = StudentCourseSubjectSubmissionAttempt{}

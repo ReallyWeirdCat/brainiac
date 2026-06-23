@@ -25,24 +25,24 @@ import (
 )
 
 type CourseSubjectAssessment struct {
-	GUID                 valueobject.GUID
-	TitleI18n            *valueobject.I18nText
-	DescriptionI18n      *valueobject.I18nText
-	IsAttestation        bool
-	HideAnswers          bool
-	HideAnswerValidity   bool
-	HideScore            bool
-	UseTimedQuestions    bool
-	MaxTime              int16
-	MaxAttempts          int16
-	ScoringMethod        enum.ScoringMethodEnum
-	RequiredScore        int8
-	ShortQuestionsCount  int16
-	NormalQuestionsCount int16
-	LongQuestionsCount   int16
-	PublishedAt          *time.Time
-	CreatedAt            time.Time
-	DeletedAt            *time.Time
+	GUID                 valueobject.GUID       `json:"guid"`
+	TitleI18n            *valueobject.I18nText  `json:"title_i18n,omitempty"`
+	DescriptionI18n      *valueobject.I18nText  `json:"description_i18n,omitempty"`
+	IsAttestation        bool                   `json:"is_attestation"`
+	HideAnswers          bool                   `json:"hide_answers"`
+	HideAnswerValidity   bool                   `json:"hide_answer_validity"`
+	HideScore            bool                   `json:"hide_score"`
+	UseTimedQuestions    bool                   `json:"use_timed_questions"`
+	MaxTime              int16                  `json:"max_time"`
+	MaxAttempts          int16                  `json:"max_attempts"`
+	ScoringMethod        enum.ScoringMethodEnum `json:"scoring_method"`
+	RequiredScore        int8                   `json:"required_score"`
+	ShortQuestionsCount  int16                  `json:"short_questions_count"`
+	NormalQuestionsCount int16                  `json:"normal_questions_count"`
+	LongQuestionsCount   int16                  `json:"long_questions_count"`
+	PublishedAt          *time.Time             `json:"published_at,omitempty"`
+	CreatedAt            time.Time              `json:"created_at"`
+	DeletedAt            *time.Time             `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = CourseSubjectAssessment{}
