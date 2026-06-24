@@ -625,6 +625,7 @@ CREATE TABLE registration_invite (
     app_user_guid UUID PRIMARY KEY REFERENCES app_user(guid),
     invited_by_app_user_guid UUID NOT NULL REFERENCES app_user(guid),
     invite_code UUID NOT NULL,
+    email VARCHAR(255) NULL,
     message TEXT NULL,
     name VARCHAR(100) NULL,
     surname VARCHAR(100) NULL,

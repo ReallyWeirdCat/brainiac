@@ -27,6 +27,7 @@ type RegistrationInvite struct {
 	AppUserGUID          valueobject.GUID      `json:"app_user_guid"`
 	InvitedByAppUserGUID *valueobject.GUID     `json:"invited_by_app_user_guid,omitempty"`
 	InviteCode           valueobject.GUID      `json:"invite_code"`
+	Email                *valueobject.Email    `json:"email,omitempty"`
 	Message              *string               `json:"message,omitempty"`
 	Name                 *valueobject.Name     `json:"name,omitempty"`
 	Surname              *valueobject.Name     `json:"surname,omitempty"`
@@ -49,6 +50,9 @@ func (r RegistrationInvite) IsValid() bool {
 		return false
 	}
 	if r.InviteCode == nil || !r.InviteCode.IsValid() {
+		return false
+	}
+	if r.Email != nil && !r.Email.IsValid() {
 		return false
 	}
 	if r.InvitedByAppUserGUID != nil && !(*r.InvitedByAppUserGUID).IsValid() {

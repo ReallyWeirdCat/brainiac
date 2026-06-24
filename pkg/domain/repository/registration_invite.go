@@ -31,5 +31,7 @@ type RegistrationInviteRepository interface {
 	GetByInviteCode(ctx context.Context, guid valueobject.GUID) (*entity.RegistrationInvite, error)
 	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) (*entity.RegistrationInvite, error)
 	GetByUsername(ctx context.Context, username string) (*entity.RegistrationInvite, error)
+	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.RegistrationInvite, error)
+	ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error)
 	ExistsByUsername(ctx context.Context, username string) (bool, error)
 }
