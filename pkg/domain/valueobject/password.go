@@ -23,10 +23,6 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
-type CompromisedPasswordChecker interface {
-	IsCompromised(password string) bool
-}
-
 var (
 	// allowedChars ensures only printable ASCII (space to ~).
 	allowedChars = regexp.MustCompile(`^[\x20-\x7E]+$`)
@@ -51,7 +47,7 @@ type Password struct {
 var _ ValueObject = Password{}
 
 // NewPassword creates a Password after validation.
-func NewPassword(password string, compromisedPasswordChecker CompromisedPasswordChecker) (Password, error) {
+func NewPassword(password string) (Password, error) {
 
 	if len(password) < minPasswordLength {
 		return Password{}, errors.ErrWeakPassword
@@ -73,9 +69,6 @@ func NewPassword(password string, compromisedPasswordChecker CompromisedPassword
 	}
 	if !hasSymbol.MatchString(password) {
 		return Password{}, errors.ErrWeakPassword
-	}
-	if compromisedPasswordChecker.IsCompromised(password) {
-		return Password{}, errors.ErrCompromisedPassword
 	}
 	return Password{value: password}, nil
 }

@@ -25,18 +25,9 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
-type mockCompromisedChecker struct {
-	compromised bool
-}
-
-func (m mockCompromisedChecker) IsCompromised(password string) bool {
-	return m.compromised
-}
-
 func TestNewPassword(t *testing.T) {
 	type args struct {
-		password                   string
-		compromisedPasswordChecker CompromisedPasswordChecker
+		password string
 	}
 	tests := []struct {
 		name    string
@@ -47,8 +38,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "valid password with all requirements",
 			args: args{
-				password:                   "Abcdef1!",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Abcdef1!",
 			},
 			want:    Password{value: "Abcdef1!"},
 			wantErr: nil,
@@ -56,8 +46,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "valid password exactly 8 chars",
 			args: args{
-				password:                   "Aa1!aaaa",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Aa1!aaaa",
 			},
 			want:    Password{value: "Aa1!aaaa"},
 			wantErr: nil,
@@ -65,8 +54,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "too short - less than 8 chars",
 			args: args{
-				password:                   "Abc1fa!",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Abc1fa!",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -74,8 +62,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "too long - more than 72 bytes",
 			args: args{
-				password:                   string(make([]byte, 73)),
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: string(make([]byte, 73)),
 			},
 			want:    Password{},
 			wantErr: errors.ErrPasswordTooLong,
@@ -83,8 +70,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "missing digit",
 			args: args{
-				password:                   "Abcdefgh!",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Abcdefgh!",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -92,8 +78,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "missing lowercase",
 			args: args{
-				password:                   "ABCDEF1!",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "ABCDEF1!",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -101,8 +86,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "missing uppercase",
 			args: args{
-				password:                   "abcdef1!",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "abcdef1!",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -110,8 +94,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "missing symbol",
 			args: args{
-				password:                   "Abcdefg1",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Abcdefg1",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -119,8 +102,7 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "invalid characters (tab)",
 			args: args{
-				password:                   "Valid1!\t",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Valid1!\t",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
@@ -128,26 +110,16 @@ func TestNewPassword(t *testing.T) {
 		{
 			name: "invalid characters (Cyrillic)",
 			args: args{
-				password:                   "Валид1!\t",
-				compromisedPasswordChecker: mockCompromisedChecker{false},
+				password: "Валид1!\t",
 			},
 			want:    Password{},
 			wantErr: errors.ErrWeakPassword,
-		},
-		{
-			name: "compromised password",
-			args: args{
-				password:                   "Abcdef1!",
-				compromisedPasswordChecker: mockCompromisedChecker{true},
-			},
-			want:    Password{},
-			wantErr: errors.ErrCompromisedPassword,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewPassword(tt.args.password, tt.args.compromisedPasswordChecker)
+			got, err := NewPassword(tt.args.password)
 			if tt.wantErr != nil {
 				if err == nil {
 					t.Fatalf("NewPassword() error = nil, wantErr %v", tt.wantErr)

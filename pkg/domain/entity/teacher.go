@@ -39,5 +39,5 @@ type Teacher struct {
 var _ Entity = Teacher{}
 
 func (t Teacher) IsValid() bool {
-	return t.AppUserGUID != nil && t.AppUserGUID.IsValid() && t.ContactInfo.IsValid()
+	return t.AppUserGUID.IsValid() && t.ContactInfo.IsValid()
 }
