@@ -35,8 +35,8 @@ var (
 	// hasSymbol requires at least one non-alphanumeric printable ASCII character.
 	hasSymbol = regexp.MustCompile(`[^a-zA-Z0-9]`)
 
-	minPasswordLength = 8
-	maxPasswordLength = 72
+	MinPasswordLength = 8
+	MaxPasswordLength = 72
 )
 
 // Password represents a validated password.
@@ -49,10 +49,10 @@ var _ ValueObject = Password{}
 // NewPassword creates a Password after validation.
 func NewPassword(password string) (Password, error) {
 
-	if len(password) < minPasswordLength {
+	if len(password) < MinPasswordLength {
 		return Password{}, errors.ErrWeakPassword
 	}
-	if len(password) > maxPasswordLength {
+	if len(password) > MaxPasswordLength {
 		return Password{}, errors.ErrPasswordTooLong
 	}
 	if !allowedChars.MatchString(password) {
