@@ -37,7 +37,7 @@ func (a *AppUserCredential) IsValid() bool {
 	if a.PasswordHash == "" || len(a.PasswordHash) != 60 {
 		return false
 	}
-	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
+	if !a.AppUserGUID.IsValid() {
 		return false
 	}
 	if a.Email != nil && !a.Email.IsValid() {

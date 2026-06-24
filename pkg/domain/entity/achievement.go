@@ -41,7 +41,7 @@ type Achievement struct {
 var _ Entity = &Achievement{}
 
 func (a *Achievement) IsValid() bool {
-	if a.GUID == nil || !a.GUID.IsValid() {
+	if !a.GUID.IsValid() {
 		return false
 	}
 	if !a.TitleI18n.IsValid() {

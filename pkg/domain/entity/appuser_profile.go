@@ -42,7 +42,7 @@ type AppUserProfile struct {
 }
 
 func (a *AppUserProfile) IsValid() bool {
-	if a.AppUserGUID == nil || !a.AppUserGUID.IsValid() {
+	if !a.AppUserGUID.IsValid() {
 		return false
 	}
 	if a.Name != nil && !a.Name.IsValid() {

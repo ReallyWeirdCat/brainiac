@@ -35,13 +35,13 @@ type CourseSubjectItem struct {
 var _ Entity = &CourseSubjectItem{}
 
 func (c *CourseSubjectItem) IsValid() bool {
-	if c.GUID == nil || !c.GUID.IsValid() {
+	if !c.GUID.IsValid() {
 		return false
 	}
-	if c.CourseSubjectGUID == nil || !c.CourseSubjectGUID.IsValid() {
+	if !c.CourseSubjectGUID.IsValid() {
 		return false
 	}
-	if c.ItemGUID == nil || !c.ItemGUID.IsValid() {
+	if !c.ItemGUID.IsValid() {
 		return false
 	}
 	if c.Amount < 1 {

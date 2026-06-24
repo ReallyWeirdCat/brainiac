@@ -51,5 +51,5 @@ func (c Course) IsValid() bool {
 		return false
 	}
 
-	return c.GUID != nil && c.GUID.IsValid()
+	return c.GUID.IsValid()
 }

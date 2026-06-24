@@ -38,7 +38,7 @@ type AppUserSession struct {
 var _ Entity = &AppUserSession{}
 
 func (a *AppUserSession) IsValid() bool {
-	if a.GUID == nil || !a.GUID.IsValid() {
+	if !a.GUID.IsValid() {
 		return false
 	}
 	if !a.AppUserGUID.IsValid() {

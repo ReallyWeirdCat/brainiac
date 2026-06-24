@@ -37,13 +37,13 @@ type StudentCourseStats struct {
 var _ Entity = &StudentCourseStats{}
 
 func (s *StudentCourseStats) IsValid() bool {
-	if s.GUID == nil || !s.GUID.IsValid() {
+	if !s.GUID.IsValid() {
 		return false
 	}
-	if s.AppUserGUID == nil || !s.AppUserGUID.IsValid() {
+	if !s.AppUserGUID.IsValid() {
 		return false
 	}
-	if s.CourseGUID == nil || !s.CourseGUID.IsValid() {
+	if !s.CourseGUID.IsValid() {
 		return false
 	}
 	if s.Experience < 0 {

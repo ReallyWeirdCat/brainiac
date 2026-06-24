@@ -46,8 +46,5 @@ func (s StudentGroupMemberClassAttendance) IsValid() bool {
 	if s.Comment != nil && len(*s.Comment) > 1024 {
 		return false
 	}
-	if s.GUID == nil || s.StudentGroupMemberGUID == nil {
-		return false
-	}
 	return s.GUID.IsValid() && s.StudentGroupMemberGUID.IsValid() && s.Grade.IsValid()
 }

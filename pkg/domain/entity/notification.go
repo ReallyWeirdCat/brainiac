@@ -41,9 +41,6 @@ type Notification struct {
 var _ Entity = Notification{}
 
 func (n Notification) IsValid() bool {
-	if n.GUID == nil || n.AppUserGUID == nil {
-		return false
-	}
 	if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() ||
 		!n.TitleI18n.IsValid() || !n.Urgency.IsValid() {
 		return false

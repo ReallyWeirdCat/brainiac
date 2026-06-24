@@ -47,7 +47,7 @@ type Item struct {
 var _ Entity = &Item{}
 
 func (i *Item) IsValid() bool {
-	if i.GUID == nil || !i.GUID.IsValid() {
+	if !i.GUID.IsValid() {
 		return false
 	}
 	if !i.TitleI18n.IsValid() {

@@ -65,12 +65,10 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 	return HttpUrl{value: normalized, url: *parsed}, nil
 }
 
-// String returns the URL string.
 func (h HttpUrl) String() string {
 	return h.value
 }
 
-// Equals returns true if the other object is an HttpUrl with the same value.
 func (h HttpUrl) Equals(other any) bool {
 	otherUrl, ok := other.(HttpUrl)
 	if !ok {
@@ -79,12 +77,11 @@ func (h HttpUrl) Equals(other any) bool {
 	return h.value == otherUrl.value
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (h HttpUrl) IsValid() bool {
-	return true
+	_, err := NewHttpUrl(h.value)
+	return err == nil
 }
 
-// IsZero returns true if the HttpUrl is the zero value (empty URL).
 func (h HttpUrl) IsZero() bool {
 	return h.value == ""
 }

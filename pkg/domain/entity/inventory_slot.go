@@ -37,13 +37,13 @@ type InventorySlot struct {
 var _ Entity = &InventorySlot{}
 
 func (i *InventorySlot) IsValid() bool {
-	if i.GUID == nil || !i.GUID.IsValid() {
+	if !i.GUID.IsValid() {
 		return false
 	}
-	if i.InventoryGUID == nil || !i.InventoryGUID.IsValid() {
+	if !i.InventoryGUID.IsValid() {
 		return false
 	}
-	if i.ItemGUID == nil || !i.ItemGUID.IsValid() {
+	if !i.ItemGUID.IsValid() {
 		return false
 	}
 	if i.Amount < 0 || i.AmountInExchange < 0 {

@@ -15,26 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package entity
+package ports
 
-import (
-	"time"
+import "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
-)
-
-type StudentGroupCourse struct {
-	GUID             valueobject.GUID `json:"guid"`
-	StudentGroupGUID valueobject.GUID `json:"student_group_guid"`
-	CourseGUID       valueobject.GUID `json:"course_guid"`
-	FullAccess       bool             `json:"full_access"`
-	CloseSubmissions bool             `json:"close_submissions"`
-	CreatedAt        time.Time        `json:"created_at"`
-	DeletedAt        *time.Time       `json:"deleted_at,omitempty"`
-}
-
-var _ Entity = StudentGroupCourse{}
-
-func (s StudentGroupCourse) IsValid() bool {
-	return s.GUID.IsValid() && s.StudentGroupGUID.IsValid() && s.CourseGUID.IsValid()
+type GuidProvider interface {
+	New() (valueobject.GUID, error)
+	Parse(string) (valueobject.GUID, error)
 }

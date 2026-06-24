@@ -48,7 +48,7 @@ type StudentGlobalStats struct {
 var _ Entity = &StudentGlobalStats{}
 
 func (s *StudentGlobalStats) IsValid() bool {
-	if s.AppUserGUID == nil || !s.AppUserGUID.IsValid() {
+	if !s.AppUserGUID.IsValid() {
 		return false
 	}
 	if s.Level < 0 {

@@ -41,8 +41,5 @@ func (s StudentCourseSubject) IsValid() bool {
 	if s.Meta != nil && !s.Meta.IsValid() {
 		return false
 	}
-	if s.GUID == nil || s.CourseSubjectGUID == nil {
-		return false
-	}
 	return s.GUID.IsValid() && s.CourseSubjectGUID.IsValid() && s.SubjectStatus.IsValid()
 }

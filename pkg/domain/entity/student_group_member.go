@@ -42,8 +42,5 @@ func (s StudentGroupMember) IsValid() bool {
 	if s.Team != nil && len(*s.Team) > 18 {
 		return false
 	}
-	if s.GUID == nil || s.AppUserGUID == nil {
-		return false
-	}
 	return s.GUID.IsValid() && s.AppUserGUID.IsValid() && s.StudentRole.IsValid()
 }

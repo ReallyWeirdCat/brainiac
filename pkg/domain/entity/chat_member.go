@@ -46,9 +46,5 @@ func (c ChatMember) IsValid() bool {
 	if c.CustomRoleName != nil && len(*c.CustomRoleName) > 100 {
 		return false
 	}
-	if c.GUID == nil || c.AppUserGUID == nil || c.ChatGUID == nil {
-		return false
-	}
-
 	return c.GUID.IsValid() && c.AppUserGUID.IsValid() && c.ChatGUID.IsValid() && c.ChatRole.IsValid()
 }

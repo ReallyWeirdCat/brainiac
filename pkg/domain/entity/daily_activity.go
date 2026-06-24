@@ -39,10 +39,10 @@ type DailyActivity struct {
 var _ Entity = &DailyActivity{}
 
 func (d *DailyActivity) IsValid() bool {
-	if d.GUID == nil || !d.GUID.IsValid() {
+	if !d.GUID.IsValid() {
 		return false
 	}
-	if d.AppUserGUID == nil || !d.AppUserGUID.IsValid() {
+	if !d.AppUserGUID.IsValid() {
 		return false
 	}
 	if d.Day.IsZero() {

@@ -44,6 +44,9 @@ var _ Entity = Course{}
 
 func (c CourseSubject) IsValid() bool {
 
+	if !c.GUID.IsValid() || !c.CourseGUID.IsValid() {
+		return false
+	}
 	if c.TitleI18n != nil && !c.TitleI18n.IsValid() {
 		return false
 	}
@@ -56,7 +59,7 @@ func (c CourseSubject) IsValid() bool {
 	if c.Meta != nil && !c.Meta.IsValid() {
 		return false
 	}
-	if c.GUID == nil || c.CourseGUID == nil || c.ParentGUID != nil && (!(*c.ParentGUID).IsValid() || c.ParentGUID == &c.GUID) {
+	if c.ParentGUID != nil && (!(*c.ParentGUID).IsValid() || *c.ParentGUID == c.GUID) {
 		return false
 	}
 

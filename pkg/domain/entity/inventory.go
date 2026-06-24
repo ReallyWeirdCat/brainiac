@@ -33,7 +33,7 @@ type Inventory struct {
 var _ Entity = &Inventory{}
 
 func (i *Inventory) IsValid() bool {
-	if i.AppUserGUID == nil || !i.AppUserGUID.IsValid() {
+	if !i.AppUserGUID.IsValid() {
 		return false
 	}
 	if i.MaxSlots < 0 {

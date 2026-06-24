@@ -17,14 +17,53 @@
 
 package valueobject
 
-type Provider interface {
-	New() GUID
-	Parse(s string) (GUID, error)
+import (
+	"regexp"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+)
+
+const uuidPattern = `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
+
+type GUID struct {
+	value string
 }
 
-type GUID interface {
-	String() string
-	IsNil() bool
-	Equals(other GUID) bool
-	IsValid() bool
+var _ ValueObject = GUID{}
+
+func NewGUID(guid string) (GUID, error) {
+	matched, _ := regexp.MatchString(uuidPattern, guid)
+
+	if !matched {
+		return GUID{}, errors.ErrInvalidGUID
+	}
+
+	return GUID{value: guid}, nil
+}
+
+func (g GUID) IsValid() bool {
+	_, err := NewGUID(g.value)
+	return err == nil
+}
+
+func (g GUID) Equals(other any) bool {
+	if other == nil {
+		return false
+	}
+	switch v := other.(type) {
+	case GUID:
+		return g.value == v.value
+	case string:
+		return g.value == v
+	default:
+		return false
+	}
+}
+
+func (g GUID) IsZero() bool {
+	return g.value == ""
+}
+
+func (g GUID) String() string {
+	return g.value
 }

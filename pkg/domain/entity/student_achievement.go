@@ -34,13 +34,13 @@ type StudentAchievement struct {
 var _ Entity = &StudentAchievement{}
 
 func (s *StudentAchievement) IsValid() bool {
-	if s.GUID == nil || !s.GUID.IsValid() {
+	if !s.GUID.IsValid() {
 		return false
 	}
-	if s.AppUserGUID == nil || !s.AppUserGUID.IsValid() {
+	if !s.AppUserGUID.IsValid() {
 		return false
 	}
-	if s.AchievementGUID == nil || !s.AchievementGUID.IsValid() {
+	if !s.AchievementGUID.IsValid() {
 		return false
 	}
 	if s.CreatedAt.IsZero() {

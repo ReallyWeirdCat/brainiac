@@ -46,10 +46,10 @@ type RegistrationInvite struct {
 var _ Entity = Language{}
 
 func (r RegistrationInvite) IsValid() bool {
-	if r.AppUserGUID == nil || !r.AppUserGUID.IsValid() {
+	if !r.AppUserGUID.IsValid() {
 		return false
 	}
-	if r.InviteCode == nil || !r.InviteCode.IsValid() {
+	if !r.InviteCode.IsValid() {
 		return false
 	}
 	if r.Email != nil && !r.Email.IsValid() {

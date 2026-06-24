@@ -34,7 +34,7 @@ type AppUser struct {
 var _ Entity = &AppUser{}
 
 func (a *AppUser) IsValid() bool {
-	if a.GUID == nil || !a.GUID.IsValid() {
+	if !a.GUID.IsValid() {
 		return false
 	}
 	if !a.Username.IsValid() {
