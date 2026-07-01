@@ -20,87 +20,70 @@ package repository
 import (
 	"context"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type AppUserCredentialRepo struct {
-	b            *generated.DBTX
-	querier      *generated.Querier
-	guidProvider *ports.GuidProvider
+type PgAppUserCredentialRepo struct {
+	Queries *generated.Queries
 }
 
-// Count implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Count(ctx context.Context) (int64, error) {
+func (p *PgAppUserCredentialRepo) Count(ctx context.Context) (int64, error) {
 	panic("unimplemented")
 }
 
-// Create implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Create(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) Create(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// CreateBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) CreateBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) CreateBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// Delete implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
+func (p *PgAppUserCredentialRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
 	panic("unimplemented")
 }
 
-// DeleteBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
+func (p *PgAppUserCredentialRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
 	panic("unimplemented")
 }
 
-// Exists implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
+func (p *PgAppUserCredentialRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
 	panic("unimplemented")
 }
 
-// ExistsBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
+func (p *PgAppUserCredentialRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
 	panic("unimplemented")
 }
 
-// Get implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// GetAll implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) GetAll(ctx context.Context) ([]*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) GetAll(ctx context.Context) ([]*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// GetBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// Save implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Save(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) Save(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// SaveBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) SaveBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) SaveBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// Update implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) Update(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) Update(ctx context.Context, obj *entity.AppUserCredential) (*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-// UpdateBatch implements repository.AppUserCredentialRepository.
-func (a AppUserCredentialRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
+func (p *PgAppUserCredentialRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUserCredential) ([]*entity.AppUserCredential, error) {
 	panic("unimplemented")
 }
 
-var _ repo.AppUserCredentialRepository = AppUserCredentialRepo{}
+var _ repo.AppUserCredentialRepository = &PgAppUserCredentialRepo{}
 var _ entity.AppUserCredential = entity.AppUserCredential(generated.AppUserCredential{})

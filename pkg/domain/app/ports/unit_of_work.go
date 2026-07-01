@@ -17,10 +17,23 @@
 
 package ports
 
-import "context"
+import (
+	"context"
+
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
+)
+
+type UnitOfWorkProvider interface {
+	// Returns an instance of UnitOfWork with a transaction
+	Begin(ctx context.Context) (UnitOfWork, error)
+	// Returns an instance of UnitOfWork with no transaction
+	New(ctx context.Context) (UnitOfWork, error)
+}
 
 type UnitOfWork interface {
-	Begin(ctx context.Context) (context.Context, error)
+	AppUsers() repository.AppUserRepository
+	AppUserCredentials() repository.AppUserCredentialRepository
+	AppUserProfiles() repository.AppUserProfileRepository
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
 }

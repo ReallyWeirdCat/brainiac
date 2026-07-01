@@ -21,87 +21,70 @@ import (
 	"context"
 
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type PgAppUserRepo struct {
-	db           generated.DBTX
-	querier      generated.Querier
-	guidProvider ports.GuidProvider
+	Queries *generated.Queries
 }
 
-// Count implements repository.AppUserRepository.
-func (p PgAppUserRepo) Count(ctx context.Context) (int64, error) {
+func (p *PgAppUserRepo) Count(ctx context.Context) (int64, error) {
 	panic("unimplemented")
 }
 
-// Create implements repository.AppUserRepository.
-func (p PgAppUserRepo) Create(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+func (p *PgAppUserRepo) Create(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// CreateBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
+func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// Delete implements repository.AppUserRepository.
-func (p PgAppUserRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
+func (p *PgAppUserRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
 	panic("unimplemented")
 }
 
-// DeleteBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
+func (p *PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
 	panic("unimplemented")
 }
 
-// Exists implements repository.AppUserRepository.
-func (p PgAppUserRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
+func (p *PgAppUserRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
 	panic("unimplemented")
 }
 
-// ExistsBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
+func (p *PgAppUserRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
 	panic("unimplemented")
 }
 
-// Get implements repository.AppUserRepository.
-func (p PgAppUserRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity.AppUser, error) {
+func (p *PgAppUserRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// GetAll implements repository.AppUserRepository.
-func (p PgAppUserRepo) GetAll(ctx context.Context) ([]*entity.AppUser, error) {
+func (p *PgAppUserRepo) GetAll(ctx context.Context) ([]*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// GetBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUser, error) {
+func (p *PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// Save implements repository.AppUserRepository.
-func (p PgAppUserRepo) Save(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+func (p *PgAppUserRepo) Save(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// SaveBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
+func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// Update implements repository.AppUserRepository.
-func (p PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+func (p *PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-// UpdateBatch implements repository.AppUserRepository.
-func (p PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
+func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
 	panic("unimplemented")
 }
 
-var _ repo.AppUserRepository = PgAppUserRepo{}
+var _ repo.AppUserRepository = &PgAppUserRepo{}
 var _ entity.AppUser = entity.AppUser(generated.AppUser{})
