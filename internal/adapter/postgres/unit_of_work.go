@@ -92,8 +92,11 @@ func (u *UnitOfWork) Commit(ctx context.Context) error {
 	if u.committed {
 		return fmt.Errorf("transaction already committed")
 	}
-	u.committed = true
-	return u.tx.Commit(ctx)
+	err := u.tx.Commit(ctx)
+	if err == nil {
+		u.committed = true
+	}
+	return err
 }
 
 func (u *UnitOfWork) Rollback(ctx context.Context) error {
