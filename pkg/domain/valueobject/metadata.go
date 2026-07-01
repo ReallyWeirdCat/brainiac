@@ -18,140 +18,65 @@
 package valueobject
 
 import (
+	"bytes"
 	"encoding/json"
-	"maps"
-	"reflect"
+	"errors"
 )
 
-// Metadata holds arbitrary key‑value data, stored as JSONB in the database.
-type Metadata struct {
-	data map[string]any
-}
+type Metadata json.RawMessage
 
-var _ ValueObject = Metadata{}
+var _ ValueObject = Metadata([]byte("{}"))
 
-// NewMetadata creates an empty metadata container.
-func NewMetadata() Metadata {
-	return Metadata{
-		data: make(map[string]any),
+func NewMetadata(data []byte) (Metadata, error) {
+	if !json.Valid(data) {
+		return Metadata{}, errors.New("invalid JSON")
 	}
+	return Metadata(data), nil
 }
 
-// MetadataFromMap creates a Metadata from an existing map.
-// The map is copied to avoid external mutations.
-func MetadataFromMap(raw map[string]any) Metadata {
-	if raw == nil {
-		return NewMetadata()
+func NewMetadataFromMap(data map[string]any) (Metadata, error) {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return Metadata{}, err
 	}
-	copy := make(map[string]any, len(raw))
-	maps.Copy(copy, raw)
-	return Metadata{data: copy}
+	return Metadata(b), nil
 }
 
-// Set adds or updates a key with any JSON‑serializable value.
-func (m *Metadata) Set(key string, value any) {
-	if m.data == nil {
-		m.data = make(map[string]any)
-	}
-	m.data[key] = value
-}
-
-// Get returns the value for a key and a boolean indicating presence.
-func (m Metadata) Get(key string) (any, bool) {
-	if m.data == nil {
-		return nil, false
-	}
-	val, ok := m.data[key]
-	return val, ok
-}
-
-// Delete removes a key.
-func (m Metadata) Delete(key string) {
-	if m.data != nil {
-		delete(m.data, key)
-	}
-}
-
-// Keys returns all keys currently set.
-func (m Metadata) Keys() []string {
-	if m.data == nil {
-		return []string{}
-	}
-	keys := make([]string, 0, len(m.data))
-	for k := range m.data {
-		keys = append(keys, k)
-	}
-	return keys
-}
-
-// AsMap returns a shallow copy of the underlying map.
-func (m Metadata) AsMap() map[string]any {
-	if m.data == nil {
-		return nil
-	}
-	out := make(map[string]any, len(m.data))
-	maps.Copy(out, m.data)
-	return out
-}
-
-// IsEmpty returns true if no metadata is stored.
-func (m Metadata) IsEmpty() bool {
-	return len(m.data) == 0
-}
-
-// Equals compares two Metadata objects by deep JSON equality.
-// This handles nested structures correctly.
 func (m Metadata) Equals(other any) bool {
-	otherMeta, ok := other.(Metadata)
+	otherM, ok := other.(Metadata)
 	if !ok {
 		return false
 	}
-	// If both are empty (nil or len==0), they are equal.
-	if len(m.data) == 0 && len(otherMeta.data) == 0 {
-		return true
-	}
-	// Otherwise compare by JSON.
-	mJSON, err1 := json.Marshal(m.data)
-	oJSON, err2 := json.Marshal(otherMeta.data)
+
+	canon1, err1 := canonicalize(m)
+	canon2, err2 := canonicalize(otherM)
 	if err1 != nil || err2 != nil {
-		return reflect.DeepEqual(m.data, otherMeta.data)
+		return bytes.Equal(m, otherM)
 	}
-	return string(mJSON) == string(oJSON)
+	return bytes.Equal(canon1, canon2)
 }
 
-// String returns a JSON representation of the metadata.
-func (m Metadata) String() string {
-	if m.IsEmpty() {
-		return "{}"
-	}
-	b, _ := json.Marshal(m.data)
-	return string(b)
-}
-
-// IsValid always returns true because any JSON‑serializable value is allowed.
 func (m Metadata) IsValid() bool {
-	return true
+	return json.Valid(m)
 }
 
-// IsZero returns true for an uninitialized Metadata (nil map) or an empty one.
 func (m Metadata) IsZero() bool {
-	return len(m.data) == 0
+	return len(m) == 0
 }
 
-// MarshalJSON implements json.Marshaler for seamless JSONB serialization.
-func (m Metadata) MarshalJSON() ([]byte, error) {
-	if m.data == nil {
-		return []byte("null"), nil
-	}
-	return json.Marshal(m.data)
+func (m Metadata) String() string {
+	return string(m)
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (m *Metadata) UnmarshalJSON(data []byte) error {
-	var raw map[string]any
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+func canonicalize(m Metadata) ([]byte, error) {
+	if len(m) == 0 {
+		return nil, errors.New("nil or empty metadata")
 	}
-	m.data = raw
-	return nil
+	var obj any
+	dec := json.NewDecoder(bytes.NewReader(m))
+	dec.UseNumber()
+	if err := dec.Decode(&obj); err != nil {
+		return nil, err
+	}
+	return json.Marshal(obj)
 }

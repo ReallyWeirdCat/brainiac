@@ -40,59 +40,53 @@ var (
 )
 
 // Password represents a validated password.
-type Password struct {
-	value string
-}
+type Password string
 
-var _ ValueObject = Password{}
+var _ ValueObject = Password("")
 
-// NewPassword creates a Password after validation.
 func NewPassword(password string) (Password, error) {
 
 	if len(password) < MinPasswordLength {
-		return Password{}, errors.ErrWeakPassword
+		return Password(""), errors.ErrWeakPassword
 	}
 	if len(password) > MaxPasswordLength {
-		return Password{}, errors.ErrPasswordTooLong
+		return Password(""), errors.ErrPasswordTooLong
 	}
 	if !allowedChars.MatchString(password) {
-		return Password{}, errors.ErrPasswordNotAcceptable
+		return Password(""), errors.ErrPasswordNotAcceptable
 	}
 	if !hasDigit.MatchString(password) {
-		return Password{}, errors.ErrWeakPassword
+		return Password(""), errors.ErrWeakPassword
 	}
 	if !hasLower.MatchString(password) {
-		return Password{}, errors.ErrWeakPassword
+		return Password(""), errors.ErrWeakPassword
 	}
 	if !hasUpper.MatchString(password) {
-		return Password{}, errors.ErrWeakPassword
+		return Password(""), errors.ErrWeakPassword
 	}
 	if !hasSymbol.MatchString(password) {
-		return Password{}, errors.ErrWeakPassword
+		return Password(""), errors.ErrWeakPassword
 	}
-	return Password{value: password}, nil
+	return Password(password), nil
 }
 
-// String returns the password string.
 func (p Password) String() string {
-	return p.value
+	return string(p)
 }
 
-// Equals returns true if the other object is a Password with the same value.
 func (p Password) Equals(other any) bool {
 	otherPassword, ok := other.(Password)
 	if !ok {
 		return false
 	}
-	return p.value == otherPassword.value
+	return string(p) == string(otherPassword)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (p Password) IsValid() bool {
-	return true
+	_, err := NewPassword(string(p))
+	return err == nil
 }
 
-// IsZero returns true if the Password is the zero value (empty string).
 func (p Password) IsZero() bool {
-	return p.value == ""
+	return string(p) == ""
 }

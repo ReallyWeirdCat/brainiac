@@ -27,7 +27,7 @@ import (
 type Notification struct {
 	GUID        valueobject.GUID      `json:"guid"`
 	AppUserGUID valueobject.GUID      `json:"app_user_guid"`
-	TitleI18n   valueobject.I18nText  `json:"title_i18n"`
+	TitleI18n   *valueobject.I18nText `json:"title_i18n,omitempty"`
 	ContentI18n *valueobject.I18nText `json:"content_i18n,omitempty"`
 	ResourceURL *valueobject.HttpUrl  `json:"resource_url,omitempty"`
 	Urgency     enum.UrgencyEnum      `json:"urgency"`
@@ -41,8 +41,10 @@ type Notification struct {
 var _ Entity = Notification{}
 
 func (n Notification) IsValid() bool {
-	if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() ||
-		!n.TitleI18n.IsValid() || !n.Urgency.IsValid() {
+	if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() || !n.Urgency.IsValid() {
+		return false
+	}
+	if n.TitleI18n != nil && !n.TitleI18n.IsValid() {
 		return false
 	}
 	if n.ContentI18n != nil && !n.ContentI18n.IsValid() {

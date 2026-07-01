@@ -18,15 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type InventoryRepository interface {
-	Save(ctx context.Context, inventory entity.Inventory) error
-	Delete(ctx context.Context, appUserGUID valueobject.GUID) error
-	GetByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) (*entity.Inventory, error)
-	ExistsByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) (bool, error)
+	Repository[entity.Inventory]
 }

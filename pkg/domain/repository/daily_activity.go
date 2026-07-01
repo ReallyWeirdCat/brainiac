@@ -18,18 +18,9 @@
 package repository
 
 import (
-	"context"
-	"time"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type DailyActivityRepository interface {
-	Save(ctx context.Context, activity entity.DailyActivity) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.DailyActivity, error)
-	GetByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) ([]*entity.DailyActivity, error)
-	GetByAppUserAndDay(ctx context.Context, appUserGUID valueobject.GUID, day time.Time) (*entity.DailyActivity, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.DailyActivity]
 }

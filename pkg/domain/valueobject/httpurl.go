@@ -25,12 +25,9 @@ import (
 )
 
 // HttpUrl represents a validated HTTP/HTTPS URL.
-type HttpUrl struct {
-	value string
-	url   url.URL
-}
+type HttpUrl string
 
-var _ ValueObject = HttpUrl{}
+var _ ValueObject = HttpUrl("")
 
 // NewHttpUrl creates an HttpUrl after validation and trimming.
 // If no scheme is provided, "https://" will be added automatically.
@@ -38,7 +35,7 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 	sanitized := strings.TrimSpace(rawUrl)
 
 	if sanitized == "" {
-		return HttpUrl{}, errors.ErrInvalidHttpUrl
+		return HttpUrl(""), errors.ErrInvalidHttpUrl
 	}
 
 	// Check if URL has a scheme; if not, add https://
@@ -48,25 +45,25 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 
 	parsed, err := url.Parse(sanitized)
 	if err != nil {
-		return HttpUrl{}, errors.ErrInvalidHttpUrl
+		return HttpUrl(""), errors.ErrInvalidHttpUrl
 	}
 
 	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return HttpUrl{}, errors.ErrInvalidHttpUrl
+		return HttpUrl(""), errors.ErrInvalidHttpUrl
 	}
 
 	if parsed.Host == "" {
-		return HttpUrl{}, errors.ErrInvalidHttpUrl
+		return HttpUrl(""), errors.ErrInvalidHttpUrl
 	}
 
 	// Reconstruct the URL to ensure consistent formatting
 	normalized := parsed.String()
 
-	return HttpUrl{value: normalized, url: *parsed}, nil
+	return HttpUrl(normalized), nil
 }
 
 func (h HttpUrl) String() string {
-	return h.value
+	return string(h)
 }
 
 func (h HttpUrl) Equals(other any) bool {
@@ -74,18 +71,14 @@ func (h HttpUrl) Equals(other any) bool {
 	if !ok {
 		return false
 	}
-	return h.value == otherUrl.value
+	return string(h) == string(otherUrl)
 }
 
 func (h HttpUrl) IsValid() bool {
-	_, err := NewHttpUrl(h.value)
+	_, err := NewHttpUrl(string(h))
 	return err == nil
 }
 
 func (h HttpUrl) IsZero() bool {
-	return h.value == ""
-}
-
-func (h HttpUrl) Url() url.URL {
-	return h.url
+	return string(h) == ""
 }

@@ -40,7 +40,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Abcdef1!",
 			},
-			want:    Password{value: "Abcdef1!"},
+			want:    Password("Abcdef1!"),
 			wantErr: nil,
 		},
 		{
@@ -48,7 +48,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Aa1!aaaa",
 			},
-			want:    Password{value: "Aa1!aaaa"},
+			want:    Password("Aa1!aaaa"),
 			wantErr: nil,
 		},
 		{
@@ -56,7 +56,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Abc1fa!",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -64,7 +64,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: string(make([]byte, 73)),
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrPasswordTooLong,
 		},
 		{
@@ -72,7 +72,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Abcdefgh!",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -80,7 +80,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "ABCDEF1!",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -88,7 +88,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "abcdef1!",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -96,7 +96,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Abcdefg1",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -104,7 +104,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Valid1!\t",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 		{
@@ -112,7 +112,7 @@ func TestNewPassword(t *testing.T) {
 			args: args{
 				password: "Валид1!\t",
 			},
-			want:    Password{},
+			want:    Password(""),
 			wantErr: errors.ErrWeakPassword,
 		},
 	}

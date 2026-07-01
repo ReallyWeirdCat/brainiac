@@ -18,16 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserCredentialRepository interface {
-	Save(ctx context.Context, userCredential entity.AppUserCredential) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserCredential, error)
-	GetByUsername(ctx context.Context, username string) (*entity.AppUserCredential, error)
-	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	Repository[entity.AppUserCredential]
 }

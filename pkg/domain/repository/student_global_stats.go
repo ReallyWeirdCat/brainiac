@@ -18,15 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type StudentGlobalStatsRepository interface {
-	Save(ctx context.Context, stats entity.StudentGlobalStats) error
-	Delete(ctx context.Context, appUserGUID valueobject.GUID) error
-	GetByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) (*entity.StudentGlobalStats, error)
-	ExistsByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) (bool, error)
+	Repository[entity.StudentGlobalStats]
 }

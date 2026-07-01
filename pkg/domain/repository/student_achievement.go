@@ -18,17 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type StudentAchievementRepository interface {
-	Save(ctx context.Context, studentAchievement entity.StudentAchievement) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentAchievement, error)
-	GetByAppUserGUID(ctx context.Context, appUserGUID valueobject.GUID) ([]*entity.StudentAchievement, error)
-	GetByAchievementGUID(ctx context.Context, achievementGUID valueobject.GUID) ([]*entity.StudentAchievement, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.StudentAchievement]
 }

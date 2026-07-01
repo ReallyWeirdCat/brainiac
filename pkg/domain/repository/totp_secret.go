@@ -18,16 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type TOTPSecretRepository interface {
-	Save(ctx context.Context, user entity.TOTPSecret) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.TOTPSecret, error)
-	GetByUsername(ctx context.Context, username string) (*entity.TOTPSecret, error)
-	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	Repository[entity.TOTPSecret]
 }

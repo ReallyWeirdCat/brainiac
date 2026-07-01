@@ -18,17 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type InventorySlotRepository interface {
-	Save(ctx context.Context, slot entity.InventorySlot) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.InventorySlot, error)
-	GetByInventoryGUID(ctx context.Context, inventoryGUID valueobject.GUID) ([]*entity.InventorySlot, error)
-	GetByItemGUID(ctx context.Context, itemGUID valueobject.GUID) ([]*entity.InventorySlot, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.InventorySlot]
 }

@@ -36,25 +36,25 @@ func TestNewHttpUrl(t *testing.T) {
 		{
 			name:    "valid HTTP URL",
 			args:    args{rawUrl: "http://example.com"},
-			want:    HttpUrl{value: "http://example.com", url: mustParseURL("http://example.com")},
+			want:    HttpUrl("http://example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "valid HTTPS URL",
 			args:    args{rawUrl: "https://example.com/path?query=1"},
-			want:    HttpUrl{value: "https://example.com/path?query=1", url: mustParseURL("https://example.com/path?query=1")},
+			want:    HttpUrl("https://example.com/path?query=1"),
 			wantErr: false,
 		},
 		{
 			name:    "URL with whitespace trimmed",
 			args:    args{rawUrl: "  https://example.com  "},
-			want:    HttpUrl{value: "https://example.com", url: mustParseURL("https://example.com")},
+			want:    HttpUrl("https://example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "Automatic HTTPS for URL with missing schema",
 			args:    args{rawUrl: "example.com"},
-			want:    HttpUrl{value: "https://example.com", url: mustParseURL("https://example.com")},
+			want:    HttpUrl("https://example.com"),
 			wantErr: false,
 		},
 		{
@@ -92,6 +92,12 @@ func TestNewHttpUrl(t *testing.T) {
 			if tt.wantErr {
 				return
 			}
+
+			_, err = mustParseURL(tt.want.String())
+			if err != nil {
+				t.Fatalf("url.Parse() error = %v, expected %v to be parsed", err, tt.want)
+			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewHttpUrl() = %v, want %v", got, tt.want)
 			}
@@ -100,10 +106,10 @@ func TestNewHttpUrl(t *testing.T) {
 }
 
 // Helper function to create URLs for test expectations
-func mustParseURL(rawURL string) url.URL {
+func mustParseURL(rawURL string) (url.URL, error) {
 	parsed, err := url.Parse(rawURL)
 	if err != nil {
-		panic(err)
+		return url.URL{}, err
 	}
-	return *parsed
+	return *parsed, nil
 }

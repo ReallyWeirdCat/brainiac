@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 const createAppUserCredential = `-- name: CreateAppUserCredential :one
@@ -19,10 +19,10 @@ RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
 type CreateAppUserCredentialParams struct {
-	AppUserGUID  uuid.UUID `db:"app_user_guid" json:"app_user_guid"`
-	Email        *string   `db:"email" json:"email"`
-	PasswordHash string    `db:"password_hash" json:"password_hash"`
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
+	CreatedAt    time.Time          `db:"created_at" json:"created_at"`
 }
 
 // CreateAppUserCredential
@@ -61,7 +61,7 @@ LIMIT 1
 //	WHERE app_user_guid = $1
 //	    AND deleted_at IS NULL
 //	LIMIT 1
-func (q *Queries) GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid uuid.UUID) (AppUserCredential, error) {
+func (q *Queries) GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error) {
 	row := q.db.QueryRow(ctx, getAppUserCredentialByAppUserGUID, appUserGuid)
 	var i AppUserCredential
 	err := row.Scan(
@@ -87,7 +87,7 @@ LIMIT 1
 //	WHERE email = $1
 //	    AND deleted_at IS NULL
 //	LIMIT 1
-func (q *Queries) GetAppUserCredentialByEmail(ctx context.Context, email *string) (AppUserCredential, error) {
+func (q *Queries) GetAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (AppUserCredential, error) {
 	row := q.db.QueryRow(ctx, getAppUserCredentialByEmail, email)
 	var i AppUserCredential
 	err := row.Scan(
@@ -109,7 +109,7 @@ WHERE app_user_guid = $1
 //
 //	DELETE FROM app_user_credential
 //	WHERE app_user_guid = $1
-func (q *Queries) HardDeleteAppUserCredential(ctx context.Context, appUserGuid uuid.UUID) error {
+func (q *Queries) HardDeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error {
 	_, err := q.db.Exec(ctx, hardDeleteAppUserCredential, appUserGuid)
 	return err
 }
@@ -122,8 +122,8 @@ WHERE app_user_guid = $1
 `
 
 type SoftDeleteAppUserCredentialParams struct {
-	AppUserGUID uuid.UUID  `db:"app_user_guid" json:"app_user_guid"`
-	DeletedAt   *time.Time `db:"deleted_at" json:"deleted_at"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
 }
 
 // SoftDeleteAppUserCredential
@@ -146,8 +146,8 @@ RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
 type UpdateAppUserCredentialEmailParams struct {
-	AppUserGUID uuid.UUID `db:"app_user_guid" json:"app_user_guid"`
-	Email       *string   `db:"email" json:"email"`
+	AppUserGUID valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email       *valueobject.Email `db:"email" json:"email"`
 }
 
 // UpdateAppUserCredentialEmail
@@ -179,8 +179,8 @@ RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
 type UpdateAppUserCredentialPasswordParams struct {
-	AppUserGUID  uuid.UUID `db:"app_user_guid" json:"app_user_guid"`
-	PasswordHash string    `db:"password_hash" json:"password_hash"`
+	AppUserGUID  valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	PasswordHash string           `db:"password_hash" json:"password_hash"`
 }
 
 // UpdateAppUserCredentialPassword

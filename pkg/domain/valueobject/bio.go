@@ -27,53 +27,47 @@ import (
 var urlPattern = regexp.MustCompile(`\b(?:https?|ftp|file|sftp|ws|wss)://`)
 
 // Bio represents a validated bio.
-type Bio struct {
-	value string
-}
+type Bio string
 
-var _ ValueObject = Bio{}
+var _ ValueObject = Bio("")
 
 // NewBio creates a Bio after validation.
 func NewBio(bio string) (Bio, error) {
-
 	sanitized := strings.TrimSpace(bio)
 
 	// Check length
 	if len(sanitized) < 1 || len(sanitized) > 175 {
-		return Bio{}, &errors.ErrInvalidBio
+		return Bio(""), &errors.ErrInvalidBio
 	}
 
 	// Check for @ symbol
 	if strings.Contains(sanitized, "@") {
-		return Bio{}, &errors.ErrInvalidBio
+		return Bio(""), &errors.ErrInvalidBio
 	}
 
 	if urlPattern.MatchString(sanitized) {
-		return Bio{}, &errors.ErrInvalidBio
+		return Bio(""), &errors.ErrInvalidBio
 	}
-	return Bio{value: sanitized}, nil
+	return Bio(sanitized), nil
 }
 
-// String returns the bio string.
 func (b Bio) String() string {
-	return b.value
+	return string(b)
 }
 
-// Equals returns true if the other object is a Bio with the same value.
 func (b Bio) Equals(other any) bool {
 	otherBio, ok := other.(Bio)
 	if !ok {
 		return false
 	}
-	return b.value == otherBio.value
+	return string(b) == string(otherBio)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (b Bio) IsValid() bool {
-	return true
+	_, err := NewBio(string(b))
+	return err == nil
 }
 
-// IsZero returns true if the Bio is the zero value (empty string).
 func (b Bio) IsZero() bool {
-	return b.value == ""
+	return string(b) == ""
 }

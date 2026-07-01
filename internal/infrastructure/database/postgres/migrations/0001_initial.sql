@@ -67,7 +67,7 @@ CREATE DOMAIN student_role_enum AS SMALLINT
 CREATE TABLE app_user (
     guid UUID PRIMARY KEY,
     username VARCHAR(18) NOT NULL,
-    activated_at TIMESTAMPTZ NOT NULL,
+    activated_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
 );
@@ -551,7 +551,7 @@ CREATE TABLE course_subject_item (
 CREATE TABLE notification (
     guid UUID PRIMARY KEY,
     app_user_guid UUID NOT NULL REFERENCES app_user(guid),
-    title_i18n JSONB NOT NULL,
+    title_i18n JSONB NULL,
     content_i18n JSONB NULL,
     resource_url VARCHAR(255) NULL,
     urgency urgency_enum NOT NULL DEFAULT 1,

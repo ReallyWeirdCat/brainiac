@@ -18,451 +18,169 @@
 package valueobject
 
 import (
-	"encoding/json"
 	"reflect"
 	"testing"
 )
 
 func TestNewMetadata(t *testing.T) {
-	got := NewMetadata()
-	if got.data == nil {
-		t.Error("NewMetadata() returned nil internal map")
+	type args struct {
+		data []byte
 	}
-	if len(got.data) != 0 {
-		t.Errorf("NewMetadata() map length = %d, want 0", len(got.data))
-	}
-	if !got.IsEmpty() {
-		t.Error("NewMetadata() should be empty")
-	}
-}
-
-func TestMetadataFromMap(t *testing.T) {
 	tests := []struct {
-		name string
-		raw  map[string]any
-		want map[string]any
+		name    string
+		args    args
+		want    Metadata
+		wantErr bool
 	}{
 		{
-			name: "nil input",
-			raw:  nil,
-			want: map[string]any{},
+			name:    "valid empty object",
+			args:    args{data: []byte(`{}`)},
+			want:    Metadata([]byte(`{}`)),
+			wantErr: false,
 		},
 		{
-			name: "empty map",
-			raw:  map[string]any{},
-			want: map[string]any{},
+			name:    "valid object with fields",
+			args:    args{data: []byte(`{"key":"value"}`)},
+			want:    Metadata([]byte(`{"key":"value"}`)),
+			wantErr: false,
 		},
 		{
-			name: "non-empty map",
-			raw:  map[string]any{"key": "value", "num": 42},
-			want: map[string]any{"key": "value", "num": 42},
+			name:    "invalid json",
+			args:    args{data: []byte(`{invalid}`)},
+			want:    Metadata{},
+			wantErr: true,
 		},
 		{
-			name: "nested structure",
-			raw:  map[string]any{"nested": map[string]any{"inner": true}},
-			want: map[string]any{"nested": map[string]any{"inner": true}},
+			name:    "empty byte slice",
+			args:    args{data: []byte{}},
+			want:    Metadata{},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := MetadataFromMap(tt.raw)
-			if !reflect.DeepEqual(got.data, tt.want) {
-				t.Errorf("MetadataFromMap().data = %v, want %v", got.data, tt.want)
+			got, err := NewMetadata(tt.args.data)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("NewMetadata() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			// Verify it's a copy: modify original map and ensure metadata unchanged.
-			if len(tt.raw) > 0 {
-				originalKey := ""
-				for k := range tt.raw {
-					originalKey = k
-					break
-				}
-				delete(tt.raw, originalKey)
-				if _, ok := got.data[originalKey]; !ok {
-					t.Error("MetadataFromMap() did not copy the map; modification affected metadata")
-				}
+			if tt.wantErr {
+				return
 			}
-		})
-	}
-}
-
-func TestMetadata_Set(t *testing.T) {
-	tests := []struct {
-		name      string
-		initial   map[string]any
-		key       string
-		value     any
-		wantData  map[string]any
-		wantEmpty bool
-	}{
-		{
-			name:      "set on nil map",
-			initial:   nil,
-			key:       "a",
-			value:     1,
-			wantData:  map[string]any{"a": 1},
-			wantEmpty: false,
-		},
-		{
-			name:      "set new key on existing map",
-			initial:   map[string]any{"b": 2},
-			key:       "c",
-			value:     3,
-			wantData:  map[string]any{"b": 2, "c": 3},
-			wantEmpty: false,
-		},
-		{
-			name:      "overwrite existing key",
-			initial:   map[string]any{"x": "old"},
-			key:       "x",
-			value:     "new",
-			wantData:  map[string]any{"x": "new"},
-			wantEmpty: false,
-		},
-		{
-			name:      "set nil value",
-			initial:   map[string]any{},
-			key:       "nilVal",
-			value:     nil,
-			wantData:  map[string]any{"nilVal": nil},
-			wantEmpty: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.initial}
-			m.Set(tt.key, tt.value)
-			if !reflect.DeepEqual(m.data, tt.wantData) {
-				t.Errorf("After Set, data = %v, want %v", m.data, tt.wantData)
-			}
-			if gotEmpty := m.IsEmpty(); gotEmpty != tt.wantEmpty {
-				t.Errorf("IsEmpty() = %v, want %v", gotEmpty, tt.wantEmpty)
-			}
-		})
-	}
-}
-
-func TestMetadata_Get(t *testing.T) {
-	tests := []struct {
-		name      string
-		data      map[string]any
-		key       string
-		wantValue any
-		wantOk    bool
-	}{
-		{
-			name:      "nil map",
-			data:      nil,
-			key:       "any",
-			wantValue: nil,
-			wantOk:    false,
-		},
-		{
-			name:      "key exists",
-			data:      map[string]any{"foo": "bar"},
-			key:       "foo",
-			wantValue: "bar",
-			wantOk:    true,
-		},
-		{
-			name:      "key does not exist",
-			data:      map[string]any{"foo": "bar"},
-			key:       "baz",
-			wantValue: nil,
-			wantOk:    false,
-		},
-		{
-			name:      "key with nil value",
-			data:      map[string]any{"nilKey": nil},
-			key:       "nilKey",
-			wantValue: nil,
-			wantOk:    true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			got, ok := m.Get(tt.key)
-			if !reflect.DeepEqual(got, tt.wantValue) {
-				t.Errorf("Get() value = %v, want %v", got, tt.wantValue)
-			}
-			if ok != tt.wantOk {
-				t.Errorf("Get() ok = %v, want %v", ok, tt.wantOk)
-			}
-		})
-	}
-}
-
-func TestMetadata_Delete(t *testing.T) {
-	tests := []struct {
-		name     string
-		initial  map[string]any
-		key      string
-		wantData map[string]any
-	}{
-		{
-			name:     "delete from nil map",
-			initial:  nil,
-			key:      "key",
-			wantData: nil, // remains nil
-		},
-		{
-			name:     "delete existing key",
-			initial:  map[string]any{"a": 1, "b": 2},
-			key:      "a",
-			wantData: map[string]any{"b": 2},
-		},
-		{
-			name:     "delete non-existing key",
-			initial:  map[string]any{"a": 1},
-			key:      "missing",
-			wantData: map[string]any{"a": 1},
-		},
-		{
-			name:     "delete last key",
-			initial:  map[string]any{"only": "value"},
-			key:      "only",
-			wantData: map[string]any{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.initial}
-			m.Delete(tt.key)
-			if !reflect.DeepEqual(m.data, tt.wantData) {
-				t.Errorf("After Delete, data = %v, want %v", m.data, tt.wantData)
-			}
-		})
-	}
-}
-
-func TestMetadata_Keys(t *testing.T) {
-	tests := []struct {
-		name string
-		data map[string]any
-		want []string
-	}{
-		{
-			name: "nil map",
-			data: nil,
-			want: []string{},
-		},
-		{
-			name: "empty map",
-			data: map[string]any{},
-			want: []string{},
-		},
-		{
-			name: "single key",
-			data: map[string]any{"foo": 1},
-			want: []string{"foo"},
-		},
-		{
-			name: "multiple keys",
-			data: map[string]any{"a": 1, "b": 2, "c": 3},
-			want: []string{"a", "b", "c"}, // order will be checked via set equivalence
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			got := m.Keys()
-			if len(got) != len(tt.want) {
-				t.Errorf("Keys() length = %d, want %d", len(got), len(tt.want))
-			}
-			if tt.want != nil {
-				// Check that all wanted keys are present.
-				wantSet := make(map[string]bool, len(tt.want))
-				for _, k := range tt.want {
-					wantSet[k] = true
-				}
-				for _, k := range got {
-					if !wantSet[k] {
-						t.Errorf("Keys() returned unexpected key %q", k)
-					}
-				}
-			}
-		})
-	}
-}
-
-func TestMetadata_AsMap(t *testing.T) {
-	tests := []struct {
-		name string
-		data map[string]any
-		want map[string]any
-	}{
-		{
-			name: "nil map",
-			data: nil,
-			want: nil,
-		},
-		{
-			name: "empty map",
-			data: map[string]any{},
-			want: map[string]any{},
-		},
-		{
-			name: "non-empty map",
-			data: map[string]any{"k1": "v1", "k2": 2},
-			want: map[string]any{"k1": "v1", "k2": 2},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			got := m.AsMap()
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AsMap() = %v, want %v", got, tt.want)
-			}
-			// Verify it's a copy by modifying the returned map.
-			if len(got) > 0 {
-				got["newKey"] = "shouldNotAppearInOriginal"
-				if _, exists := m.data["newKey"]; exists {
-					t.Error("AsMap() did not return a copy; modification affected original metadata")
-				}
+				t.Errorf("NewMetadata() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMetadata_IsEmpty(t *testing.T) {
-	tests := []struct {
-		name string
+func TestNewMetadataFromMap(t *testing.T) {
+	type args struct {
 		data map[string]any
-		want bool
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Metadata
+		wantErr bool
 	}{
-		{"nil map", nil, true},
-		{"empty map", map[string]any{}, true},
-		{"non-empty map", map[string]any{"x": 1}, false},
+		{
+			name:    "empty map",
+			args:    args{data: map[string]any{}},
+			want:    Metadata([]byte(`{}`)),
+			wantErr: false,
+		},
+		{
+			name:    "simple map",
+			args:    args{data: map[string]any{"a": 1, "b": "text"}},
+			want:    Metadata([]byte(`{"a":1,"b":"text"}`)),
+			wantErr: false,
+		},
+		{
+			name:    "map with nested data",
+			args:    args{data: map[string]any{"nested": map[string]any{"x": true}}},
+			want:    Metadata([]byte(`{"nested":{"x":true}}`)),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			if got := m.IsEmpty(); got != tt.want {
-				t.Errorf("IsEmpty() = %v, want %v", got, tt.want)
+			got, err := NewMetadataFromMap(tt.args.data)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("NewMetadataFromMap() error = %v, wantErr %v", err, tt.wantErr)
 			}
-		})
-	}
-}
-
-func TestMetadata_IsZero(t *testing.T) {
-	// IsZero returns true for empty or nil map (same as IsEmpty).
-	tests := []struct {
-		name string
-		data map[string]any
-		want bool
-	}{
-		{"nil map", nil, true},
-		{"empty map", map[string]any{}, true},
-		{"non-empty map", map[string]any{"a": 1}, false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			if got := m.IsZero(); got != tt.want {
-				t.Errorf("IsZero() = %v, want %v", got, tt.want)
+			if tt.wantErr {
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewMetadataFromMap() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestMetadata_Equals(t *testing.T) {
-	tests := []struct {
-		name  string
-		m     Metadata
+	type args struct {
 		other any
-		want  bool
-	}{
-		{
-			name:  "equal empty metadata",
-			m:     Metadata{data: map[string]any{}},
-			other: Metadata{data: map[string]any{}},
-			want:  true,
-		},
-		{
-			name:  "equal with values",
-			m:     Metadata{data: map[string]any{"a": 1, "b": "text"}},
-			other: Metadata{data: map[string]any{"a": 1, "b": "text"}},
-			want:  true,
-		},
-		{
-			name:  "different values",
-			m:     Metadata{data: map[string]any{"a": 1}},
-			other: Metadata{data: map[string]any{"a": 2}},
-			want:  false,
-		},
-		{
-			name:  "different keys",
-			m:     Metadata{data: map[string]any{"a": 1}},
-			other: Metadata{data: map[string]any{"b": 1}},
-			want:  false,
-		},
-		{
-			name:  "nil vs empty map",
-			m:     Metadata{data: nil},
-			other: Metadata{data: map[string]any{}},
-			want:  true, // both are empty, Equals should treat them equal
-		},
-		{
-			name:  "nil vs non-empty",
-			m:     Metadata{data: nil},
-			other: Metadata{data: map[string]any{"x": 1}},
-			want:  false,
-		},
-		{
-			name:  "different type",
-			m:     Metadata{data: map[string]any{}},
-			other: "not a metadata",
-			want:  false,
-		},
-		{
-			name:  "deep equality nested",
-			m:     Metadata{data: map[string]any{"nested": map[string]any{"inner": true}}},
-			other: Metadata{data: map[string]any{"nested": map[string]any{"inner": true}}},
-			want:  true,
-		},
-		{
-			name:  "deep equality different nested",
-			m:     Metadata{data: map[string]any{"nested": map[string]any{"inner": true}}},
-			other: Metadata{data: map[string]any{"nested": map[string]any{"inner": false}}},
-			want:  false,
-		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.m.Equals(tt.other); got != tt.want {
-				t.Errorf("Equals() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMetadata_String(t *testing.T) {
 	tests := []struct {
 		name string
-		data map[string]any
-		want string
+		m    Metadata
+		args args
+		want bool
 	}{
-		{"nil map", nil, "{}"},
-		{"empty map", map[string]any{}, "{}"},
-		{"single key", map[string]any{"a": 1}, `{"a":1}`},
-		{"multiple keys", map[string]any{"a": 1, "b": "two"}, `{"a":1,"b":"two"}`}, // order may vary
-		{"nested", map[string]any{"n": map[string]any{"x": 2}}, `{"n":{"x":2}}`},
+		{
+			name: "equal identical",
+			m:    Metadata([]byte(`{"a":1}`)),
+			args: args{other: Metadata([]byte(`{"a":1}`))},
+			want: true,
+		},
+		{
+			name: "equal different whitespace",
+			m:    Metadata([]byte(`{"a": 1}`)),
+			args: args{other: Metadata([]byte(`{"a":1}`))},
+			want: true,
+		},
+		{
+			name: "equal key order",
+			m:    Metadata([]byte(`{"a":1,"b":2}`)),
+			args: args{other: Metadata([]byte(`{"b":2,"a":1}`))},
+			want: true,
+		},
+		{
+			name: "different values",
+			m:    Metadata([]byte(`{"a":1}`)),
+			args: args{other: Metadata([]byte(`{"a":2}`))},
+			want: false,
+		},
+		{
+			name: "other nil",
+			m:    Metadata([]byte(`{}`)),
+			args: args{other: nil},
+			want: false,
+		},
+		{
+			name: "other wrong type",
+			m:    Metadata([]byte(`{}`)),
+			args: args{other: "not metadata"},
+			want: false,
+		},
+		{
+			name: "both invalid json",
+			m:    Metadata([]byte(`invalid`)),
+			args: args{other: Metadata([]byte(`invalid`))},
+			want: true,
+		},
+		{
+			name: "one invalid json",
+			m:    Metadata([]byte(`invalid`)),
+			args: args{other: Metadata([]byte(`{}`))},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			got := m.String()
-			// For maps with multiple keys, JSON order is not guaranteed; we can unmarshal and compare.
-			var gotMap, wantMap map[string]any
-			if err := json.Unmarshal([]byte(got), &gotMap); err != nil {
-				t.Fatalf("String() returned invalid JSON: %v", err)
-			}
-			if err := json.Unmarshal([]byte(tt.want), &wantMap); err != nil {
-				t.Fatalf("want string is invalid JSON: %v", err)
-			}
-			if !reflect.DeepEqual(gotMap, wantMap) {
-				t.Errorf("String() = %v, want JSON representing %v", got, tt.want)
+			if got := tt.m.Equals(tt.args.other); got != tt.want {
+				t.Errorf("Metadata.Equals() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -471,108 +189,141 @@ func TestMetadata_String(t *testing.T) {
 func TestMetadata_IsValid(t *testing.T) {
 	tests := []struct {
 		name string
-		data map[string]any
+		m    Metadata
+		want bool
 	}{
-		{"nil", nil},
-		{"empty", map[string]any{}},
-		{"valid data", map[string]any{"a": 1, "b": nil, "c": []int{1, 2}}},
+		{
+			name: "valid object",
+			m:    Metadata([]byte(`{"a":1}`)),
+			want: true,
+		},
+		{
+			name: "invalid json",
+			m:    Metadata([]byte(`{bad}`)),
+			want: false,
+		},
+		{
+			name: "empty byte slice",
+			m:    Metadata{},
+			want: false,
+		},
+		{
+			name: "empty object",
+			m:    Metadata([]byte(`{}`)),
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			if !m.IsValid() {
-				t.Error("IsValid() returned false, should always be true")
+			if got := tt.m.IsValid(); got != tt.want {
+				t.Errorf("Metadata.IsValid() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMetadata_MarshalJSON(t *testing.T) {
+func TestMetadata_IsZero(t *testing.T) {
+	tests := []struct {
+		name string
+		m    Metadata
+		want bool
+	}{
+		{
+			name: "zero length",
+			m:    Metadata{},
+			want: true,
+		},
+		{
+			name: "empty object",
+			m:    Metadata([]byte(`{}`)),
+			want: false,
+		},
+		{
+			name: "non-empty",
+			m:    Metadata([]byte(`{"a":1}`)),
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.m.IsZero(); got != tt.want {
+				t.Errorf("Metadata.IsZero() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMetadata_String(t *testing.T) {
+	tests := []struct {
+		name string
+		m    Metadata
+		want string
+	}{
+		{
+			name: "empty",
+			m:    Metadata{},
+			want: "",
+		},
+		{
+			name: "simple",
+			m:    Metadata([]byte(`{"key":"value"}`)),
+			want: `{"key":"value"}`,
+		},
+		{
+			name: "with spaces",
+			m:    Metadata([]byte(`{  }`)),
+			want: `{  }`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.m.String(); got != tt.want {
+				t.Errorf("Metadata.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_canonicalize(t *testing.T) {
+	type args struct {
+		m Metadata
+	}
 	tests := []struct {
 		name    string
-		data    map[string]any
+		args    args
 		want    []byte
 		wantErr bool
 	}{
 		{
-			name:    "nil map",
-			data:    nil,
-			want:    []byte("null"),
+			name:    "valid compact",
+			args:    args{m: Metadata([]byte(`{"a": 1 }`))},
+			want:    []byte(`{"a":1}`),
 			wantErr: false,
 		},
 		{
-			name:    "empty map",
-			data:    map[string]any{},
-			want:    []byte("{}"),
-			wantErr: false,
+			name:    "invalid json",
+			args:    args{m: Metadata([]byte(`not json`))},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			name:    "non-empty map",
-			data:    map[string]any{"key": "value"},
-			want:    []byte(`{"key":"value"}`),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			m := Metadata{data: tt.data}
-			got, err := m.MarshalJSON()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MarshalJSON() = %s, want %s", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMetadata_UnmarshalJSON(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    []byte
-		wantData map[string]any
-		wantErr  bool
-	}{
-		{
-			name:     "null",
-			input:    []byte("null"),
-			wantData: nil,
-			wantErr:  false,
-		},
-		{
-			name:     "empty object",
-			input:    []byte("{}"),
-			wantData: map[string]any{},
-			wantErr:  false,
-		},
-		{
-			name:     "simple object",
-			input:    []byte(`{"a":1,"b":"text"}`),
-			wantData: map[string]any{"a": float64(1), "b": "text"}, // numbers become float64 in unmarshaled interface{}
-			wantErr:  false,
-		},
-		{
-			name:     "nested object",
-			input:    []byte(`{"nested":{"x":true}}`),
-			wantData: map[string]any{"nested": map[string]any{"x": true}},
-			wantErr:  false,
-		},
-		{
-			name:    "invalid JSON",
-			input:   []byte(`{not json}`),
+			name:    "empty json not allowed",
+			args:    args{m: Metadata{}},
+			want:    nil,
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &Metadata{}
-			err := m.UnmarshalJSON(tt.input)
+			got, err := canonicalize(tt.args.m)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("canonicalize() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !tt.wantErr && !reflect.DeepEqual(m.data, tt.wantData) {
-				t.Errorf("UnmarshalJSON() data = %v, want %v", m.data, tt.wantData)
+			if tt.wantErr {
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("canonicalize() = %v, want %v", got, tt.want)
 			}
 		})
 	}

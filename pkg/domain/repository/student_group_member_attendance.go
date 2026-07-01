@@ -18,18 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type StudentGroupMemberClassAttendanceRepository interface {
-	Save(ctx context.Context, studentGroupMemberAttendance entity.StudentGroupMemberClassAttendance) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.StudentGroupMemberClassAttendance, error)
-	GetByStudentGroupClassGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
-	GetByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.StudentGroupMemberClassAttendance, error)
-	GetByUsername(ctx context.Context, username string) ([]*entity.StudentGroupMemberClassAttendance, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.StudentGroupMemberClassAttendance]
 }

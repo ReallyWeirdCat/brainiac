@@ -9,7 +9,7 @@ import (
 	"context"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
-	"github.com/google/uuid"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 const createAppUserProfile = `-- name: CreateAppUserProfile :one
@@ -29,14 +29,14 @@ RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_lan
 `
 
 type CreateAppUserProfileParams struct {
-	AppUserGUID      uuid.UUID                 `db:"app_user_guid" json:"app_user_guid"`
-	Name             *string                   `db:"name" json:"name"`
-	Surname          *string                   `db:"surname" json:"surname"`
-	Patronymic       *string                   `db:"patronymic" json:"patronymic"`
-	Nickname         *string                   `db:"nickname" json:"nickname"`
-	Bio              *string                   `db:"bio" json:"bio"`
+	AppUserGUID      valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name             *valueobject.Name         `db:"name" json:"name"`
+	Surname          *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic       *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname         *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio              *valueobject.Bio          `db:"bio" json:"bio"`
 	ProfileDiscovery enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
-	AvatarUrl        *string                   `db:"avatar_url" json:"avatar_url"`
+	AvatarUrl        *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
 }
 
 // CreateAppUserProfile

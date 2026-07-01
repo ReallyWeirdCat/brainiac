@@ -18,20 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserSuspensionRepository interface {
-	Save(ctx context.Context, userSuspension entity.AppUserSuspension) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserSuspension, error)
-	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSuspension, error)
-	GetInactiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSuspension, error)
-	GetActiveByUsername(ctx context.Context, username string) ([]*entity.AppUserSuspension, error)
-	GetInactiveByUsername(ctx context.Context, username string) ([]*entity.AppUserSuspension, error)
-	ExistsByAppUserGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	Repository[entity.AppUserSuspension]
 }

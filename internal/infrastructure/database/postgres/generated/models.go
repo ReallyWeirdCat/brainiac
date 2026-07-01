@@ -8,36 +8,47 @@ import (
 	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
-	"github.com/google/uuid"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUser struct {
-	GUID        uuid.UUID  `db:"guid" json:"guid"`
-	Username    string     `db:"username" json:"username"`
-	ActivatedAt time.Time  `db:"activated_at" json:"activated_at"`
-	CreatedAt   time.Time  `db:"created_at" json:"created_at"`
-	DeletedAt   *time.Time `db:"deleted_at" json:"deleted_at"`
+	GUID        valueobject.GUID     `db:"guid" json:"guid"`
+	Username    valueobject.Username `db:"username" json:"username"`
+	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
+	CreatedAt   time.Time            `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 type AppUserCredential struct {
-	AppUserGUID  uuid.UUID  `db:"app_user_guid" json:"app_user_guid"`
-	Email        *string    `db:"email" json:"email"`
-	PasswordHash string     `db:"password_hash" json:"password_hash"`
-	CreatedAt    time.Time  `db:"created_at" json:"created_at"`
-	DeletedAt    *time.Time `db:"deleted_at" json:"deleted_at"`
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
+	CreatedAt    time.Time          `db:"created_at" json:"created_at"`
+	DeletedAt    *time.Time         `db:"deleted_at" json:"deleted_at"`
 }
 
 type AppUserProfile struct {
-	AppUserGUID       uuid.UUID                 `db:"app_user_guid" json:"app_user_guid"`
-	Name              *string                   `db:"name" json:"name"`
-	Surname           *string                   `db:"surname" json:"surname"`
-	Patronymic        *string                   `db:"patronymic" json:"patronymic"`
-	Nickname          *string                   `db:"nickname" json:"nickname"`
-	Bio               *string                   `db:"bio" json:"bio"`
-	PreferredLanguage string                    `db:"preferred_language" json:"preferred_language"`
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
 	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
-	AvatarUrl         *string                   `db:"avatar_url" json:"avatar_url"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
 	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
 	CreatedAt         time.Time                 `db:"created_at" json:"created_at"`
 	DeletedAt         *time.Time                `db:"deleted_at" json:"deleted_at"`
+}
+
+type Course struct {
+	GUID            valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	Style           *valueobject.Metadata `db:"style" json:"style"`
+	Meta            *valueobject.Metadata `db:"meta" json:"meta"`
+	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
+	CreatedAt       time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt       *time.Time            `db:"deleted_at" json:"deleted_at"`
 }

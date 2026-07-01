@@ -27,43 +27,37 @@ import (
 var languageCodePattern = regexp.MustCompile(`^[a-z]{2}$`)
 
 // LanguageCode represents a validated language code.
-type LanguageCode struct {
-	value string
-}
+type LanguageCode string
 
-var _ ValueObject = LanguageCode{}
+var _ ValueObject = LanguageCode("")
 
-// NewLanguageCode creates a LanguageCode after validation.
 func NewLanguageCode(languageCode string) (LanguageCode, error) {
 
 	sanitized := strings.ToLower(languageCode)
 
 	if !languageCodePattern.MatchString(sanitized) {
-		return LanguageCode{}, errors.ErrInvalidLanguageCode
+		return LanguageCode(""), errors.ErrInvalidLanguageCode
 	}
-	return LanguageCode{value: sanitized}, nil
+	return LanguageCode(sanitized), nil
 }
 
-// String returns the language code string.
 func (l LanguageCode) String() string {
-	return l.value
+	return string(l)
 }
 
-// Equals returns true if the other object is a LanguageCode with the same value.
 func (l LanguageCode) Equals(other any) bool {
 	otherCode, ok := other.(LanguageCode)
 	if !ok {
 		return false
 	}
-	return l.value == otherCode.value
+	return string(l) == string(otherCode)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (l LanguageCode) IsValid() bool {
-	return true
+	_, err := NewLanguageCode(string(l))
+	return err == nil
 }
 
-// IsZero returns true if the LanguageCode is the zero value (empty string).
 func (l LanguageCode) IsZero() bool {
-	return l.value == ""
+	return string(l) == ""
 }

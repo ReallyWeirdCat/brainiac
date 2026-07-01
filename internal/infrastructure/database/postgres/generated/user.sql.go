@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 const createAppUser = `-- name: CreateAppUser :one
@@ -23,7 +23,7 @@ RETURNING guid, username, activated_at, created_at, deleted_at
 //	INSERT INTO app_user(username)
 //	VALUES ($1)
 //	RETURNING guid, username, activated_at, created_at, deleted_at
-func (q *Queries) CreateAppUser(ctx context.Context, username string) (AppUser, error) {
+func (q *Queries) CreateAppUser(ctx context.Context, username valueobject.Username) (AppUser, error) {
 	row := q.db.QueryRow(ctx, createAppUser, username)
 	var i AppUser
 	err := row.Scan(
@@ -45,7 +45,7 @@ WHERE guid = $1
 //
 //	DELETE FROM app_user
 //	WHERE guid = $1
-func (q *Queries) DeleteAppUser(ctx context.Context, guid uuid.UUID) error {
+func (q *Queries) DeleteAppUser(ctx context.Context, guid valueobject.GUID) error {
 	_, err := q.db.Exec(ctx, deleteAppUser, guid)
 	return err
 }
@@ -63,7 +63,7 @@ SELECT EXISTS(
 //	    SELECT 1 FROM app_user
 //	    WHERE username = $1
 //	) AS exists
-func (q *Queries) ExistsAppUserByUsername(ctx context.Context, username string) (bool, error) {
+func (q *Queries) ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error) {
 	row := q.db.QueryRow(ctx, existsAppUserByUsername, username)
 	var exists bool
 	err := row.Scan(&exists)
@@ -81,7 +81,7 @@ LIMIT 1
 //	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 //	WHERE guid = $1
 //	LIMIT 1
-func (q *Queries) GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser, error) {
+func (q *Queries) GetAppUserByGUID(ctx context.Context, guid valueobject.GUID) (AppUser, error) {
 	row := q.db.QueryRow(ctx, getAppUserByGUID, guid)
 	var i AppUser
 	err := row.Scan(
@@ -105,7 +105,7 @@ LIMIT 1
 //	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 //	WHERE username = $1
 //	LIMIT 1
-func (q *Queries) GetAppUserByUsername(ctx context.Context, username string) (AppUser, error) {
+func (q *Queries) GetAppUserByUsername(ctx context.Context, username valueobject.Username) (AppUser, error) {
 	row := q.db.QueryRow(ctx, getAppUserByUsername, username)
 	var i AppUser
 	err := row.Scan(
@@ -128,10 +128,10 @@ RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
 type SaveAppUserParams struct {
-	GUID        uuid.UUID `db:"guid" json:"guid"`
-	Username    string    `db:"username" json:"username"`
-	ActivatedAt time.Time `db:"activated_at" json:"activated_at"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	GUID        valueobject.GUID     `db:"guid" json:"guid"`
+	Username    valueobject.Username `db:"username" json:"username"`
+	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
+	CreatedAt   time.Time            `db:"created_at" json:"created_at"`
 }
 
 // SaveAppUser

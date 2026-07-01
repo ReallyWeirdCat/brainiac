@@ -7,7 +7,7 @@ package generated
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type Querier interface {
@@ -16,7 +16,7 @@ type Querier interface {
 	//  INSERT INTO app_user(username)
 	//  VALUES ($1)
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
-	CreateAppUser(ctx context.Context, username string) (AppUser, error)
+	CreateAppUser(ctx context.Context, username valueobject.Username) (AppUser, error)
 	//CreateAppUserCredential
 	//
 	//  INSERT INTO app_user_credential (app_user_guid, email, password_hash, created_at)
@@ -43,45 +43,51 @@ type Querier interface {
 	//
 	//  DELETE FROM app_user
 	//  WHERE guid = $1
-	DeleteAppUser(ctx context.Context, guid uuid.UUID) error
+	DeleteAppUser(ctx context.Context, guid valueobject.GUID) error
 	//ExistsAppUserByUsername
 	//
 	//  SELECT EXISTS(
 	//      SELECT 1 FROM app_user
 	//      WHERE username = $1
 	//  ) AS exists
-	ExistsAppUserByUsername(ctx context.Context, username string) (bool, error)
+	ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error)
 	//GetAppUserByGUID
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 	//  WHERE guid = $1
 	//  LIMIT 1
-	GetAppUserByGUID(ctx context.Context, guid uuid.UUID) (AppUser, error)
+	GetAppUserByGUID(ctx context.Context, guid valueobject.GUID) (AppUser, error)
 	//GetAppUserByUsername
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 	//  WHERE username = $1
 	//  LIMIT 1
-	GetAppUserByUsername(ctx context.Context, username string) (AppUser, error)
+	GetAppUserByUsername(ctx context.Context, username valueobject.Username) (AppUser, error)
 	//GetAppUserCredentialByAppUserGUID
 	//
 	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
 	//  WHERE app_user_guid = $1
 	//      AND deleted_at IS NULL
 	//  LIMIT 1
-	GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid uuid.UUID) (AppUserCredential, error)
+	GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error)
 	//GetAppUserCredentialByEmail
 	//
 	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
 	//  WHERE email = $1
 	//      AND deleted_at IS NULL
 	//  LIMIT 1
-	GetAppUserCredentialByEmail(ctx context.Context, email *string) (AppUserCredential, error)
+	GetAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (AppUserCredential, error)
+	//GetCourseByGUID
+	//
+	//  SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
+	//  WHERE guid = $1
+	//  LIMIT 1
+	GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error)
 	//HardDeleteAppUserCredential
 	//
 	//  DELETE FROM app_user_credential
 	//  WHERE app_user_guid = $1
-	HardDeleteAppUserCredential(ctx context.Context, appUserGuid uuid.UUID) error
+	HardDeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error
 	//SaveAppUser
 	//
 	//  INSERT INTO app_user (guid, username, activated_at, created_at)

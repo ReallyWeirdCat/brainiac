@@ -27,11 +27,9 @@ import (
 var nicknamePattern = regexp.MustCompile(`^[\p{L}\p{N}_ ]{3,30}$`)
 
 // Nickname represents a validated nickname.
-type Nickname struct {
-	value string
-}
+type Nickname string
 
-var _ ValueObject = Nickname{}
+var _ ValueObject = Nickname("")
 
 // NewNickname creates a Nickname after validation.
 func NewNickname(nickname string) (Nickname, error) {
@@ -39,31 +37,28 @@ func NewNickname(nickname string) (Nickname, error) {
 	sanitized := strings.TrimSpace(nickname)
 
 	if !nicknamePattern.MatchString(sanitized) {
-		return Nickname{}, errors.ErrInvalidNickname
+		return Nickname(""), errors.ErrInvalidNickname
 	}
-	return Nickname{value: sanitized}, nil
+	return Nickname(sanitized), nil
 }
 
-// String returns the username string.
 func (n Nickname) String() string {
-	return n.value
+	return string(n)
 }
 
-// Equals returns true if the other object is a Nickname with the same value.
 func (n Nickname) Equals(other any) bool {
 	otherNick, ok := other.(Nickname)
 	if !ok {
 		return false
 	}
-	return n.value == otherNick.value
+	return string(n) == string(otherNick)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (n Nickname) IsValid() bool {
-	return true
+	_, err := NewNickname(string(n))
+	return err == nil
 }
 
-// IsZero returns true if the Nickname is the zero value (empty string).
 func (n Nickname) IsZero() bool {
-	return n.value == ""
+	return string(n) == ""
 }

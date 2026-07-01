@@ -26,40 +26,34 @@ import (
 var namePattern = regexp.MustCompile(`^[\p{L}\p{M} -]{1,70}$`)
 
 // Name represents a validated name.
-type Name struct {
-	value string
-}
+type Name string
 
-var _ ValueObject = Name{}
+var _ ValueObject = Name("")
 
-// NewName creates a Name after validation.
 func NewName(name string) (Name, error) {
 	if !namePattern.MatchString(name) {
-		return Name{}, errors.ErrInvalidName
+		return Name(""), errors.ErrInvalidName
 	}
-	return Name{value: name}, nil
+	return Name(name), nil
 }
 
-// String returns the name string.
 func (n Name) String() string {
-	return n.value
+	return string(n)
 }
 
-// Equals returns true if the other object is a Name with the same value.
 func (n Name) Equals(other any) bool {
 	otherName, ok := other.(Name)
 	if !ok {
 		return false
 	}
-	return n.value == otherName.value
+	return string(n) == string(otherName)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (n Name) IsValid() bool {
-	return true
+	_, err := NewName(string(n))
+	return err == nil
 }
 
-// IsZero returns true if the Name is the zero value (empty string).
 func (n Name) IsZero() bool {
-	return n.value == ""
+	return string(n) == ""
 }

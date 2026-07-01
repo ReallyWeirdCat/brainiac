@@ -18,17 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type LanguageRepository interface {
-	Save(ctx context.Context, language entity.Language) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Language, error)
-	GetByLanguageCode(ctx context.Context, languageCode string) (*entity.Language, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsByLanguageCode(ctx context.Context, languageCode string) (bool, error)
+	Repository[entity.Language]
 }

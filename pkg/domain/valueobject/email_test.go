@@ -29,97 +29,97 @@ func TestNewEmail(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Email
+		want    Email
 		wantErr bool
 	}{
 		{
 			name:    "valid email - simple",
 			args:    args{email: "user@example.com"},
-			want:    &Email{value: "user@example.com"},
+			want:    Email("user@example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "valid email - cyrillic characters",
 			args:    args{email: "юзер@почта.рф"},
-			want:    &Email{value: "юзер@почта.рф"},
+			want:    Email("юзер@почта.рф"),
 			wantErr: false,
 		},
 		{
 			name:    "valid email - with plus",
 			args:    args{email: "user+tag@example.com"},
-			want:    &Email{value: "user+tag@example.com"},
+			want:    Email("user+tag@example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "valid email - with dot",
 			args:    args{email: "first.last@example.co.uk"},
-			want:    &Email{value: "first.last@example.co.uk"},
+			want:    Email("first.last@example.co.uk"),
 			wantErr: false,
 		},
 		{
 			name:    "valid email - numbers",
 			args:    args{email: "user123@example.com"},
-			want:    &Email{value: "user123@example.com"},
+			want:    Email("user123@example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "valid email - untrimmed",
 			args:    args{email: "  user@example.com   "},
-			want:    &Email{value: "user@example.com"},
+			want:    Email("user@example.com"),
 			wantErr: false,
 		},
 		{
 			name:    "invalid email - missing @",
 			args:    args{email: "userexample.com"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - missing domain",
 			args:    args{email: "user@"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - missing local part",
 			args:    args{email: "@example.com"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - empty string",
 			args:    args{email: ""},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - spaces only",
 			args:    args{email: "   "},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - invalid characters",
 			args:    args{email: "user name@example.com"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - double dots",
 			args:    args{email: "user..name@example.com"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - no dot in domain",
 			args:    args{email: "user@example"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid email - multiple dots in domain",
 			args:    args{email: "user@example..com"},
-			want:    nil,
+			want:    Email(""),
 			wantErr: true,
 		},
 	}

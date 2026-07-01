@@ -24,64 +24,53 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
-type Email struct {
-	value string
-}
+type Email string
 
-var _ ValueObject = (*Email)(nil)
+var _ ValueObject = Email("")
 
-func NewEmail(email string) (*Email, error) {
+func NewEmail(email string) (Email, error) {
 
 	sanitized := strings.TrimSpace(email)
 
 	parsed, err := mail.ParseAddress(sanitized)
 
 	if err != nil {
-		return nil, &errors.ErrInvalidEmail
+		return Email(""), &errors.ErrInvalidEmail
 	}
 
 	// Extract domain from parsed email
 	parts := strings.Split(parsed.Address, "@")
 	if len(parts) != 2 {
-		return nil, &errors.ErrInvalidEmail
+		return Email(""), &errors.ErrInvalidEmail
 	}
 
 	domain := parts[1]
 
 	// Check if domain contains a dot
 	if !strings.Contains(domain, ".") {
-		return nil, &errors.ErrInvalidEmail
+		return Email(""), &errors.ErrInvalidEmail
 	}
 
-	return &Email{value: sanitized}, nil
+	return Email(sanitized), nil
 }
 
 func (e Email) String() string {
-	return e.value
+	return string(e)
 }
 
-// Equals returns true if the other object is an *Email with the same value.
-// A nil *Email is only equal to another nil *Email.
-func (e *Email) Equals(other any) bool {
-	if e == nil {
-		return other == nil
-	}
-	otherEmail, ok := other.(*Email)
+func (e Email) Equals(other any) bool {
+	otherEmail, ok := other.(Email)
 	if !ok {
 		return false
 	}
-	if otherEmail == nil {
-		return false
-	}
-	return e.value == otherEmail.value
+	return string(e) == string(otherEmail)
 }
 
-// IsValid returns true because the constructor guarantees validity.
-func (e *Email) IsValid() bool {
-	return e != nil
+func (e Email) IsValid() bool {
+	_, err := NewEmail(string(e))
+	return err == nil
 }
 
-// IsZero returns true if the Email is nil or contains an empty value.
-func (e *Email) IsZero() bool {
-	return e == nil || e.value == ""
+func (e Email) IsZero() bool {
+	return string(e) == ""
 }

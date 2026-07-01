@@ -18,20 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserSessionRepository interface {
-	Save(ctx context.Context, userSession entity.AppUserSession) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.AppUserSession, error)
-	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSession, error)
-	GetInactiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.AppUserSession, error)
-	GetActiveByUsername(ctx context.Context, username string) ([]*entity.AppUserSession, error)
-	GetInactiveByUsername(ctx context.Context, username string) ([]*entity.AppUserSession, error)
-	ExistsByAppUserGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	Repository[entity.AppUserSession]
 }

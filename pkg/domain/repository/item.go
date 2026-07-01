@@ -18,18 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type ItemRepository interface {
-	Save(ctx context.Context, item entity.Item) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Item, error)
-	GetByRarity(ctx context.Context, rarity enum.RarityEnum) ([]*entity.Item, error)
-	GetPublished(ctx context.Context) ([]*entity.Item, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.Item]
 }

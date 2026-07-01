@@ -27,40 +27,34 @@ import (
 var usernamePattern = regexp.MustCompile(`^[a-zA-Z0-9_]{3,18}$`)
 
 // Username represents a validated username.
-type Username struct {
-	value string
-}
+type Username string
 
-var _ ValueObject = Username{}
+var _ ValueObject = Username("")
 
-// NewUsername creates a Username after validation.
 func NewUsername(name string) (Username, error) {
 	if !usernamePattern.MatchString(name) {
-		return Username{}, &errors.ErrInvalidUsername
+		return Username(""), &errors.ErrInvalidUsername
 	}
-	return Username{value: name}, nil
+	return Username(name), nil
 }
 
-// String returns the username string.
 func (u Username) String() string {
-	return u.value
+	return string(u)
 }
 
-// Equals returns true if the other object is a Username with the same value.
 func (u Username) Equals(other any) bool {
 	otherUser, ok := other.(Username)
 	if !ok {
 		return false
 	}
-	return u.value == otherUser.value
+	return string(u) == string(otherUser)
 }
 
-// IsValid returns true because the constructor guarantees validity.
 func (u Username) IsValid() bool {
-	return true
+	_, err := NewUsername(string(u))
+	return err == nil
 }
 
-// IsZero returns true if the Username is the zero value (empty string).
 func (u Username) IsZero() bool {
-	return u.value == ""
+	return string(u) == ""
 }

@@ -25,24 +25,22 @@ import (
 
 const uuidPattern = `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
 
-type GUID struct {
-	value string
-}
+type GUID string
 
-var _ ValueObject = GUID{}
+var _ ValueObject = GUID("")
 
 func NewGUID(guid string) (GUID, error) {
 	matched, _ := regexp.MatchString(uuidPattern, guid)
 
 	if !matched {
-		return GUID{}, errors.ErrInvalidGUID
+		return GUID(""), errors.ErrInvalidGUID
 	}
 
-	return GUID{value: guid}, nil
+	return GUID(guid), nil
 }
 
 func (g GUID) IsValid() bool {
-	_, err := NewGUID(g.value)
+	_, err := NewGUID(string(g))
 	return err == nil
 }
 
@@ -52,18 +50,18 @@ func (g GUID) Equals(other any) bool {
 	}
 	switch v := other.(type) {
 	case GUID:
-		return g.value == v.value
+		return string(g) == string(v)
 	case string:
-		return g.value == v
+		return string(g) == v
 	default:
 		return false
 	}
 }
 
 func (g GUID) IsZero() bool {
-	return g.value == ""
+	return string(g) == ""
 }
 
 func (g GUID) String() string {
-	return g.value
+	return string(g)
 }

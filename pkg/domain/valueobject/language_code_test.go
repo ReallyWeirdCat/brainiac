@@ -36,49 +36,49 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "valid lowercase english",
 			args:    args{languageCode: "en"},
-			want:    LanguageCode{value: "en"},
+			want:    LanguageCode("en"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase spanish",
 			args:    args{languageCode: "es"},
-			want:    LanguageCode{value: "es"},
+			want:    LanguageCode("es"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase french",
 			args:    args{languageCode: "fr"},
-			want:    LanguageCode{value: "fr"},
+			want:    LanguageCode("fr"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase german",
 			args:    args{languageCode: "de"},
-			want:    LanguageCode{value: "de"},
+			want:    LanguageCode("de"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase russian",
 			args:    args{languageCode: "ru"},
-			want:    LanguageCode{value: "ru"},
+			want:    LanguageCode("ru"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase chinese",
 			args:    args{languageCode: "zh"},
-			want:    LanguageCode{value: "zh"},
+			want:    LanguageCode("zh"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase japanese",
 			args:    args{languageCode: "ja"},
-			want:    LanguageCode{value: "ja"},
+			want:    LanguageCode("ja"),
 			wantErr: false,
 		},
 		{
 			name:    "valid lowercase arabic",
 			args:    args{languageCode: "ar"},
-			want:    LanguageCode{value: "ar"},
+			want:    LanguageCode("ar"),
 			wantErr: false,
 		},
 
@@ -86,19 +86,19 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "valid uppercase becomes lowercase",
 			args:    args{languageCode: "EN"},
-			want:    LanguageCode{value: "en"},
+			want:    LanguageCode("en"),
 			wantErr: false,
 		},
 		{
 			name:    "valid mixed case becomes lowercase",
 			args:    args{languageCode: "En"},
-			want:    LanguageCode{value: "en"},
+			want:    LanguageCode("en"),
 			wantErr: false,
 		},
 		{
 			name:    "valid mixed case french",
 			args:    args{languageCode: "Fr"},
-			want:    LanguageCode{value: "fr"},
+			want:    LanguageCode("fr"),
 			wantErr: false,
 		},
 
@@ -106,25 +106,25 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "invalid empty string",
 			args:    args{languageCode: ""},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid too short - 1 letter",
 			args:    args{languageCode: "e"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid too long - 3 letters",
 			args:    args{languageCode: "eng"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid too long - 4 letters",
 			args:    args{languageCode: "engl"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 
@@ -132,31 +132,31 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "invalid contains number",
 			args:    args{languageCode: "e1"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid contains special char",
 			args:    args{languageCode: "e-"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid contains space",
 			args:    args{languageCode: "e "},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid contains underscore",
 			args:    args{languageCode: "e_"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid contains punctuation",
 			args:    args{languageCode: "e."},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 
@@ -164,19 +164,19 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "invalid cyrillic letters",
 			args:    args{languageCode: "ен"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid chinese characters",
 			args:    args{languageCode: "中文"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid arabic characters",
 			args:    args{languageCode: "عع"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 
@@ -184,19 +184,19 @@ func TestNewLanguageCode(t *testing.T) {
 		{
 			name:    "invalid leading space",
 			args:    args{languageCode: " en"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid trailing space",
 			args:    args{languageCode: "en "},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 		{
 			name:    "invalid tab",
 			args:    args{languageCode: "en\t"},
-			want:    LanguageCode{},
+			want:    LanguageCode(""),
 			wantErr: true,
 		},
 	}

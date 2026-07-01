@@ -18,22 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type NotificationRepository interface {
-	Save(ctx context.Context, notification entity.Notification) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Notification, error)
-	GetActiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.Notification, error)
-	GetInactiveByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.Notification, error)
-	GetUnreadByAppUserGUID(ctx context.Context, guid valueobject.GUID) ([]*entity.Notification, error)
-	GetActiveByUsername(ctx context.Context, username string) ([]*entity.Notification, error)
-	GetInactiveByUsername(ctx context.Context, username string) ([]*entity.Notification, error)
-	GetUnreadByUsername(ctx context.Context, username string) ([]*entity.Notification, error)
-	ExistsByAppUserGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	Repository[entity.Notification]
 }

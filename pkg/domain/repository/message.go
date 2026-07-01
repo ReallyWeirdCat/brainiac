@@ -18,20 +18,9 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type MessageRepository interface {
-	Save(ctx context.Context, message entity.Message) error
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	GetByGUID(ctx context.Context, guid valueobject.GUID) (*entity.Message, error)
-	GetByUsername(ctx context.Context, username string) ([]*entity.Message, error)
-	GetByUsernameInChat(ctx context.Context, username string, chatGuid valueobject.GUID) ([]*entity.Message, error)
-	GetByUsernameInChatWithOffset(ctx context.Context, username string, chatGuid valueobject.GUID, count int, offset int) ([]*entity.Message, error)
-	GetByChatGUID(ctx context.Context, guid string) ([]*entity.Message, error)
-	GetByChatGUIDWithOffset(ctx context.Context, guid string, count int, offset int) ([]*entity.Message, error)
-	ExistsByGUID(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Repository[entity.Message]
 }
