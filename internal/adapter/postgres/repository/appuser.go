@@ -108,7 +108,6 @@ func (p *PgAppUserRepo) Create(ctx context.Context, obj *entity.AppUser) (*entit
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
-		DeletedAt:   obj.DeletedAt,
 	}
 	newObj, err := p.queries.CreateAppUser(ctx, params)
 	if err != nil {
@@ -128,7 +127,6 @@ func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser)
 			GUID:        obj.GUID,
 			Username:    obj.Username,
 			ActivatedAt: obj.ActivatedAt,
-			DeletedAt:   obj.DeletedAt,
 		})
 	}
 	batch := p.queries.CreateAppUserBatch(ctx, params)
@@ -281,7 +279,6 @@ func (p *PgAppUserRepo) Save(ctx context.Context, obj *entity.AppUser) (*entity.
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
-		DeletedAt:   obj.DeletedAt,
 	}
 	newObj, err := p.queries.SaveAppUser(ctx, params)
 	if err != nil {
@@ -331,7 +328,6 @@ func (p *PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entit
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
-		DeletedAt:   obj.DeletedAt,
 	}
 	newObj, err := p.queries.UpdateAppUser(ctx, params)
 	if err != nil {

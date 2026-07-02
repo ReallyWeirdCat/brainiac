@@ -15,17 +15,16 @@ type Querier interface {
 	//
 	//  SELECT COUNT(*)
 	//  FROM app_user
+	//  WHERE deleted_at IS NULL
 	CountAppUsers(ctx context.Context) (int64, error)
 	//CreateAppUser
 	//
 	//  INSERT INTO app_user (
 	//      guid,
 	//      username,
-	//      activated_at,
-	//      created_at,
-	//      deleted_at
+	//      activated_at
 	//  ) VALUES (
-	//      $1, $2, $3, now(), $4
+	//      $1, $2, $3
 	//  )
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	CreateAppUser(ctx context.Context, arg CreateAppUserParams) (AppUser, error)
@@ -34,9 +33,8 @@ type Querier interface {
 	//  INSERT INTO app_user (
 	//      guid,
 	//      username,
-	//      activated_at,
-	//      deleted_at
-	//  ) VALUES ($1, $2, $3, $4)
+	//      activated_at
+	//  ) VALUES ($1, $2, $3)
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	CreateAppUserBatch(ctx context.Context, arg []CreateAppUserBatchParams) *CreateAppUserBatchBatchResults
 	//CreateAppUserCredential
@@ -72,44 +70,45 @@ type Querier interface {
 	//
 	//  UPDATE app_user
 	//  SET deleted_at = now()
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	DeleteAppUser(ctx context.Context, guid valueobject.GUID) error
 	//DeleteAppUserBatch
 	//
 	//  UPDATE app_user
 	//  SET
 	//      deleted_at = true
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults
 	//ExistsAppUser
 	//
 	//  SELECT EXISTS (
 	//      SELECT 1
 	//      FROM app_user
-	//      WHERE guid = $1
+	//      WHERE guid = $1 AND deleted_at IS NULL
 	//  )
 	ExistsAppUser(ctx context.Context, guid valueobject.GUID) (bool, error)
 	//ExistsAppUserBatch
 	//
 	//  SELECT guid FROM app_user
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	ExistsAppUserBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserBatchBatchResults
 	//GetAllAppUsers
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at
 	//  FROM app_user
+	//  WHERE deleted_at IS NULL
 	GetAllAppUsers(ctx context.Context) ([]AppUser, error)
 	//GetAppUser
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at
 	//  FROM app_user
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  LIMIT 1
 	GetAppUser(ctx context.Context, guid valueobject.GUID) (AppUser, error)
 	//GetAppUserBatch
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	GetAppUserBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserBatchBatchResults
 	//GetAppUserByEmail
 	//
@@ -163,17 +162,14 @@ type Querier interface {
 	//  INSERT INTO app_user (
 	//      guid,
 	//      username,
-	//      activated_at,
-	//      created_at,
-	//      deleted_at
+	//      activated_at
 	//  ) VALUES (
-	//      $1, $2, $3, now(), $4
+	//      $1, $2, $3
 	//  )
 	//  ON CONFLICT (guid) DO UPDATE
 	//  SET
 	//      username = EXCLUDED.username,
-	//      activated_at = EXCLUDED.activated_at,
-	//      deleted_at = EXCLUDED.deleted_at
+	//      activated_at = EXCLUDED.activated_at
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error)
 	//SaveAppUserBatch
@@ -181,16 +177,15 @@ type Querier interface {
 	//  INSERT INTO app_user (
 	//      guid,
 	//      username,
-	//      activated_at,
-	//      deleted_at
+	//      activated_at
 	//  ) VALUES (
-	//      $1, $2, $3, $4
+	//      $1, $2, $3
 	//  )
 	//  ON CONFLICT (guid) DO UPDATE
 	//  SET
 	//      username = EXCLUDED.username,
-	//      activated_at = EXCLUDED.activated_at,
-	//      deleted_at = EXCLUDED.deleted_at
+	//      activated_at = EXCLUDED.activated_at
+	//  WHERE deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUserBatch(ctx context.Context, arg []SaveAppUserBatchParams) *SaveAppUserBatchBatchResults
 	//SoftDeleteAppUserCredential
@@ -205,9 +200,8 @@ type Querier interface {
 	//  UPDATE app_user
 	//  SET
 	//      username = $2,
-	//      activated_at = $3,
-	//      deleted_at = $4
-	//  WHERE guid = $1
+	//      activated_at = $3
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	UpdateAppUser(ctx context.Context, arg UpdateAppUserParams) (AppUser, error)
 	//UpdateAppUserBatch
@@ -215,9 +209,8 @@ type Querier interface {
 	//  UPDATE app_user
 	//  SET
 	//      username = $2,
-	//      activated_at = $3,
-	//      deleted_at = $4
-	//  WHERE guid = $1
+	//      activated_at = $3
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	UpdateAppUserBatch(ctx context.Context, arg []UpdateAppUserBatchParams) *UpdateAppUserBatchBatchResults
 	//UpdateAppUserCredentialEmail

@@ -2,11 +2,9 @@
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    created_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, now(), $4
+    $1, $2, $3
 )
 RETURNING *;
 
@@ -14,52 +12,50 @@ RETURNING *;
 UPDATE app_user
 SET
     username = $2,
-    activated_at = $3,
-    deleted_at = $4
-WHERE guid = $1
+    activated_at = $3
+WHERE guid = $1 AND deleted_at IS NULL
 RETURNING *;
 
 -- name: SaveAppUser :one
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    created_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, now(), $4
+    $1, $2, $3
 )
 ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
-    activated_at = EXCLUDED.activated_at,
-    deleted_at = EXCLUDED.deleted_at
+    activated_at = EXCLUDED.activated_at
 RETURNING *;
 
 -- name: DeleteAppUser :exec
 UPDATE app_user
 SET deleted_at = now()
-WHERE guid = $1;
+WHERE guid = $1 AND deleted_at IS NULL;
 
 -- name: GetAppUser :one
 SELECT *
 FROM app_user
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 LIMIT 1;
 
 -- name: GetAllAppUsers :many
 SELECT *
-FROM app_user;
+FROM app_user
+WHERE deleted_at IS NULL;
 
 -- name: CountAppUsers :one
 SELECT COUNT(*)
-FROM app_user;
+FROM app_user
+WHERE deleted_at IS NULL;
 
 -- name: ExistsAppUser :one
 SELECT EXISTS (
     SELECT 1
     FROM app_user
-    WHERE guid = $1
+    WHERE guid = $1 AND deleted_at IS NULL
 );
 
 -- name: IsDeletedAppUser :one
@@ -71,49 +67,46 @@ WHERE guid = $1;
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    deleted_at
-) VALUES ($1, $2, $3, $4)
+    activated_at
+) VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: UpdateAppUserBatch :batchmany
 UPDATE app_user
 SET 
     username = $2,
-    activated_at = $3,
-    deleted_at = $4
-WHERE guid = $1
+    activated_at = $3
+WHERE guid = $1 AND deleted_at IS NULL
 RETURNING *;
 
 -- name: SaveAppUserBatch :batchmany
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3
 )
 ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
-    activated_at = EXCLUDED.activated_at,
-    deleted_at = EXCLUDED.deleted_at
+    activated_at = EXCLUDED.activated_at
+WHERE deleted_at IS NULL
 RETURNING *;
 
 -- name: DeleteAppUserBatch :batchexec
 UPDATE app_user
 SET 
     deleted_at = true
-WHERE guid = $1;
+WHERE guid = $1 AND deleted_at IS NULL;
 
 -- name: GetAppUserBatch :batchmany
 SELECT * FROM app_user
-WHERE guid = $1;
+WHERE guid = $1 AND deleted_at IS NULL;
 
 -- name: ExistsAppUserBatch :batchmany
 SELECT guid FROM app_user
-WHERE guid = $1;
+WHERE guid = $1 AND deleted_at IS NULL;
 
 -- name: GetAppUserByUsername :one
 SELECT *

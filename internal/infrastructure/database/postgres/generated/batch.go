@@ -22,9 +22,8 @@ const createAppUserBatch = `-- name: CreateAppUserBatch :batchmany
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    deleted_at
-) VALUES ($1, $2, $3, $4)
+    activated_at
+) VALUES ($1, $2, $3)
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -38,7 +37,6 @@ type CreateAppUserBatchParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // CreateAppUserBatch
@@ -46,9 +44,8 @@ type CreateAppUserBatchParams struct {
 //	INSERT INTO app_user (
 //	    guid,
 //	    username,
-//	    activated_at,
-//	    deleted_at
-//	) VALUES ($1, $2, $3, $4)
+//	    activated_at
+//	) VALUES ($1, $2, $3)
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) CreateAppUserBatch(ctx context.Context, arg []CreateAppUserBatchParams) *CreateAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
@@ -57,7 +54,6 @@ func (q *Queries) CreateAppUserBatch(ctx context.Context, arg []CreateAppUserBat
 			a.GUID,
 			a.Username,
 			a.ActivatedAt,
-			a.DeletedAt,
 		}
 		batch.Queue(createAppUserBatch, vals...)
 	}
@@ -111,7 +107,7 @@ const deleteAppUserBatch = `-- name: DeleteAppUserBatch :batchexec
 UPDATE app_user
 SET 
     deleted_at = true
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 `
 
 type DeleteAppUserBatchBatchResults struct {
@@ -125,7 +121,7 @@ type DeleteAppUserBatchBatchResults struct {
 //	UPDATE app_user
 //	SET
 //	    deleted_at = true
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 func (q *Queries) DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
 	for _, a := range guid {
@@ -161,7 +157,7 @@ func (b *DeleteAppUserBatchBatchResults) Close() error {
 
 const existsAppUserBatch = `-- name: ExistsAppUserBatch :batchmany
 SELECT guid FROM app_user
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 `
 
 type ExistsAppUserBatchBatchResults struct {
@@ -173,7 +169,7 @@ type ExistsAppUserBatchBatchResults struct {
 // ExistsAppUserBatch
 //
 //	SELECT guid FROM app_user
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 func (q *Queries) ExistsAppUserBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
 	for _, a := range guid {
@@ -224,7 +220,7 @@ func (b *ExistsAppUserBatchBatchResults) Close() error {
 
 const getAppUserBatch = `-- name: GetAppUserBatch :batchmany
 SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 `
 
 type GetAppUserBatchBatchResults struct {
@@ -236,7 +232,7 @@ type GetAppUserBatchBatchResults struct {
 // GetAppUserBatch
 //
 //	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 func (q *Queries) GetAppUserBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
 	for _, a := range guid {
@@ -295,16 +291,15 @@ const saveAppUserBatch = `-- name: SaveAppUserBatch :batchmany
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3
 )
 ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
-    activated_at = EXCLUDED.activated_at,
-    deleted_at = EXCLUDED.deleted_at
+    activated_at = EXCLUDED.activated_at
+WHERE deleted_at IS NULL
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -318,7 +313,6 @@ type SaveAppUserBatchParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // SaveAppUserBatch
@@ -326,16 +320,15 @@ type SaveAppUserBatchParams struct {
 //	INSERT INTO app_user (
 //	    guid,
 //	    username,
-//	    activated_at,
-//	    deleted_at
+//	    activated_at
 //	) VALUES (
-//	    $1, $2, $3, $4
+//	    $1, $2, $3
 //	)
 //	ON CONFLICT (guid) DO UPDATE
 //	SET
 //	    username = EXCLUDED.username,
-//	    activated_at = EXCLUDED.activated_at,
-//	    deleted_at = EXCLUDED.deleted_at
+//	    activated_at = EXCLUDED.activated_at
+//	WHERE deleted_at IS NULL
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) SaveAppUserBatch(ctx context.Context, arg []SaveAppUserBatchParams) *SaveAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
@@ -344,7 +337,6 @@ func (q *Queries) SaveAppUserBatch(ctx context.Context, arg []SaveAppUserBatchPa
 			a.GUID,
 			a.Username,
 			a.ActivatedAt,
-			a.DeletedAt,
 		}
 		batch.Queue(saveAppUserBatch, vals...)
 	}
@@ -398,9 +390,8 @@ const updateAppUserBatch = `-- name: UpdateAppUserBatch :batchmany
 UPDATE app_user
 SET 
     username = $2,
-    activated_at = $3,
-    deleted_at = $4
-WHERE guid = $1
+    activated_at = $3
+WHERE guid = $1 AND deleted_at IS NULL
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -414,7 +405,6 @@ type UpdateAppUserBatchParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // UpdateAppUserBatch
@@ -422,9 +412,8 @@ type UpdateAppUserBatchParams struct {
 //	UPDATE app_user
 //	SET
 //	    username = $2,
-//	    activated_at = $3,
-//	    deleted_at = $4
-//	WHERE guid = $1
+//	    activated_at = $3
+//	WHERE guid = $1 AND deleted_at IS NULL
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) UpdateAppUserBatch(ctx context.Context, arg []UpdateAppUserBatchParams) *UpdateAppUserBatchBatchResults {
 	batch := &pgx.Batch{}
@@ -433,7 +422,6 @@ func (q *Queries) UpdateAppUserBatch(ctx context.Context, arg []UpdateAppUserBat
 			a.GUID,
 			a.Username,
 			a.ActivatedAt,
-			a.DeletedAt,
 		}
 		batch.Queue(updateAppUserBatch, vals...)
 	}

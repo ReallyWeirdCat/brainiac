@@ -15,12 +15,14 @@ import (
 const countAppUsers = `-- name: CountAppUsers :one
 SELECT COUNT(*)
 FROM app_user
+WHERE deleted_at IS NULL
 `
 
 // CountAppUsers
 //
 //	SELECT COUNT(*)
 //	FROM app_user
+//	WHERE deleted_at IS NULL
 func (q *Queries) CountAppUsers(ctx context.Context) (int64, error) {
 	row := q.db.QueryRow(ctx, countAppUsers)
 	var count int64
@@ -32,11 +34,9 @@ const createAppUser = `-- name: CreateAppUser :one
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    created_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, now(), $4
+    $1, $2, $3
 )
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
@@ -45,7 +45,6 @@ type CreateAppUserParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // CreateAppUser
@@ -53,20 +52,13 @@ type CreateAppUserParams struct {
 //	INSERT INTO app_user (
 //	    guid,
 //	    username,
-//	    activated_at,
-//	    created_at,
-//	    deleted_at
+//	    activated_at
 //	) VALUES (
-//	    $1, $2, $3, now(), $4
+//	    $1, $2, $3
 //	)
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) CreateAppUser(ctx context.Context, arg CreateAppUserParams) (AppUser, error) {
-	row := q.db.QueryRow(ctx, createAppUser,
-		arg.GUID,
-		arg.Username,
-		arg.ActivatedAt,
-		arg.DeletedAt,
-	)
+	row := q.db.QueryRow(ctx, createAppUser, arg.GUID, arg.Username, arg.ActivatedAt)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
@@ -81,14 +73,14 @@ func (q *Queries) CreateAppUser(ctx context.Context, arg CreateAppUserParams) (A
 const deleteAppUser = `-- name: DeleteAppUser :exec
 UPDATE app_user
 SET deleted_at = now()
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 `
 
 // DeleteAppUser
 //
 //	UPDATE app_user
 //	SET deleted_at = now()
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 func (q *Queries) DeleteAppUser(ctx context.Context, guid valueobject.GUID) error {
 	_, err := q.db.Exec(ctx, deleteAppUser, guid)
 	return err
@@ -98,7 +90,7 @@ const existsAppUser = `-- name: ExistsAppUser :one
 SELECT EXISTS (
     SELECT 1
     FROM app_user
-    WHERE guid = $1
+    WHERE guid = $1 AND deleted_at IS NULL
 )
 `
 
@@ -107,7 +99,7 @@ SELECT EXISTS (
 //	SELECT EXISTS (
 //	    SELECT 1
 //	    FROM app_user
-//	    WHERE guid = $1
+//	    WHERE guid = $1 AND deleted_at IS NULL
 //	)
 func (q *Queries) ExistsAppUser(ctx context.Context, guid valueobject.GUID) (bool, error) {
 	row := q.db.QueryRow(ctx, existsAppUser, guid)
@@ -119,12 +111,14 @@ func (q *Queries) ExistsAppUser(ctx context.Context, guid valueobject.GUID) (boo
 const getAllAppUsers = `-- name: GetAllAppUsers :many
 SELECT guid, username, activated_at, created_at, deleted_at
 FROM app_user
+WHERE deleted_at IS NULL
 `
 
 // GetAllAppUsers
 //
 //	SELECT guid, username, activated_at, created_at, deleted_at
 //	FROM app_user
+//	WHERE deleted_at IS NULL
 func (q *Queries) GetAllAppUsers(ctx context.Context) ([]AppUser, error) {
 	rows, err := q.db.Query(ctx, getAllAppUsers)
 	if err != nil {
@@ -154,7 +148,7 @@ func (q *Queries) GetAllAppUsers(ctx context.Context) ([]AppUser, error) {
 const getAppUser = `-- name: GetAppUser :one
 SELECT guid, username, activated_at, created_at, deleted_at
 FROM app_user
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 LIMIT 1
 `
 
@@ -162,7 +156,7 @@ LIMIT 1
 //
 //	SELECT guid, username, activated_at, created_at, deleted_at
 //	FROM app_user
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
 func (q *Queries) GetAppUser(ctx context.Context, guid valueobject.GUID) (AppUser, error) {
 	row := q.db.QueryRow(ctx, getAppUser, guid)
@@ -255,17 +249,14 @@ const saveAppUser = `-- name: SaveAppUser :one
 INSERT INTO app_user (
     guid,
     username,
-    activated_at,
-    created_at,
-    deleted_at
+    activated_at
 ) VALUES (
-    $1, $2, $3, now(), $4
+    $1, $2, $3
 )
 ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
-    activated_at = EXCLUDED.activated_at,
-    deleted_at = EXCLUDED.deleted_at
+    activated_at = EXCLUDED.activated_at
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -273,7 +264,6 @@ type SaveAppUserParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // SaveAppUser
@@ -281,25 +271,17 @@ type SaveAppUserParams struct {
 //	INSERT INTO app_user (
 //	    guid,
 //	    username,
-//	    activated_at,
-//	    created_at,
-//	    deleted_at
+//	    activated_at
 //	) VALUES (
-//	    $1, $2, $3, now(), $4
+//	    $1, $2, $3
 //	)
 //	ON CONFLICT (guid) DO UPDATE
 //	SET
 //	    username = EXCLUDED.username,
-//	    activated_at = EXCLUDED.activated_at,
-//	    deleted_at = EXCLUDED.deleted_at
+//	    activated_at = EXCLUDED.activated_at
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error) {
-	row := q.db.QueryRow(ctx, saveAppUser,
-		arg.GUID,
-		arg.Username,
-		arg.ActivatedAt,
-		arg.DeletedAt,
-	)
+	row := q.db.QueryRow(ctx, saveAppUser, arg.GUID, arg.Username, arg.ActivatedAt)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
@@ -315,9 +297,8 @@ const updateAppUser = `-- name: UpdateAppUser :one
 UPDATE app_user
 SET
     username = $2,
-    activated_at = $3,
-    deleted_at = $4
-WHERE guid = $1
+    activated_at = $3
+WHERE guid = $1 AND deleted_at IS NULL
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -325,7 +306,6 @@ type UpdateAppUserParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // UpdateAppUser
@@ -333,17 +313,11 @@ type UpdateAppUserParams struct {
 //	UPDATE app_user
 //	SET
 //	    username = $2,
-//	    activated_at = $3,
-//	    deleted_at = $4
-//	WHERE guid = $1
+//	    activated_at = $3
+//	WHERE guid = $1 AND deleted_at IS NULL
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) UpdateAppUser(ctx context.Context, arg UpdateAppUserParams) (AppUser, error) {
-	row := q.db.QueryRow(ctx, updateAppUser,
-		arg.GUID,
-		arg.Username,
-		arg.ActivatedAt,
-		arg.DeletedAt,
-	)
+	row := q.db.QueryRow(ctx, updateAppUser, arg.GUID, arg.Username, arg.ActivatedAt)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
