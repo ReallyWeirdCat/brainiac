@@ -11,12 +11,34 @@ import (
 )
 
 type Querier interface {
+	//CountAppUsers
+	//
+	//  SELECT COUNT(*)
+	//  FROM app_user
+	CountAppUsers(ctx context.Context) (int64, error)
 	//CreateAppUser
 	//
-	//  INSERT INTO app_user(username)
-	//  VALUES ($1)
+	//  INSERT INTO app_user (
+	//      guid,
+	//      username,
+	//      activated_at,
+	//      created_at,
+	//      deleted_at
+	//  ) VALUES (
+	//      $1, $2, $3, now(), $4
+	//  )
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
-	CreateAppUser(ctx context.Context, username valueobject.Username) (AppUser, error)
+	CreateAppUser(ctx context.Context, arg CreateAppUserParams) (AppUser, error)
+	//CreateAppUserBatch
+	//
+	//  INSERT INTO app_user (
+	//      guid,
+	//      username,
+	//      activated_at,
+	//      deleted_at
+	//  ) VALUES ($1, $2, $3, $4)
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
+	CreateAppUserBatch(ctx context.Context, arg []CreateAppUserBatchParams) *CreateAppUserBatchBatchResults
 	//CreateAppUserCredential
 	//
 	//  INSERT INTO app_user_credential (app_user_guid, email, password_hash, created_at)
@@ -39,29 +61,71 @@ type Querier interface {
 	//  )
 	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 	CreateAppUserProfile(ctx context.Context, arg CreateAppUserProfileParams) (AppUserProfile, error)
+	//CreateAppUserSession
+	//
+	//  INSERT INTO app_user_session(guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at)
+	//  VALUES
+	//  ($1, $2, $3, $4, $5, $6, $7)
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	CreateAppUserSession(ctx context.Context, arg CreateAppUserSessionParams) (AppUserSession, error)
 	//DeleteAppUser
 	//
-	//  DELETE FROM app_user
+	//  UPDATE app_user
+	//  SET deleted_at = now()
 	//  WHERE guid = $1
 	DeleteAppUser(ctx context.Context, guid valueobject.GUID) error
-	//ExistsAppUserByUsername
+	//DeleteAppUserBatch
 	//
-	//  SELECT EXISTS(
-	//      SELECT 1 FROM app_user
-	//      WHERE username = $1
-	//  ) AS exists
-	ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error)
-	//GetAppUserByGUID
+	//  UPDATE app_user
+	//  SET
+	//      deleted_at = true
+	//  WHERE guid = $1
+	DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults
+	//ExistsAppUser
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user
+	//      WHERE guid = $1
+	//  )
+	ExistsAppUser(ctx context.Context, guid valueobject.GUID) (bool, error)
+	//ExistsAppUserBatch
+	//
+	//  SELECT guid FROM app_user
+	//  WHERE guid = $1
+	ExistsAppUserBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserBatchBatchResults
+	//GetAllAppUsers
+	//
+	//  SELECT guid, username, activated_at, created_at, deleted_at
+	//  FROM app_user
+	GetAllAppUsers(ctx context.Context) ([]AppUser, error)
+	//GetAppUser
+	//
+	//  SELECT guid, username, activated_at, created_at, deleted_at
+	//  FROM app_user
+	//  WHERE guid = $1
+	//  LIMIT 1
+	GetAppUser(ctx context.Context, guid valueobject.GUID) (AppUser, error)
+	//GetAppUserBatch
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
 	//  WHERE guid = $1
-	//  LIMIT 1
-	GetAppUserByGUID(ctx context.Context, guid valueobject.GUID) (AppUser, error)
+	GetAppUserBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserBatchBatchResults
+	//GetAppUserByEmail
+	//
+	//  SELECT au.guid, au.username, au.activated_at, au.created_at, au.deleted_at
+	//  FROM app_user au
+	//  INNER JOIN app_user_credential auc ON au.guid = auc.app_user_guid
+	//  WHERE auc.email = $1
+	//    AND auc.deleted_at IS NULL
+	//    AND au.deleted_at IS NULL
+	GetAppUserByEmail(ctx context.Context, email *valueobject.Email) (AppUser, error)
 	//GetAppUserByUsername
 	//
-	//  SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
+	//  SELECT guid, username, activated_at, created_at, deleted_at
+	//  FROM app_user
 	//  WHERE username = $1
-	//  LIMIT 1
+	//    AND deleted_at IS NULL
 	GetAppUserByUsername(ctx context.Context, username valueobject.Username) (AppUser, error)
 	//GetAppUserCredentialByAppUserGUID
 	//
@@ -88,15 +152,47 @@ type Querier interface {
 	//  DELETE FROM app_user_credential
 	//  WHERE app_user_guid = $1
 	HardDeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error
+	//IsDeletedAppUser
+	//
+	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+	//  FROM app_user
+	//  WHERE guid = $1
+	IsDeletedAppUser(ctx context.Context, guid valueobject.GUID) (bool, error)
 	//SaveAppUser
 	//
-	//  INSERT INTO app_user (guid, username, activated_at, created_at)
-	//  VALUES ($1, $2, $3, $4)
-	//  ON CONFLICT (guid)
-	//  DO UPDATE SET
-	//      username = EXCLUDED.username
+	//  INSERT INTO app_user (
+	//      guid,
+	//      username,
+	//      activated_at,
+	//      created_at,
+	//      deleted_at
+	//  ) VALUES (
+	//      $1, $2, $3, now(), $4
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      username = EXCLUDED.username,
+	//      activated_at = EXCLUDED.activated_at,
+	//      deleted_at = EXCLUDED.deleted_at
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error)
+	//SaveAppUserBatch
+	//
+	//  INSERT INTO app_user (
+	//      guid,
+	//      username,
+	//      activated_at,
+	//      deleted_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      username = EXCLUDED.username,
+	//      activated_at = EXCLUDED.activated_at,
+	//      deleted_at = EXCLUDED.deleted_at
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
+	SaveAppUserBatch(ctx context.Context, arg []SaveAppUserBatchParams) *SaveAppUserBatchBatchResults
 	//SoftDeleteAppUserCredential
 	//
 	//  UPDATE app_user_credential
@@ -104,6 +200,26 @@ type Querier interface {
 	//  WHERE app_user_guid = $1
 	//      AND deleted_at IS NULL
 	SoftDeleteAppUserCredential(ctx context.Context, arg SoftDeleteAppUserCredentialParams) error
+	//UpdateAppUser
+	//
+	//  UPDATE app_user
+	//  SET
+	//      username = $2,
+	//      activated_at = $3,
+	//      deleted_at = $4
+	//  WHERE guid = $1
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
+	UpdateAppUser(ctx context.Context, arg UpdateAppUserParams) (AppUser, error)
+	//UpdateAppUserBatch
+	//
+	//  UPDATE app_user
+	//  SET
+	//      username = $2,
+	//      activated_at = $3,
+	//      deleted_at = $4
+	//  WHERE guid = $1
+	//  RETURNING guid, username, activated_at, created_at, deleted_at
+	UpdateAppUserBatch(ctx context.Context, arg []UpdateAppUserBatchParams) *UpdateAppUserBatchBatchResults
 	//UpdateAppUserCredentialEmail
 	//
 	//  UPDATE app_user_credential

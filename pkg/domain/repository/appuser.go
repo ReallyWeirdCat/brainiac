@@ -18,9 +18,14 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserRepository interface {
 	Repository[entity.AppUser]
+	GetByUsername(ctx context.Context, username valueobject.Username) (*entity.AppUser, error)
+	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUser, error)
 }

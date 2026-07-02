@@ -12,19 +12,61 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+const countAppUsers = `-- name: CountAppUsers :one
+SELECT COUNT(*)
+FROM app_user
+`
+
+// CountAppUsers
+//
+//	SELECT COUNT(*)
+//	FROM app_user
+func (q *Queries) CountAppUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAppUsers)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAppUser = `-- name: CreateAppUser :one
-INSERT INTO app_user(username)
-VALUES ($1)
+INSERT INTO app_user (
+    guid,
+    username,
+    activated_at,
+    created_at,
+    deleted_at
+) VALUES (
+    $1, $2, $3, now(), $4
+)
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
+type CreateAppUserParams struct {
+	GUID        valueobject.GUID     `db:"guid" json:"guid"`
+	Username    valueobject.Username `db:"username" json:"username"`
+	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
+	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
+}
+
 // CreateAppUser
 //
-//	INSERT INTO app_user(username)
-//	VALUES ($1)
+//	INSERT INTO app_user (
+//	    guid,
+//	    username,
+//	    activated_at,
+//	    created_at,
+//	    deleted_at
+//	) VALUES (
+//	    $1, $2, $3, now(), $4
+//	)
 //	RETURNING guid, username, activated_at, created_at, deleted_at
-func (q *Queries) CreateAppUser(ctx context.Context, username valueobject.Username) (AppUser, error) {
-	row := q.db.QueryRow(ctx, createAppUser, username)
+func (q *Queries) CreateAppUser(ctx context.Context, arg CreateAppUserParams) (AppUser, error) {
+	row := q.db.QueryRow(ctx, createAppUser,
+		arg.GUID,
+		arg.Username,
+		arg.ActivatedAt,
+		arg.DeletedAt,
+	)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
@@ -37,52 +79,123 @@ func (q *Queries) CreateAppUser(ctx context.Context, username valueobject.Userna
 }
 
 const deleteAppUser = `-- name: DeleteAppUser :exec
-DELETE FROM app_user
+UPDATE app_user
+SET deleted_at = now()
 WHERE guid = $1
 `
 
 // DeleteAppUser
 //
-//	DELETE FROM app_user
+//	UPDATE app_user
+//	SET deleted_at = now()
 //	WHERE guid = $1
 func (q *Queries) DeleteAppUser(ctx context.Context, guid valueobject.GUID) error {
 	_, err := q.db.Exec(ctx, deleteAppUser, guid)
 	return err
 }
 
-const existsAppUserByUsername = `-- name: ExistsAppUserByUsername :one
-SELECT EXISTS(
-    SELECT 1 FROM app_user
-    WHERE username = $1
-) AS exists
+const existsAppUser = `-- name: ExistsAppUser :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user
+    WHERE guid = $1
+)
 `
 
-// ExistsAppUserByUsername
+// ExistsAppUser
 //
-//	SELECT EXISTS(
-//	    SELECT 1 FROM app_user
-//	    WHERE username = $1
-//	) AS exists
-func (q *Queries) ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error) {
-	row := q.db.QueryRow(ctx, existsAppUserByUsername, username)
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user
+//	    WHERE guid = $1
+//	)
+func (q *Queries) ExistsAppUser(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUser, guid)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
 }
 
-const getAppUserByGUID = `-- name: GetAppUserByGUID :one
-SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
+const getAllAppUsers = `-- name: GetAllAppUsers :many
+SELECT guid, username, activated_at, created_at, deleted_at
+FROM app_user
+`
+
+// GetAllAppUsers
+//
+//	SELECT guid, username, activated_at, created_at, deleted_at
+//	FROM app_user
+func (q *Queries) GetAllAppUsers(ctx context.Context) ([]AppUser, error) {
+	rows, err := q.db.Query(ctx, getAllAppUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUser
+	for rows.Next() {
+		var i AppUser
+		if err := rows.Scan(
+			&i.GUID,
+			&i.Username,
+			&i.ActivatedAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAppUser = `-- name: GetAppUser :one
+SELECT guid, username, activated_at, created_at, deleted_at
+FROM app_user
 WHERE guid = $1
 LIMIT 1
 `
 
-// GetAppUserByGUID
+// GetAppUser
 //
-//	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
+//	SELECT guid, username, activated_at, created_at, deleted_at
+//	FROM app_user
 //	WHERE guid = $1
 //	LIMIT 1
-func (q *Queries) GetAppUserByGUID(ctx context.Context, guid valueobject.GUID) (AppUser, error) {
-	row := q.db.QueryRow(ctx, getAppUserByGUID, guid)
+func (q *Queries) GetAppUser(ctx context.Context, guid valueobject.GUID) (AppUser, error) {
+	row := q.db.QueryRow(ctx, getAppUser, guid)
+	var i AppUser
+	err := row.Scan(
+		&i.GUID,
+		&i.Username,
+		&i.ActivatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getAppUserByEmail = `-- name: GetAppUserByEmail :one
+SELECT au.guid, au.username, au.activated_at, au.created_at, au.deleted_at
+FROM app_user au
+INNER JOIN app_user_credential auc ON au.guid = auc.app_user_guid
+WHERE auc.email = $1
+  AND auc.deleted_at IS NULL
+  AND au.deleted_at IS NULL
+`
+
+// GetAppUserByEmail
+//
+//	SELECT au.guid, au.username, au.activated_at, au.created_at, au.deleted_at
+//	FROM app_user au
+//	INNER JOIN app_user_credential auc ON au.guid = auc.app_user_guid
+//	WHERE auc.email = $1
+//	  AND auc.deleted_at IS NULL
+//	  AND au.deleted_at IS NULL
+func (q *Queries) GetAppUserByEmail(ctx context.Context, email *valueobject.Email) (AppUser, error) {
+	row := q.db.QueryRow(ctx, getAppUserByEmail, email)
 	var i AppUser
 	err := row.Scan(
 		&i.GUID,
@@ -95,16 +208,18 @@ func (q *Queries) GetAppUserByGUID(ctx context.Context, guid valueobject.GUID) (
 }
 
 const getAppUserByUsername = `-- name: GetAppUserByUsername :one
-SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
+SELECT guid, username, activated_at, created_at, deleted_at
+FROM app_user
 WHERE username = $1
-LIMIT 1
+  AND deleted_at IS NULL
 `
 
 // GetAppUserByUsername
 //
-//	SELECT guid, username, activated_at, created_at, deleted_at FROM app_user
+//	SELECT guid, username, activated_at, created_at, deleted_at
+//	FROM app_user
 //	WHERE username = $1
-//	LIMIT 1
+//	  AND deleted_at IS NULL
 func (q *Queries) GetAppUserByUsername(ctx context.Context, username valueobject.Username) (AppUser, error) {
 	row := q.db.QueryRow(ctx, getAppUserByUsername, username)
 	var i AppUser
@@ -118,12 +233,39 @@ func (q *Queries) GetAppUserByUsername(ctx context.Context, username valueobject
 	return i, err
 }
 
+const isDeletedAppUser = `-- name: IsDeletedAppUser :one
+SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+FROM app_user
+WHERE guid = $1
+`
+
+// IsDeletedAppUser
+//
+//	SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+//	FROM app_user
+//	WHERE guid = $1
+func (q *Queries) IsDeletedAppUser(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, isDeletedAppUser, guid)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const saveAppUser = `-- name: SaveAppUser :one
-INSERT INTO app_user (guid, username, activated_at, created_at)
-VALUES ($1, $2, $3, $4)
-ON CONFLICT (guid) 
-DO UPDATE SET 
-    username = EXCLUDED.username
+INSERT INTO app_user (
+    guid,
+    username,
+    activated_at,
+    created_at,
+    deleted_at
+) VALUES (
+    $1, $2, $3, now(), $4
+)
+ON CONFLICT (guid) DO UPDATE
+SET
+    username = EXCLUDED.username,
+    activated_at = EXCLUDED.activated_at,
+    deleted_at = EXCLUDED.deleted_at
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -131,23 +273,76 @@ type SaveAppUserParams struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
 	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
-	CreatedAt   time.Time            `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
 }
 
 // SaveAppUser
 //
-//	INSERT INTO app_user (guid, username, activated_at, created_at)
-//	VALUES ($1, $2, $3, $4)
-//	ON CONFLICT (guid)
-//	DO UPDATE SET
-//	    username = EXCLUDED.username
+//	INSERT INTO app_user (
+//	    guid,
+//	    username,
+//	    activated_at,
+//	    created_at,
+//	    deleted_at
+//	) VALUES (
+//	    $1, $2, $3, now(), $4
+//	)
+//	ON CONFLICT (guid) DO UPDATE
+//	SET
+//	    username = EXCLUDED.username,
+//	    activated_at = EXCLUDED.activated_at,
+//	    deleted_at = EXCLUDED.deleted_at
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error) {
 	row := q.db.QueryRow(ctx, saveAppUser,
 		arg.GUID,
 		arg.Username,
 		arg.ActivatedAt,
-		arg.CreatedAt,
+		arg.DeletedAt,
+	)
+	var i AppUser
+	err := row.Scan(
+		&i.GUID,
+		&i.Username,
+		&i.ActivatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateAppUser = `-- name: UpdateAppUser :one
+UPDATE app_user
+SET
+    username = $2,
+    activated_at = $3,
+    deleted_at = $4
+WHERE guid = $1
+RETURNING guid, username, activated_at, created_at, deleted_at
+`
+
+type UpdateAppUserParams struct {
+	GUID        valueobject.GUID     `db:"guid" json:"guid"`
+	Username    valueobject.Username `db:"username" json:"username"`
+	ActivatedAt *time.Time           `db:"activated_at" json:"activated_at"`
+	DeletedAt   *time.Time           `db:"deleted_at" json:"deleted_at"`
+}
+
+// UpdateAppUser
+//
+//	UPDATE app_user
+//	SET
+//	    username = $2,
+//	    activated_at = $3,
+//	    deleted_at = $4
+//	WHERE guid = $1
+//	RETURNING guid, username, activated_at, created_at, deleted_at
+func (q *Queries) UpdateAppUser(ctx context.Context, arg UpdateAppUserParams) (AppUser, error) {
+	row := q.db.QueryRow(ctx, updateAppUser,
+		arg.GUID,
+		arg.Username,
+		arg.ActivatedAt,
+		arg.DeletedAt,
 	)
 	var i AppUser
 	err := row.Scan(

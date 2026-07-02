@@ -29,6 +29,14 @@ type PgAppUserProfileRepo struct {
 	Queries *generated.Queries
 }
 
+func (p *PgAppUserProfileRepo) GetByUsername(ctx context.Context, username valueobject.Username) (*entity.AppUserProfile, error) {
+	panic("unimplemented")
+}
+
+func (p *PgAppUserProfileRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	panic("unimplemented")
+}
+
 func (p *PgAppUserProfileRepo) Count(ctx context.Context) (int64, error) {
 	panic("unimplemented")
 }
@@ -53,7 +61,7 @@ func (p *PgAppUserProfileRepo) Exists(ctx context.Context, guid valueobject.GUID
 	panic("unimplemented")
 }
 
-func (p *PgAppUserProfileRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
+func (p *PgAppUserProfileRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error) {
 	panic("unimplemented")
 }
 

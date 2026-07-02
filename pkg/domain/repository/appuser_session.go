@@ -18,9 +18,16 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserSessionRepository interface {
 	Repository[entity.AppUserSession]
+	GetAllActiveByUsername(ctx context.Context, username valueobject.Username) ([]*entity.AppUserSession, error)
+	GetAllInactiveByUsername(ctx context.Context, username valueobject.Username) ([]*entity.AppUserSession, error)
+	GetAllByLastIP(ctx context.Context, ip string) ([]*entity.AppUserSession, error)
+	GetAllAppUserGUIDsByIP(ctx context.Context, ip string) ([]valueobject.GUID, error)
 }

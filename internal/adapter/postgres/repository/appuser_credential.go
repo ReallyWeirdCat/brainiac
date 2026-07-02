@@ -29,6 +29,14 @@ type PgAppUserCredentialRepo struct {
 	Queries *generated.Queries
 }
 
+func (p *PgAppUserCredentialRepo) GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error) {
+	panic("unimplemented")
+}
+
+func (p *PgAppUserCredentialRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	panic("unimplemented")
+}
+
 func (p *PgAppUserCredentialRepo) Count(ctx context.Context) (int64, error) {
 	panic("unimplemented")
 }
@@ -53,7 +61,7 @@ func (p *PgAppUserCredentialRepo) Exists(ctx context.Context, guid valueobject.G
 	panic("unimplemented")
 }
 
-func (p *PgAppUserCredentialRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error) {
+func (p *PgAppUserCredentialRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error) {
 	panic("unimplemented")
 }
 

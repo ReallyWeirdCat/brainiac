@@ -23,4 +23,5 @@ var (
 	ErrUserDoesNotExist   = NewDomainError("user does not exist", nil).WithType(NotFound)
 	ErrInvalidCredentials = NewDomainError("invalid credentials", nil).WithType(Unauthorized)
 	ErrTooManyAttempts    = NewDomainError("too many attempts", nil).WithType(LimitExceeded)
+	ErrEntityNotFound     = NewDomainError("entity not found or does not exist", nil).WithType(NotFound)
 )

@@ -18,9 +18,13 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type AppUserProfileRepository interface {
 	Repository[entity.AppUserProfile]
+	GetByUsername(ctx context.Context, username valueobject.Username) (*entity.AppUserProfile, error)
 }

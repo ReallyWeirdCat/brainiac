@@ -37,5 +37,6 @@ type Repository[T any] interface {
 	GetAll(ctx context.Context) ([]*T, error)
 	Count(ctx context.Context) (int64, error)
 	Exists(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsBatch(ctx context.Context, guids []valueobject.GUID) (bool, error)
+	ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error)
+	IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error)
 }

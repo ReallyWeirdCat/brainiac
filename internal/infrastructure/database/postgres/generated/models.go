@@ -42,6 +42,18 @@ type AppUserProfile struct {
 	DeletedAt         *time.Time                `db:"deleted_at" json:"deleted_at"`
 }
 
+type AppUserSession struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
 type Course struct {
 	GUID            valueobject.GUID      `db:"guid" json:"guid"`
 	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`

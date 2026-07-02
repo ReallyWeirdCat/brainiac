@@ -76,6 +76,12 @@ func (d DomainError) WithType(error_type DomainErrorType) DomainError {
 	return clone
 }
 
+func (d DomainError) FromError(err error) DomainError {
+	clone := d
+	clone.err = err
+	return clone
+}
+
 func (d DomainError) DomainErrorType() DomainErrorType {
 	return d.errtype
 }

@@ -26,8 +26,8 @@ import (
 type AppUserSession struct {
 	GUID        valueobject.GUID `json:"guid"`
 	AppUserGUID valueobject.GUID `json:"app_user_guid"`
-	LastIPv4    *string          `json:"last_ipv4,omitempty"`
-	LastIPv6    *string          `json:"last_ipv6,omitempty"`
+	LastIPV4    *string          `json:"last_ipv4,omitempty"`
+	LastIPV6    *string          `json:"last_ipv6,omitempty"`
 	LastAgent   *string          `json:"last_agent,omitempty"`
 	LastSeenAt  time.Time        `json:"last_seen_at"`
 	ExpireAt    *time.Time       `json:"expire_at,omitempty"`
