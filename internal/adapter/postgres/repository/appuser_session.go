@@ -19,6 +19,8 @@ package repository
 
 import (
 	"context"
+	"sync"
+
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
@@ -26,7 +28,18 @@ import (
 )
 
 type PgAppUserSessionRepo struct {
-	Queries *generated.Queries
+	queries *generated.Queries
+	mu      *sync.Mutex
+}
+
+func NewPgAppUserSessionRepo(queries *generated.Queries, mu *sync.Mutex) repository.AppUserSessionRepository {
+	if queries == nil || mu == nil {
+		panic("queries and mu must not be nil")
+	}
+	return &PgAppUserSessionRepo{
+		mu:      mu,
+		queries: queries,
+	}
 }
 
 func (p *PgAppUserSessionRepo) Count(ctx context.Context) (int64, error) {

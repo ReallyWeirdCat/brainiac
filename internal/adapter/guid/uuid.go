@@ -15,10 +15,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package ports
+package guid
 
-import "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+import (
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+	"github.com/google/uuid"
+)
 
-type GuidProvider interface {
-	New() (valueobject.GUID, error)
+type UuidGuidProvider struct{}
+
+func (u UuidGuidProvider) New() (valueobject.GUID, error) {
+	uuid := uuid.New()
+	guid, err := valueobject.NewGUID(uuid.String())
+	if err != nil {
+		return valueobject.GUID(""), err
+	}
+	return guid, nil
 }
+
+var _ ports.GuidProvider = UuidGuidProvider{}

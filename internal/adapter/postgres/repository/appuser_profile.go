@@ -19,6 +19,8 @@ package repository
 
 import (
 	"context"
+	"sync"
+
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
@@ -26,7 +28,18 @@ import (
 )
 
 type PgAppUserProfileRepo struct {
-	Queries *generated.Queries
+	queries *generated.Queries
+	mu      *sync.Mutex
+}
+
+func NewPgAppUserProfileRepo(queries *generated.Queries, mu *sync.Mutex) repo.AppUserProfileRepository {
+	if queries == nil || mu == nil {
+		panic("queries and mu must not be nil")
+	}
+	return &PgAppUserProfileRepo{
+		mu:      mu,
+		queries: queries,
+	}
 }
 
 func (p *PgAppUserProfileRepo) GetByUsername(ctx context.Context, username valueobject.Username) (*entity.AppUserProfile, error) {

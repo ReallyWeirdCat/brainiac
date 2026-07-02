@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package postgres
+package repository
 
 import (
 	"context"
 	"fmt"
+	"sync"
 
-	repo "github.com/ReallyWeirdCat/brainiac/internal/adapter/postgres/repository"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
@@ -54,12 +54,14 @@ func (u *UnitOfWorkProvider) New(ctx context.Context) (ports.UnitOfWork, error) 
 var _ ports.UnitOfWorkProvider = &UnitOfWorkProvider{}
 
 type UnitOfWork struct {
+	mu                 sync.Mutex
 	queries            *generated.Queries
 	tx                 pgx.Tx
 	committed          bool
 	appUsers           repository.AppUserRepository
 	appUserCredentials repository.AppUserCredentialRepository
 	appUserProfiles    repository.AppUserProfileRepository
+	appUserSessions    repository.AppUserSessionRepository
 }
 
 func NewUnitOfWork(queries *generated.Queries, tx pgx.Tx) ports.UnitOfWork {
@@ -67,9 +69,10 @@ func NewUnitOfWork(queries *generated.Queries, tx pgx.Tx) ports.UnitOfWork {
 		queries: queries,
 		tx:      tx,
 	}
-	uow.appUsers = &repo.PgAppUserRepo{Queries: queries}
-	uow.appUserCredentials = &repo.PgAppUserCredentialRepo{Queries: queries}
-	uow.appUserProfiles = &repo.PgAppUserProfileRepo{Queries: queries}
+	uow.appUsers = NewPgAppUserRepo(queries, &uow.mu)
+	uow.appUserCredentials = NewPgAppUserCredentialRepo(queries, &uow.mu)
+	uow.appUserProfiles = NewPgAppUserProfileRepo(queries, &uow.mu)
+	uow.appUserSessions = NewPgAppUserSessionRepo(queries, &uow.mu)
 	return uow
 }
 
@@ -86,6 +89,9 @@ func (u *UnitOfWork) AppUsers() repository.AppUserRepository {
 }
 
 func (u *UnitOfWork) Commit(ctx context.Context) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	if u.tx == nil {
 		return nil
 	}
@@ -100,6 +106,9 @@ func (u *UnitOfWork) Commit(ctx context.Context) error {
 }
 
 func (u *UnitOfWork) Rollback(ctx context.Context) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	if u.tx == nil {
 		return nil
 	}

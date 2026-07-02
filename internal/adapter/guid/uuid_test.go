@@ -15,10 +15,34 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package ports
+package guid_test
 
-import "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+import (
+	"testing"
 
-type GuidProvider interface {
-	New() (valueobject.GUID, error)
+	"github.com/ReallyWeirdCat/brainiac/internal/adapter/guid"
+)
+
+func TestUuidGuidProvider_New(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantErr bool
+	}{
+		{name: "Generated UUID", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := guid.UuidGuidProvider{}
+			_, gotErr := u.New()
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("New() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("New() succeeded unexpectedly")
+			}
+		})
+	}
 }

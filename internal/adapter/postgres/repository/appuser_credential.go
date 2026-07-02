@@ -19,6 +19,8 @@ package repository
 
 import (
 	"context"
+	"sync"
+
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
@@ -26,7 +28,18 @@ import (
 )
 
 type PgAppUserCredentialRepo struct {
-	Queries *generated.Queries
+	queries *generated.Queries
+	mu      *sync.Mutex
+}
+
+func NewPgAppUserCredentialRepo(queries *generated.Queries, mu *sync.Mutex) repo.AppUserCredentialRepository {
+	if queries == nil || mu == nil {
+		panic("queries and mu must not be nil")
+	}
+	return &PgAppUserCredentialRepo{
+		mu:      mu,
+		queries: queries,
+	}
 }
 
 func (p *PgAppUserCredentialRepo) GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error) {

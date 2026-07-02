@@ -20,6 +20,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
@@ -30,11 +31,25 @@ import (
 )
 
 type PgAppUserRepo struct {
-	Queries *generated.Queries
+	queries *generated.Queries
+	mu      *sync.Mutex
+}
+
+func NewPgAppUserRepo(queries *generated.Queries, mu *sync.Mutex) repo.AppUserRepository {
+	if queries == nil || mu == nil {
+		panic("queries and mu must not be nil")
+	}
+	return &PgAppUserRepo{
+		mu:      mu,
+		queries: queries,
+	}
 }
 
 func (p *PgAppUserRepo) GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUser, error) {
-	obj, err := p.Queries.GetAppUserByEmail(ctx, &email)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	obj, err := p.queries.GetAppUserByEmail(ctx, &email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domerr.ErrEntityNotFound.FromError(err)
@@ -46,7 +61,10 @@ func (p *PgAppUserRepo) GetByEmail(ctx context.Context, email valueobject.Email)
 }
 
 func (p *PgAppUserRepo) GetByUsername(ctx context.Context, username valueobject.Username) (*entity.AppUser, error) {
-	obj, err := p.Queries.GetAppUserByUsername(ctx, username)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	obj, err := p.queries.GetAppUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domerr.ErrEntityNotFound.FromError(err)
@@ -58,7 +76,10 @@ func (p *PgAppUserRepo) GetByUsername(ctx context.Context, username valueobject.
 }
 
 func (p *PgAppUserRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error) {
-	obj, err := p.Queries.IsDeletedAppUser(ctx, guid)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	obj, err := p.queries.IsDeletedAppUser(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return false, domerr.ErrEntityNotFound.FromError(err)
@@ -69,7 +90,10 @@ func (p *PgAppUserRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (b
 }
 
 func (p *PgAppUserRepo) Count(ctx context.Context) (int64, error) {
-	count, err := p.Queries.CountAppUsers(ctx)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	count, err := p.queries.CountAppUsers(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -77,13 +101,16 @@ func (p *PgAppUserRepo) Count(ctx context.Context) (int64, error) {
 }
 
 func (p *PgAppUserRepo) Create(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	params := generated.CreateAppUserParams{
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
 		DeletedAt:   obj.DeletedAt,
 	}
-	newObj, err := p.Queries.CreateAppUser(ctx, params)
+	newObj, err := p.queries.CreateAppUser(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +119,9 @@ func (p *PgAppUserRepo) Create(ctx context.Context, obj *entity.AppUser) (*entit
 }
 
 func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	var params []generated.CreateAppUserBatchParams
 	for _, obj := range objs {
 		params = append(params, generated.CreateAppUserBatchParams{
@@ -101,7 +131,7 @@ func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser)
 			DeletedAt:   obj.DeletedAt,
 		})
 	}
-	batch := p.Queries.CreateAppUserBatch(ctx, params)
+	batch := p.queries.CreateAppUserBatch(ctx, params)
 
 	var models []*entity.AppUser
 	var batchErrs []error
@@ -123,7 +153,10 @@ func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser)
 }
 
 func (p *PgAppUserRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
-	err := p.Queries.DeleteAppUser(ctx, guid)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	err := p.queries.DeleteAppUser(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domerr.ErrEntityNotFound.FromError(err)
@@ -134,7 +167,10 @@ func (p *PgAppUserRepo) Delete(ctx context.Context, guid valueobject.GUID) error
 }
 
 func (p *PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
-	batch := p.Queries.DeleteAppUserBatch(ctx, guids)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	batch := p.queries.DeleteAppUserBatch(ctx, guids)
 	var batchErrs []error
 	batch.Exec(func(_ int, err error) {
 		if err != nil {
@@ -153,11 +189,14 @@ func (p *PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUI
 }
 
 func (p *PgAppUserRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
-	return p.Queries.ExistsAppUser(ctx, guid)
+	return p.queries.ExistsAppUser(ctx, guid)
 }
 
 func (p *PgAppUserRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error) {
-	batch := p.Queries.ExistsAppUserBatch(ctx, guids)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	batch := p.queries.ExistsAppUserBatch(ctx, guids)
 	var existingGuids []valueobject.GUID
 	var batchErrs []error
 	batch.Query(func(idx int, items []valueobject.GUID, err error) {
@@ -174,7 +213,10 @@ func (p *PgAppUserRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUI
 }
 
 func (p *PgAppUserRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity.AppUser, error) {
-	obj, err := p.Queries.GetAppUser(ctx, guid)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	obj, err := p.queries.GetAppUser(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domerr.ErrEntityNotFound.FromError(err)
@@ -186,8 +228,11 @@ func (p *PgAppUserRepo) Get(ctx context.Context, guid valueobject.GUID) (*entity
 }
 
 func (p *PgAppUserRepo) GetAll(ctx context.Context) ([]*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	var models []*entity.AppUser
-	objs, err := p.Queries.GetAllAppUsers(ctx)
+	objs, err := p.queries.GetAllAppUsers(ctx)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models, nil
@@ -202,7 +247,10 @@ func (p *PgAppUserRepo) GetAll(ctx context.Context) ([]*entity.AppUser, error) {
 }
 
 func (p *PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUser, error) {
-	batch := p.Queries.GetAppUserBatch(ctx, guids)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	batch := p.queries.GetAppUserBatch(ctx, guids)
 	var models []*entity.AppUser
 	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
@@ -226,13 +274,16 @@ func (p *PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) 
 }
 
 func (p *PgAppUserRepo) Save(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	params := generated.SaveAppUserParams{
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
 		DeletedAt:   obj.DeletedAt,
 	}
-	newObj, err := p.Queries.SaveAppUser(ctx, params)
+	newObj, err := p.queries.SaveAppUser(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -241,6 +292,9 @@ func (p *PgAppUserRepo) Save(ctx context.Context, obj *entity.AppUser) (*entity.
 }
 
 func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	var params []generated.SaveAppUserBatchParams
 	for _, obj := range objs {
 		params = append(params, generated.SaveAppUserBatchParams{
@@ -250,7 +304,7 @@ func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) (
 			DeletedAt:   obj.DeletedAt,
 		})
 	}
-	batch := p.Queries.SaveAppUserBatch(ctx, params)
+	batch := p.queries.SaveAppUserBatch(ctx, params)
 	var models []*entity.AppUser
 	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
@@ -270,13 +324,16 @@ func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) (
 }
 
 func (p *PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entity.AppUser, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	params := generated.UpdateAppUserParams{
 		GUID:        obj.GUID,
 		Username:    obj.Username,
 		ActivatedAt: obj.ActivatedAt,
 		DeletedAt:   obj.DeletedAt,
 	}
-	newObj, err := p.Queries.UpdateAppUser(ctx, params)
+	newObj, err := p.queries.UpdateAppUser(ctx, params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domerr.ErrEntityNotFound.FromError(err)
@@ -289,6 +346,9 @@ func (p *PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entit
 
 func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser) ([]*entity.AppUser, error) {
 	var params []generated.UpdateAppUserBatchParams
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	for _, obj := range objs {
 		params = append(params, generated.UpdateAppUserBatchParams{
 			GUID:        obj.GUID,
@@ -297,7 +357,7 @@ func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser)
 			DeletedAt:   obj.DeletedAt,
 		})
 	}
-	batch := p.Queries.UpdateAppUserBatch(ctx, params)
+	batch := p.queries.UpdateAppUserBatch(ctx, params)
 	var models []*entity.AppUser
 	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
