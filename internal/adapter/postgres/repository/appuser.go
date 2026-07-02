@@ -104,10 +104,10 @@ func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser)
 	batch := p.Queries.CreateAppUserBatch(ctx, params)
 
 	var models []*entity.AppUser
-	var batchErr error
+	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
 		if err != nil {
-			batchErr = err
+			batchErrs = append(batchErrs, err)
 			return
 		}
 		for _, newObj := range items {
@@ -116,27 +116,38 @@ func (p *PgAppUserRepo) CreateBatch(ctx context.Context, objs []*entity.AppUser)
 		}
 	})
 
-	if batchErr != nil {
-		return nil, batchErr
+	if len(batchErrs) != 0 {
+		return models, errors.Join(batchErrs...)
 	}
 	return models, nil
 }
 
 func (p *PgAppUserRepo) Delete(ctx context.Context, guid valueobject.GUID) error {
-	return p.Queries.DeleteAppUser(ctx, guid)
+	err := p.Queries.DeleteAppUser(ctx, guid)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domerr.ErrEntityNotFound.FromError(err)
+		}
+		return err
+	}
+	return nil
 }
 
 func (p *PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUID) error {
 	batch := p.Queries.DeleteAppUserBatch(ctx, guids)
-	var batchErr error
+	var batchErrs []error
 	batch.Exec(func(_ int, err error) {
 		if err != nil {
-			batchErr = err
+			if errors.Is(err, pgx.ErrNoRows) {
+				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				return
+			}
+			batchErrs = append(batchErrs, err)
 			return
 		}
 	})
-	if batchErr != nil {
-		return batchErr
+	if len(batchErrs) != 0 {
+		return errors.Join(batchErrs...)
 	}
 	return nil
 }
@@ -148,16 +159,16 @@ func (p *PgAppUserRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool
 func (p *PgAppUserRepo) ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error) {
 	batch := p.Queries.ExistsAppUserBatch(ctx, guids)
 	var existingGuids []valueobject.GUID
-	var batchErr error
+	var batchErrs []error
 	batch.Query(func(idx int, items []valueobject.GUID, err error) {
 		if err != nil {
-			batchErr = err
+			batchErrs = append(batchErrs, err)
 			return
 		}
-		existingGuids = items
+		existingGuids = append(existingGuids, items...)
 	})
-	if batchErr != nil {
-		return nil, batchErr
+	if len(batchErrs) != 0 {
+		return existingGuids, errors.Join(batchErrs...)
 	}
 	return existingGuids, nil
 }
@@ -193,10 +204,14 @@ func (p *PgAppUserRepo) GetAll(ctx context.Context) ([]*entity.AppUser, error) {
 func (p *PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*entity.AppUser, error) {
 	batch := p.Queries.GetAppUserBatch(ctx, guids)
 	var models []*entity.AppUser
-	var batchErr error
+	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
 		if err != nil {
-			batchErr = err
+			if errors.Is(err, pgx.ErrNoRows) {
+				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				return
+			}
+			batchErrs = append(batchErrs, err)
 			return
 		}
 		for _, item := range items {
@@ -204,8 +219,8 @@ func (p *PgAppUserRepo) GetBatch(ctx context.Context, guids []valueobject.GUID) 
 			models = append(models, &model)
 		}
 	})
-	if batchErr != nil {
-		return nil, batchErr
+	if len(batchErrs) != 0 {
+		return models, errors.Join(batchErrs...)
 	}
 	return models, nil
 }
@@ -237,10 +252,10 @@ func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) (
 	}
 	batch := p.Queries.SaveAppUserBatch(ctx, params)
 	var models []*entity.AppUser
-	var batchErr error
+	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
 		if err != nil {
-			batchErr = err
+			batchErrs = append(batchErrs, err)
 			return
 		}
 		for _, item := range items {
@@ -248,8 +263,8 @@ func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) (
 			models = append(models, &model)
 		}
 	})
-	if batchErr != nil {
-		return nil, batchErr
+	if len(batchErrs) != 0 {
+		return models, errors.Join(batchErrs...)
 	}
 	return models, nil
 }
@@ -263,6 +278,9 @@ func (p *PgAppUserRepo) Update(ctx context.Context, obj *entity.AppUser) (*entit
 	}
 	newObj, err := p.Queries.UpdateAppUser(ctx, params)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domerr.ErrEntityNotFound.FromError(err)
+		}
 		return nil, err
 	}
 	model := entity.AppUser(newObj)
@@ -281,10 +299,14 @@ func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser)
 	}
 	batch := p.Queries.UpdateAppUserBatch(ctx, params)
 	var models []*entity.AppUser
-	var batchErr error
+	var batchErrs []error
 	batch.Query(func(idx int, items []generated.AppUser, err error) {
 		if err != nil {
-			batchErr = err
+			if errors.Is(err, pgx.ErrNoRows) {
+				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				return
+			}
+			batchErrs = append(batchErrs, err)
 			return
 		}
 		for _, item := range items {
@@ -292,8 +314,8 @@ func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser)
 			models = append(models, &model)
 		}
 	})
-	if batchErr != nil {
-		return nil, batchErr
+	if len(batchErrs) != 0 {
+		return models, errors.Join(batchErrs...)
 	}
 	return models, nil
 }
