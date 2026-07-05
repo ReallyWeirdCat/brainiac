@@ -33,7 +33,7 @@ type AppUserProfile struct {
 	Patronymic        *valueobject.Name         `json:"patronymic,omitempty"`
 	Nickname          *valueobject.Nickname     `json:"nickname,omitempty"`
 	Bio               *valueobject.Bio          `json:"bio,omitempty"`
-	PreferredLanguage valueobject.LanguageCode  `json:"preferred_language"`
+	PreferredLanguage *valueobject.LanguageCode `json:"preferred_language"`
 	ProfileDiscovery  enum.ProfileDiscoveryEnum `json:"profile_discovery"`
 	AvatarUrl         *valueobject.HttpUrl      `json:"avatar_url,omitempty"`
 	EditingLockedAt   *time.Time                `json:"editing_locked_at,omitempty"`
@@ -60,7 +60,7 @@ func (a *AppUserProfile) IsValid() bool {
 	if a.Bio != nil && !a.Bio.IsValid() {
 		return false
 	}
-	if !a.PreferredLanguage.IsValid() {
+	if a.PreferredLanguage != nil && !a.PreferredLanguage.IsValid() {
 		return false
 	}
 	if !a.ProfileDiscovery.IsValid() {

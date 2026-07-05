@@ -187,6 +187,9 @@ func (p *PgAppUserRepo) DeleteBatch(ctx context.Context, guids []valueobject.GUI
 }
 
 func (p *PgAppUserRepo) Exists(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	return p.queries.ExistsAppUser(ctx, guid)
 }
 
