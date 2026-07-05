@@ -257,6 +257,7 @@ ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
     activated_at = EXCLUDED.activated_at
+WHERE deleted_at IS NULL
 RETURNING guid, username, activated_at, created_at, deleted_at
 `
 
@@ -279,6 +280,7 @@ type SaveAppUserParams struct {
 //	SET
 //	    username = EXCLUDED.username,
 //	    activated_at = EXCLUDED.activated_at
+//	WHERE deleted_at IS NULL
 //	RETURNING guid, username, activated_at, created_at, deleted_at
 func (q *Queries) SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error) {
 	row := q.db.QueryRow(ctx, saveAppUser, arg.GUID, arg.Username, arg.ActivatedAt)

@@ -11,6 +11,24 @@ import (
 )
 
 type Querier interface {
+	//CountAppUserCredentials
+	//
+	//  SELECT COUNT(*)
+	//  FROM app_user_credential
+	//  WHERE deleted_at IS NULL
+	CountAppUserCredentials(ctx context.Context) (int64, error)
+	//CountAppUserProfiles
+	//
+	//  SELECT COUNT(*)
+	//  FROM app_user_profile
+	//  WHERE deleted_at IS NULL
+	CountAppUserProfiles(ctx context.Context) (int64, error)
+	//CountAppUserSessions
+	//
+	//  SELECT COUNT(*)
+	//  FROM app_user_session
+	//  WHERE deleted_at IS NULL
+	CountAppUserSessions(ctx context.Context) (int64, error)
 	//CountAppUsers
 	//
 	//  SELECT COUNT(*)
@@ -39,33 +57,86 @@ type Querier interface {
 	CreateAppUserBatch(ctx context.Context, arg []CreateAppUserBatchParams) *CreateAppUserBatchBatchResults
 	//CreateAppUserCredential
 	//
-	//  INSERT INTO app_user_credential (app_user_guid, email, password_hash, created_at)
-	//  VALUES ($1, $2, $3, $4)
+	//  INSERT INTO app_user_credential (
+	//      app_user_guid,
+	//      email,
+	//      password_hash
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
 	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 	CreateAppUserCredential(ctx context.Context, arg CreateAppUserCredentialParams) (AppUserCredential, error)
+	//CreateAppUserCredentialBatch
+	//
+	//  INSERT INTO app_user_credential (
+	//      app_user_guid,
+	//      email,
+	//      password_hash
+	//  ) VALUES ($1, $2, $3)
+	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+	CreateAppUserCredentialBatch(ctx context.Context, arg []CreateAppUserCredentialBatchParams) *CreateAppUserCredentialBatchBatchResults
 	//CreateAppUserProfile
 	//
-	//  INSERT INTO app_user_profile(
+	//  INSERT INTO app_user_profile (
 	//      app_user_guid,
 	//      name,
 	//      surname,
 	//      patronymic,
 	//      nickname,
 	//      bio,
+	//      preferred_language,
 	//      profile_discovery,
-	//      avatar_url
+	//      avatar_url,
+	//      editing_locked_at
 	//  ) VALUES (
-	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 	//  )
 	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 	CreateAppUserProfile(ctx context.Context, arg CreateAppUserProfileParams) (AppUserProfile, error)
+	//CreateAppUserProfileBatch
+	//
+	//  INSERT INTO app_user_profile (
+	//      app_user_guid,
+	//      name,
+	//      surname,
+	//      patronymic,
+	//      nickname,
+	//      bio,
+	//      preferred_language,
+	//      profile_discovery,
+	//      avatar_url,
+	//      editing_locked_at
+	//  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	CreateAppUserProfileBatch(ctx context.Context, arg []CreateAppUserProfileBatchParams) *CreateAppUserProfileBatchBatchResults
 	//CreateAppUserSession
 	//
-	//  INSERT INTO app_user_session(guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at)
-	//  VALUES
-	//  ($1, $2, $3, $4, $5, $6, $7)
+	//  INSERT INTO app_user_session (
+	//      guid,
+	//      app_user_guid,
+	//      last_ipv4,
+	//      last_ipv6,
+	//      last_agent,
+	//      last_seen_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
 	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 	CreateAppUserSession(ctx context.Context, arg CreateAppUserSessionParams) (AppUserSession, error)
+	//CreateAppUserSessionBatch
+	//
+	//  INSERT INTO app_user_session (
+	//      guid,
+	//      app_user_guid,
+	//      last_ipv4,
+	//      last_ipv6,
+	//      last_agent,
+	//      last_seen_at,
+	//      expire_at
+	//  ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	CreateAppUserSessionBatch(ctx context.Context, arg []CreateAppUserSessionBatchParams) *CreateAppUserSessionBatchBatchResults
 	//DeleteAppUser
 	//
 	//  UPDATE app_user
@@ -79,6 +150,42 @@ type Querier interface {
 	//      deleted_at = true
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults
+	//DeleteAppUserCredential
+	//
+	//  UPDATE app_user_credential
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteAppUserCredentialBatch
+	//
+	//  UPDATE app_user_credential
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *DeleteAppUserCredentialBatchBatchResults
+	//DeleteAppUserProfile
+	//
+	//  UPDATE app_user_profile
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteAppUserProfileBatch
+	//
+	//  UPDATE app_user_profile
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *DeleteAppUserProfileBatchBatchResults
+	//DeleteAppUserSession
+	//
+	//  UPDATE app_user_session
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteAppUserSession(ctx context.Context, guid valueobject.GUID) error
+	//DeleteAppUserSessionBatch
+	//
+	//  UPDATE app_user_session
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserSessionBatchBatchResults
 	//ExistsAppUser
 	//
 	//  SELECT EXISTS (
@@ -92,12 +199,106 @@ type Querier interface {
 	//  SELECT guid FROM app_user
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	ExistsAppUserBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserBatchBatchResults
+	//ExistsAppUserCredential
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user_credential
+	//      WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  )
+	ExistsAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (bool, error)
+	//ExistsAppUserCredentialBatch
+	//
+	//  SELECT app_user_guid FROM app_user_credential
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	ExistsAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *ExistsAppUserCredentialBatchBatchResults
+	//ExistsAppUserProfile
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user_profile
+	//      WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  )
+	ExistsAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (bool, error)
+	//ExistsAppUserProfileBatch
+	//
+	//  SELECT app_user_guid FROM app_user_profile
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	ExistsAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *ExistsAppUserProfileBatchBatchResults
+	//ExistsAppUserSession
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user_session
+	//      WHERE guid = $1 AND deleted_at IS NULL
+	//  )
+	ExistsAppUserSession(ctx context.Context, guid valueobject.GUID) (bool, error)
+	//ExistsAppUserSessionBatch
+	//
+	//  SELECT guid FROM app_user_session
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	ExistsAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserSessionBatchBatchResults
+	//GetAllActiveSessionsByUsername
+	//
+	//  SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+	//  FROM app_user_session s
+	//  JOIN app_user u ON s.app_user_guid = u.guid
+	//  WHERE u.username = $1
+	//    AND u.deleted_at IS NULL
+	//    AND s.deleted_at IS NULL
+	//    AND (s.expire_at IS NULL OR s.expire_at > now())
+	//  ORDER BY s.created_at DESC
+	GetAllActiveSessionsByUsername(ctx context.Context, username valueobject.Username) ([]AppUserSession, error)
+	//GetAllAppUserCredentials
+	//
+	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at
+	//  FROM app_user_credential
+	//  WHERE deleted_at IS NULL
+	GetAllAppUserCredentials(ctx context.Context) ([]AppUserCredential, error)
+	//GetAllAppUserGUIDsByIP
+	//
+	//  SELECT DISTINCT app_user_guid
+	//  FROM app_user_session
+	//  WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+	//    AND deleted_at IS NULL
+	GetAllAppUserGUIDsByIP(ctx context.Context, lastIpv4 *string) ([]valueobject.GUID, error)
+	//GetAllAppUserProfiles
+	//
+	//  SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	//  FROM app_user_profile
+	//  WHERE deleted_at IS NULL
+	GetAllAppUserProfiles(ctx context.Context) ([]AppUserProfile, error)
+	//GetAllAppUserSessions
+	//
+	//  SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	//  FROM app_user_session
+	//  WHERE deleted_at IS NULL
+	GetAllAppUserSessions(ctx context.Context) ([]AppUserSession, error)
 	//GetAllAppUsers
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at
 	//  FROM app_user
 	//  WHERE deleted_at IS NULL
 	GetAllAppUsers(ctx context.Context) ([]AppUser, error)
+	//GetAllInactiveSessionsByUsername
+	//
+	//  SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+	//  FROM app_user_session s
+	//  JOIN app_user u ON s.app_user_guid = u.guid
+	//  WHERE u.username = $1
+	//    AND u.deleted_at IS NULL
+	//    AND s.deleted_at IS NULL
+	//    AND s.expire_at IS NOT NULL
+	//    AND s.expire_at <= now()
+	//  ORDER BY s.created_at DESC
+	GetAllInactiveSessionsByUsername(ctx context.Context, username valueobject.Username) ([]AppUserSession, error)
+	//GetAllSessionsByLastIP
+	//
+	//  SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	//  FROM app_user_session
+	//  WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+	//    AND deleted_at IS NULL
+	GetAllSessionsByLastIP(ctx context.Context, lastIpv4 *string) ([]AppUserSession, error)
 	//GetAppUser
 	//
 	//  SELECT guid, username, activated_at, created_at, deleted_at
@@ -126,37 +327,90 @@ type Querier interface {
 	//  WHERE username = $1
 	//    AND deleted_at IS NULL
 	GetAppUserByUsername(ctx context.Context, username valueobject.Username) (AppUser, error)
-	//GetAppUserCredentialByAppUserGUID
+	//GetAppUserCredential
+	//
+	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at
+	//  FROM app_user_credential
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error)
+	//GetAppUserCredentialBatch
 	//
 	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
-	//  WHERE app_user_guid = $1
-	//      AND deleted_at IS NULL
-	//  LIMIT 1
-	GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error)
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	GetAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *GetAppUserCredentialBatchBatchResults
 	//GetAppUserCredentialByEmail
 	//
-	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
+	//  SELECT app_user_guid, email, password_hash, created_at, deleted_at
+	//  FROM app_user_credential
 	//  WHERE email = $1
-	//      AND deleted_at IS NULL
+	//    AND deleted_at IS NULL
 	//  LIMIT 1
 	GetAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (AppUserCredential, error)
+	//GetAppUserProfile
+	//
+	//  SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	//  FROM app_user_profile
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (AppUserProfile, error)
+	//GetAppUserProfileBatch
+	//
+	//  SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at FROM app_user_profile
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	GetAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *GetAppUserProfileBatchBatchResults
+	//GetAppUserProfileByUsername
+	//
+	//  SELECT p.app_user_guid, p.name, p.surname, p.patronymic, p.nickname, p.bio, p.preferred_language, p.profile_discovery, p.avatar_url, p.editing_locked_at, p.created_at, p.deleted_at
+	//  FROM app_user_profile p
+	//  JOIN app_user u ON p.app_user_guid = u.guid
+	//  WHERE u.username = $1
+	//    AND u.deleted_at IS NULL
+	//    AND p.deleted_at IS NULL
+	//  LIMIT 1
+	GetAppUserProfileByUsername(ctx context.Context, username valueobject.Username) (AppUserProfile, error)
+	//GetAppUserSession
+	//
+	//  SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	//  FROM app_user_session
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetAppUserSession(ctx context.Context, guid valueobject.GUID) (AppUserSession, error)
+	//GetAppUserSessionBatch
+	//
+	//  SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at FROM app_user_session
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	GetAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserSessionBatchBatchResults
 	//GetCourseByGUID
 	//
 	//  SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
 	//  WHERE guid = $1
 	//  LIMIT 1
 	GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error)
-	//HardDeleteAppUserCredential
-	//
-	//  DELETE FROM app_user_credential
-	//  WHERE app_user_guid = $1
-	HardDeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error
 	//IsDeletedAppUser
 	//
 	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
 	//  FROM app_user
 	//  WHERE guid = $1
 	IsDeletedAppUser(ctx context.Context, guid valueobject.GUID) (bool, error)
+	//IsDeletedAppUserCredential
+	//
+	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+	//  FROM app_user_credential
+	//  WHERE app_user_guid = $1
+	IsDeletedAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (bool, error)
+	//IsDeletedAppUserProfile
+	//
+	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+	//  FROM app_user_profile
+	//  WHERE app_user_guid = $1
+	IsDeletedAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (bool, error)
+	//IsDeletedAppUserSession
+	//
+	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+	//  FROM app_user_session
+	//  WHERE guid = $1
+	IsDeletedAppUserSession(ctx context.Context, guid valueobject.GUID) (bool, error)
 	//SaveAppUser
 	//
 	//  INSERT INTO app_user (
@@ -170,6 +424,7 @@ type Querier interface {
 	//  SET
 	//      username = EXCLUDED.username,
 	//      activated_at = EXCLUDED.activated_at
+	//  WHERE deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUser(ctx context.Context, arg SaveAppUserParams) (AppUser, error)
 	//SaveAppUserBatch
@@ -188,13 +443,140 @@ type Querier interface {
 	//  WHERE deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	SaveAppUserBatch(ctx context.Context, arg []SaveAppUserBatchParams) *SaveAppUserBatchBatchResults
-	//SoftDeleteAppUserCredential
+	//SaveAppUserCredential
 	//
-	//  UPDATE app_user_credential
-	//  SET deleted_at = $2
-	//  WHERE app_user_guid = $1
-	//      AND deleted_at IS NULL
-	SoftDeleteAppUserCredential(ctx context.Context, arg SoftDeleteAppUserCredentialParams) error
+	//  INSERT INTO app_user_credential (
+	//      app_user_guid,
+	//      email,
+	//      password_hash
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      email = EXCLUDED.email,
+	//      password_hash = EXCLUDED.password_hash
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+	SaveAppUserCredential(ctx context.Context, arg SaveAppUserCredentialParams) (AppUserCredential, error)
+	//SaveAppUserCredentialBatch
+	//
+	//  INSERT INTO app_user_credential (
+	//      app_user_guid,
+	//      email,
+	//      password_hash
+	//  ) VALUES ($1, $2, $3)
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      email = EXCLUDED.email,
+	//      password_hash = EXCLUDED.password_hash
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+	SaveAppUserCredentialBatch(ctx context.Context, arg []SaveAppUserCredentialBatchParams) *SaveAppUserCredentialBatchBatchResults
+	//SaveAppUserProfile
+	//
+	//  INSERT INTO app_user_profile (
+	//      app_user_guid,
+	//      name,
+	//      surname,
+	//      patronymic,
+	//      nickname,
+	//      bio,
+	//      preferred_language,
+	//      profile_discovery,
+	//      avatar_url,
+	//      editing_locked_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      name = EXCLUDED.name,
+	//      surname = EXCLUDED.surname,
+	//      patronymic = EXCLUDED.patronymic,
+	//      nickname = EXCLUDED.nickname,
+	//      bio = EXCLUDED.bio,
+	//      preferred_language = EXCLUDED.preferred_language,
+	//      profile_discovery = EXCLUDED.profile_discovery,
+	//      avatar_url = EXCLUDED.avatar_url,
+	//      editing_locked_at = EXCLUDED.editing_locked_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	SaveAppUserProfile(ctx context.Context, arg SaveAppUserProfileParams) (AppUserProfile, error)
+	//SaveAppUserProfileBatch
+	//
+	//  INSERT INTO app_user_profile (
+	//      app_user_guid,
+	//      name,
+	//      surname,
+	//      patronymic,
+	//      nickname,
+	//      bio,
+	//      preferred_language,
+	//      profile_discovery,
+	//      avatar_url,
+	//      editing_locked_at
+	//  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      name = EXCLUDED.name,
+	//      surname = EXCLUDED.surname,
+	//      patronymic = EXCLUDED.patronymic,
+	//      nickname = EXCLUDED.nickname,
+	//      bio = EXCLUDED.bio,
+	//      preferred_language = EXCLUDED.preferred_language,
+	//      profile_discovery = EXCLUDED.profile_discovery,
+	//      avatar_url = EXCLUDED.avatar_url,
+	//      editing_locked_at = EXCLUDED.editing_locked_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	SaveAppUserProfileBatch(ctx context.Context, arg []SaveAppUserProfileBatchParams) *SaveAppUserProfileBatchBatchResults
+	//SaveAppUserSession
+	//
+	//  INSERT INTO app_user_session (
+	//      guid,
+	//      app_user_guid,
+	//      last_ipv4,
+	//      last_ipv6,
+	//      last_agent,
+	//      last_seen_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      last_ipv4 = EXCLUDED.last_ipv4,
+	//      last_ipv6 = EXCLUDED.last_ipv6,
+	//      last_agent = EXCLUDED.last_agent,
+	//      last_seen_at = EXCLUDED.last_seen_at,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	SaveAppUserSession(ctx context.Context, arg SaveAppUserSessionParams) (AppUserSession, error)
+	//SaveAppUserSessionBatch
+	//
+	//  INSERT INTO app_user_session (
+	//      guid,
+	//      app_user_guid,
+	//      last_ipv4,
+	//      last_ipv6,
+	//      last_agent,
+	//      last_seen_at,
+	//      expire_at
+	//  ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      last_ipv4 = EXCLUDED.last_ipv4,
+	//      last_ipv6 = EXCLUDED.last_ipv6,
+	//      last_agent = EXCLUDED.last_agent,
+	//      last_seen_at = EXCLUDED.last_seen_at,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	SaveAppUserSessionBatch(ctx context.Context, arg []SaveAppUserSessionBatchParams) *SaveAppUserSessionBatchBatchResults
 	//UpdateAppUser
 	//
 	//  UPDATE app_user
@@ -213,22 +595,82 @@ type Querier interface {
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  RETURNING guid, username, activated_at, created_at, deleted_at
 	UpdateAppUserBatch(ctx context.Context, arg []UpdateAppUserBatchParams) *UpdateAppUserBatchBatchResults
-	//UpdateAppUserCredentialEmail
+	//UpdateAppUserCredential
 	//
 	//  UPDATE app_user_credential
-	//  SET email = $2
-	//  WHERE app_user_guid = $1
-	//      AND deleted_at IS NULL
+	//  SET
+	//      email = $2,
+	//      password_hash = $3
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
 	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
-	UpdateAppUserCredentialEmail(ctx context.Context, arg UpdateAppUserCredentialEmailParams) (AppUserCredential, error)
-	//UpdateAppUserCredentialPassword
+	UpdateAppUserCredential(ctx context.Context, arg UpdateAppUserCredentialParams) (AppUserCredential, error)
+	//UpdateAppUserCredentialBatch
 	//
 	//  UPDATE app_user_credential
-	//  SET password_hash = $2
-	//  WHERE app_user_guid = $1
-	//      AND deleted_at IS NULL
+	//  SET
+	//      email = $2,
+	//      password_hash = $3
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
 	//  RETURNING app_user_guid, email, password_hash, created_at, deleted_at
-	UpdateAppUserCredentialPassword(ctx context.Context, arg UpdateAppUserCredentialPasswordParams) (AppUserCredential, error)
+	UpdateAppUserCredentialBatch(ctx context.Context, arg []UpdateAppUserCredentialBatchParams) *UpdateAppUserCredentialBatchBatchResults
+	//UpdateAppUserProfile
+	//
+	//  UPDATE app_user_profile
+	//  SET
+	//      name = $2,
+	//      surname = $3,
+	//      patronymic = $4,
+	//      nickname = $5,
+	//      bio = $6,
+	//      preferred_language = $7,
+	//      profile_discovery = $8,
+	//      avatar_url = $9,
+	//      editing_locked_at = $10
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	UpdateAppUserProfile(ctx context.Context, arg UpdateAppUserProfileParams) (AppUserProfile, error)
+	//UpdateAppUserProfileBatch
+	//
+	//  UPDATE app_user_profile
+	//  SET
+	//      name = $2,
+	//      surname = $3,
+	//      patronymic = $4,
+	//      nickname = $5,
+	//      bio = $6,
+	//      preferred_language = $7,
+	//      profile_discovery = $8,
+	//      avatar_url = $9,
+	//      editing_locked_at = $10
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+	UpdateAppUserProfileBatch(ctx context.Context, arg []UpdateAppUserProfileBatchParams) *UpdateAppUserProfileBatchBatchResults
+	//UpdateAppUserSession
+	//
+	//  UPDATE app_user_session
+	//  SET
+	//      app_user_guid = $2,
+	//      last_ipv4 = $3,
+	//      last_ipv6 = $4,
+	//      last_agent = $5,
+	//      last_seen_at = $6,
+	//      expire_at = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	UpdateAppUserSession(ctx context.Context, arg UpdateAppUserSessionParams) (AppUserSession, error)
+	//UpdateAppUserSessionBatch
+	//
+	//  UPDATE app_user_session
+	//  SET
+	//      app_user_guid = $2,
+	//      last_ipv4 = $3,
+	//      last_ipv6 = $4,
+	//      last_agent = $5,
+	//      last_seen_at = $6,
+	//      expire_at = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+	UpdateAppUserSessionBatch(ctx context.Context, arg []UpdateAppUserSessionBatchParams) *UpdateAppUserSessionBatchBatchResults
 }
 
 var _ Querier = (*Queries)(nil)

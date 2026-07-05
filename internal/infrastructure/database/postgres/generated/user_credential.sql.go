@@ -7,14 +7,36 @@ package generated
 
 import (
 	"context"
-	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+const countAppUserCredentials = `-- name: CountAppUserCredentials :one
+SELECT COUNT(*)
+FROM app_user_credential
+WHERE deleted_at IS NULL
+`
+
+// CountAppUserCredentials
+//
+//	SELECT COUNT(*)
+//	FROM app_user_credential
+//	WHERE deleted_at IS NULL
+func (q *Queries) CountAppUserCredentials(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAppUserCredentials)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAppUserCredential = `-- name: CreateAppUserCredential :one
-INSERT INTO app_user_credential (app_user_guid, email, password_hash, created_at)
-VALUES ($1, $2, $3, $4)
+INSERT INTO app_user_credential (
+    app_user_guid,
+    email,
+    password_hash
+) VALUES (
+    $1, $2, $3
+)
 RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
@@ -22,21 +44,20 @@ type CreateAppUserCredentialParams struct {
 	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
 	Email        *valueobject.Email `db:"email" json:"email"`
 	PasswordHash string             `db:"password_hash" json:"password_hash"`
-	CreatedAt    time.Time          `db:"created_at" json:"created_at"`
 }
 
 // CreateAppUserCredential
 //
-//	INSERT INTO app_user_credential (app_user_guid, email, password_hash, created_at)
-//	VALUES ($1, $2, $3, $4)
+//	INSERT INTO app_user_credential (
+//	    app_user_guid,
+//	    email,
+//	    password_hash
+//	) VALUES (
+//	    $1, $2, $3
+//	)
 //	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 func (q *Queries) CreateAppUserCredential(ctx context.Context, arg CreateAppUserCredentialParams) (AppUserCredential, error) {
-	row := q.db.QueryRow(ctx, createAppUserCredential,
-		arg.AppUserGUID,
-		arg.Email,
-		arg.PasswordHash,
-		arg.CreatedAt,
-	)
+	row := q.db.QueryRow(ctx, createAppUserCredential, arg.AppUserGUID, arg.Email, arg.PasswordHash)
 	var i AppUserCredential
 	err := row.Scan(
 		&i.AppUserGUID,
@@ -48,21 +69,96 @@ func (q *Queries) CreateAppUserCredential(ctx context.Context, arg CreateAppUser
 	return i, err
 }
 
-const getAppUserCredentialByAppUserGUID = `-- name: GetAppUserCredentialByAppUserGUID :one
-SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
-WHERE app_user_guid = $1 
-    AND deleted_at IS NULL
+const deleteAppUserCredential = `-- name: DeleteAppUserCredential :exec
+UPDATE app_user_credential
+SET deleted_at = now()
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+// DeleteAppUserCredential
+//
+//	UPDATE app_user_credential
+//	SET deleted_at = now()
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error {
+	_, err := q.db.Exec(ctx, deleteAppUserCredential, appUserGuid)
+	return err
+}
+
+const existsAppUserCredential = `-- name: ExistsAppUserCredential :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user_credential
+    WHERE app_user_guid = $1 AND deleted_at IS NULL
+)
+`
+
+// ExistsAppUserCredential
+//
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user_credential
+//	    WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	)
+func (q *Queries) ExistsAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUserCredential, appUserGuid)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getAllAppUserCredentials = `-- name: GetAllAppUserCredentials :many
+SELECT app_user_guid, email, password_hash, created_at, deleted_at
+FROM app_user_credential
+WHERE deleted_at IS NULL
+`
+
+// GetAllAppUserCredentials
+//
+//	SELECT app_user_guid, email, password_hash, created_at, deleted_at
+//	FROM app_user_credential
+//	WHERE deleted_at IS NULL
+func (q *Queries) GetAllAppUserCredentials(ctx context.Context) ([]AppUserCredential, error) {
+	rows, err := q.db.Query(ctx, getAllAppUserCredentials)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserCredential
+	for rows.Next() {
+		var i AppUserCredential
+		if err := rows.Scan(
+			&i.AppUserGUID,
+			&i.Email,
+			&i.PasswordHash,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAppUserCredential = `-- name: GetAppUserCredential :one
+SELECT app_user_guid, email, password_hash, created_at, deleted_at
+FROM app_user_credential
+WHERE app_user_guid = $1 AND deleted_at IS NULL
 LIMIT 1
 `
 
-// GetAppUserCredentialByAppUserGUID
+// GetAppUserCredential
 //
-//	SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
-//	WHERE app_user_guid = $1
-//	    AND deleted_at IS NULL
+//	SELECT app_user_guid, email, password_hash, created_at, deleted_at
+//	FROM app_user_credential
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
-func (q *Queries) GetAppUserCredentialByAppUserGUID(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error) {
-	row := q.db.QueryRow(ctx, getAppUserCredentialByAppUserGUID, appUserGuid)
+func (q *Queries) GetAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (AppUserCredential, error) {
+	row := q.db.QueryRow(ctx, getAppUserCredential, appUserGuid)
 	var i AppUserCredential
 	err := row.Scan(
 		&i.AppUserGUID,
@@ -75,17 +171,19 @@ func (q *Queries) GetAppUserCredentialByAppUserGUID(ctx context.Context, appUser
 }
 
 const getAppUserCredentialByEmail = `-- name: GetAppUserCredentialByEmail :one
-SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
-WHERE email = $1 
-    AND deleted_at IS NULL
+SELECT app_user_guid, email, password_hash, created_at, deleted_at
+FROM app_user_credential
+WHERE email = $1
+  AND deleted_at IS NULL
 LIMIT 1
 `
 
 // GetAppUserCredentialByEmail
 //
-//	SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
+//	SELECT app_user_guid, email, password_hash, created_at, deleted_at
+//	FROM app_user_credential
 //	WHERE email = $1
-//	    AND deleted_at IS NULL
+//	  AND deleted_at IS NULL
 //	LIMIT 1
 func (q *Queries) GetAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (AppUserCredential, error) {
 	row := q.db.QueryRow(ctx, getAppUserCredentialByEmail, email)
@@ -100,65 +198,63 @@ func (q *Queries) GetAppUserCredentialByEmail(ctx context.Context, email *valueo
 	return i, err
 }
 
-const hardDeleteAppUserCredential = `-- name: HardDeleteAppUserCredential :exec
-DELETE FROM app_user_credential
+const isDeletedAppUserCredential = `-- name: IsDeletedAppUserCredential :one
+SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+FROM app_user_credential
 WHERE app_user_guid = $1
 `
 
-// HardDeleteAppUserCredential
+// IsDeletedAppUserCredential
 //
-//	DELETE FROM app_user_credential
+//	SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+//	FROM app_user_credential
 //	WHERE app_user_guid = $1
-func (q *Queries) HardDeleteAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) error {
-	_, err := q.db.Exec(ctx, hardDeleteAppUserCredential, appUserGuid)
-	return err
+func (q *Queries) IsDeletedAppUserCredential(ctx context.Context, appUserGuid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, isDeletedAppUserCredential, appUserGuid)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
-const softDeleteAppUserCredential = `-- name: SoftDeleteAppUserCredential :exec
-UPDATE app_user_credential
-SET deleted_at = $2
-WHERE app_user_guid = $1 
-    AND deleted_at IS NULL
-`
-
-type SoftDeleteAppUserCredentialParams struct {
-	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
-	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
-}
-
-// SoftDeleteAppUserCredential
-//
-//	UPDATE app_user_credential
-//	SET deleted_at = $2
-//	WHERE app_user_guid = $1
-//	    AND deleted_at IS NULL
-func (q *Queries) SoftDeleteAppUserCredential(ctx context.Context, arg SoftDeleteAppUserCredentialParams) error {
-	_, err := q.db.Exec(ctx, softDeleteAppUserCredential, arg.AppUserGUID, arg.DeletedAt)
-	return err
-}
-
-const updateAppUserCredentialEmail = `-- name: UpdateAppUserCredentialEmail :one
-UPDATE app_user_credential
-SET email = $2
-WHERE app_user_guid = $1 
-    AND deleted_at IS NULL
+const saveAppUserCredential = `-- name: SaveAppUserCredential :one
+INSERT INTO app_user_credential (
+    app_user_guid,
+    email,
+    password_hash
+) VALUES (
+    $1, $2, $3
+)
+ON CONFLICT (app_user_guid) DO UPDATE
+SET
+    email = EXCLUDED.email,
+    password_hash = EXCLUDED.password_hash
+WHERE deleted_at IS NULL
 RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
-type UpdateAppUserCredentialEmailParams struct {
-	AppUserGUID valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
-	Email       *valueobject.Email `db:"email" json:"email"`
+type SaveAppUserCredentialParams struct {
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
 }
 
-// UpdateAppUserCredentialEmail
+// SaveAppUserCredential
 //
-//	UPDATE app_user_credential
-//	SET email = $2
-//	WHERE app_user_guid = $1
-//	    AND deleted_at IS NULL
+//	INSERT INTO app_user_credential (
+//	    app_user_guid,
+//	    email,
+//	    password_hash
+//	) VALUES (
+//	    $1, $2, $3
+//	)
+//	ON CONFLICT (app_user_guid) DO UPDATE
+//	SET
+//	    email = EXCLUDED.email,
+//	    password_hash = EXCLUDED.password_hash
+//	WHERE deleted_at IS NULL
 //	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
-func (q *Queries) UpdateAppUserCredentialEmail(ctx context.Context, arg UpdateAppUserCredentialEmailParams) (AppUserCredential, error) {
-	row := q.db.QueryRow(ctx, updateAppUserCredentialEmail, arg.AppUserGUID, arg.Email)
+func (q *Queries) SaveAppUserCredential(ctx context.Context, arg SaveAppUserCredentialParams) (AppUserCredential, error) {
+	row := q.db.QueryRow(ctx, saveAppUserCredential, arg.AppUserGUID, arg.Email, arg.PasswordHash)
 	var i AppUserCredential
 	err := row.Scan(
 		&i.AppUserGUID,
@@ -170,28 +266,31 @@ func (q *Queries) UpdateAppUserCredentialEmail(ctx context.Context, arg UpdateAp
 	return i, err
 }
 
-const updateAppUserCredentialPassword = `-- name: UpdateAppUserCredentialPassword :one
+const updateAppUserCredential = `-- name: UpdateAppUserCredential :one
 UPDATE app_user_credential
-SET password_hash = $2
-WHERE app_user_guid = $1 
-    AND deleted_at IS NULL
+SET
+    email = $2,
+    password_hash = $3
+WHERE app_user_guid = $1 AND deleted_at IS NULL
 RETURNING app_user_guid, email, password_hash, created_at, deleted_at
 `
 
-type UpdateAppUserCredentialPasswordParams struct {
-	AppUserGUID  valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
-	PasswordHash string           `db:"password_hash" json:"password_hash"`
+type UpdateAppUserCredentialParams struct {
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
 }
 
-// UpdateAppUserCredentialPassword
+// UpdateAppUserCredential
 //
 //	UPDATE app_user_credential
-//	SET password_hash = $2
-//	WHERE app_user_guid = $1
-//	    AND deleted_at IS NULL
+//	SET
+//	    email = $2,
+//	    password_hash = $3
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
 //	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
-func (q *Queries) UpdateAppUserCredentialPassword(ctx context.Context, arg UpdateAppUserCredentialPasswordParams) (AppUserCredential, error) {
-	row := q.db.QueryRow(ctx, updateAppUserCredentialPassword, arg.AppUserGUID, arg.PasswordHash)
+func (q *Queries) UpdateAppUserCredential(ctx context.Context, arg UpdateAppUserCredentialParams) (AppUserCredential, error) {
+	row := q.db.QueryRow(ctx, updateAppUserCredential, arg.AppUserGUID, arg.Email, arg.PasswordHash)
 	var i AppUserCredential
 	err := row.Scan(
 		&i.AppUserGUID,

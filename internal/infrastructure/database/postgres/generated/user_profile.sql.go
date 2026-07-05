@@ -7,51 +7,76 @@ package generated
 
 import (
 	"context"
+	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+const countAppUserProfiles = `-- name: CountAppUserProfiles :one
+SELECT COUNT(*)
+FROM app_user_profile
+WHERE deleted_at IS NULL
+`
+
+// CountAppUserProfiles
+//
+//	SELECT COUNT(*)
+//	FROM app_user_profile
+//	WHERE deleted_at IS NULL
+func (q *Queries) CountAppUserProfiles(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAppUserProfiles)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAppUserProfile = `-- name: CreateAppUserProfile :one
-INSERT INTO app_user_profile(
+INSERT INTO app_user_profile (
     app_user_guid,
     name,
     surname,
     patronymic,
     nickname,
     bio,
+    preferred_language,
     profile_discovery,
-    avatar_url
+    avatar_url,
+    editing_locked_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )
 RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 `
 
 type CreateAppUserProfileParams struct {
-	AppUserGUID      valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
-	Name             *valueobject.Name         `db:"name" json:"name"`
-	Surname          *valueobject.Name         `db:"surname" json:"surname"`
-	Patronymic       *valueobject.Name         `db:"patronymic" json:"patronymic"`
-	Nickname         *valueobject.Nickname     `db:"nickname" json:"nickname"`
-	Bio              *valueobject.Bio          `db:"bio" json:"bio"`
-	ProfileDiscovery enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
-	AvatarUrl        *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
 }
 
 // CreateAppUserProfile
 //
-//	INSERT INTO app_user_profile(
+//	INSERT INTO app_user_profile (
 //	    app_user_guid,
 //	    name,
 //	    surname,
 //	    patronymic,
 //	    nickname,
 //	    bio,
+//	    preferred_language,
 //	    profile_discovery,
-//	    avatar_url
+//	    avatar_url,
+//	    editing_locked_at
 //	) VALUES (
-//	    $1, $2, $3, $4, $5, $6, $7, $8
+//	    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 //	)
 //	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
 func (q *Queries) CreateAppUserProfile(ctx context.Context, arg CreateAppUserProfileParams) (AppUserProfile, error) {
@@ -62,8 +87,360 @@ func (q *Queries) CreateAppUserProfile(ctx context.Context, arg CreateAppUserPro
 		arg.Patronymic,
 		arg.Nickname,
 		arg.Bio,
+		arg.PreferredLanguage,
 		arg.ProfileDiscovery,
 		arg.AvatarUrl,
+		arg.EditingLockedAt,
+	)
+	var i AppUserProfile
+	err := row.Scan(
+		&i.AppUserGUID,
+		&i.Name,
+		&i.Surname,
+		&i.Patronymic,
+		&i.Nickname,
+		&i.Bio,
+		&i.PreferredLanguage,
+		&i.ProfileDiscovery,
+		&i.AvatarUrl,
+		&i.EditingLockedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const deleteAppUserProfile = `-- name: DeleteAppUserProfile :exec
+UPDATE app_user_profile
+SET deleted_at = now()
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+// DeleteAppUserProfile
+//
+//	UPDATE app_user_profile
+//	SET deleted_at = now()
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) error {
+	_, err := q.db.Exec(ctx, deleteAppUserProfile, appUserGuid)
+	return err
+}
+
+const existsAppUserProfile = `-- name: ExistsAppUserProfile :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user_profile
+    WHERE app_user_guid = $1 AND deleted_at IS NULL
+)
+`
+
+// ExistsAppUserProfile
+//
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user_profile
+//	    WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	)
+func (q *Queries) ExistsAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUserProfile, appUserGuid)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getAllAppUserProfiles = `-- name: GetAllAppUserProfiles :many
+SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+FROM app_user_profile
+WHERE deleted_at IS NULL
+`
+
+// GetAllAppUserProfiles
+//
+//	SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+//	FROM app_user_profile
+//	WHERE deleted_at IS NULL
+func (q *Queries) GetAllAppUserProfiles(ctx context.Context) ([]AppUserProfile, error) {
+	rows, err := q.db.Query(ctx, getAllAppUserProfiles)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserProfile
+	for rows.Next() {
+		var i AppUserProfile
+		if err := rows.Scan(
+			&i.AppUserGUID,
+			&i.Name,
+			&i.Surname,
+			&i.Patronymic,
+			&i.Nickname,
+			&i.Bio,
+			&i.PreferredLanguage,
+			&i.ProfileDiscovery,
+			&i.AvatarUrl,
+			&i.EditingLockedAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAppUserProfile = `-- name: GetAppUserProfile :one
+SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+FROM app_user_profile
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+LIMIT 1
+`
+
+// GetAppUserProfile
+//
+//	SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+//	FROM app_user_profile
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	LIMIT 1
+func (q *Queries) GetAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (AppUserProfile, error) {
+	row := q.db.QueryRow(ctx, getAppUserProfile, appUserGuid)
+	var i AppUserProfile
+	err := row.Scan(
+		&i.AppUserGUID,
+		&i.Name,
+		&i.Surname,
+		&i.Patronymic,
+		&i.Nickname,
+		&i.Bio,
+		&i.PreferredLanguage,
+		&i.ProfileDiscovery,
+		&i.AvatarUrl,
+		&i.EditingLockedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getAppUserProfileByUsername = `-- name: GetAppUserProfileByUsername :one
+SELECT p.app_user_guid, p.name, p.surname, p.patronymic, p.nickname, p.bio, p.preferred_language, p.profile_discovery, p.avatar_url, p.editing_locked_at, p.created_at, p.deleted_at
+FROM app_user_profile p
+JOIN app_user u ON p.app_user_guid = u.guid
+WHERE u.username = $1
+  AND u.deleted_at IS NULL
+  AND p.deleted_at IS NULL
+LIMIT 1
+`
+
+// GetAppUserProfileByUsername
+//
+//	SELECT p.app_user_guid, p.name, p.surname, p.patronymic, p.nickname, p.bio, p.preferred_language, p.profile_discovery, p.avatar_url, p.editing_locked_at, p.created_at, p.deleted_at
+//	FROM app_user_profile p
+//	JOIN app_user u ON p.app_user_guid = u.guid
+//	WHERE u.username = $1
+//	  AND u.deleted_at IS NULL
+//	  AND p.deleted_at IS NULL
+//	LIMIT 1
+func (q *Queries) GetAppUserProfileByUsername(ctx context.Context, username valueobject.Username) (AppUserProfile, error) {
+	row := q.db.QueryRow(ctx, getAppUserProfileByUsername, username)
+	var i AppUserProfile
+	err := row.Scan(
+		&i.AppUserGUID,
+		&i.Name,
+		&i.Surname,
+		&i.Patronymic,
+		&i.Nickname,
+		&i.Bio,
+		&i.PreferredLanguage,
+		&i.ProfileDiscovery,
+		&i.AvatarUrl,
+		&i.EditingLockedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const isDeletedAppUserProfile = `-- name: IsDeletedAppUserProfile :one
+SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+FROM app_user_profile
+WHERE app_user_guid = $1
+`
+
+// IsDeletedAppUserProfile
+//
+//	SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+//	FROM app_user_profile
+//	WHERE app_user_guid = $1
+func (q *Queries) IsDeletedAppUserProfile(ctx context.Context, appUserGuid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, isDeletedAppUserProfile, appUserGuid)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const saveAppUserProfile = `-- name: SaveAppUserProfile :one
+INSERT INTO app_user_profile (
+    app_user_guid,
+    name,
+    surname,
+    patronymic,
+    nickname,
+    bio,
+    preferred_language,
+    profile_discovery,
+    avatar_url,
+    editing_locked_at
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+)
+ON CONFLICT (app_user_guid) DO UPDATE
+SET
+    name = EXCLUDED.name,
+    surname = EXCLUDED.surname,
+    patronymic = EXCLUDED.patronymic,
+    nickname = EXCLUDED.nickname,
+    bio = EXCLUDED.bio,
+    preferred_language = EXCLUDED.preferred_language,
+    profile_discovery = EXCLUDED.profile_discovery,
+    avatar_url = EXCLUDED.avatar_url,
+    editing_locked_at = EXCLUDED.editing_locked_at
+WHERE deleted_at IS NULL
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+`
+
+type SaveAppUserProfileParams struct {
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
+}
+
+// SaveAppUserProfile
+//
+//	INSERT INTO app_user_profile (
+//	    app_user_guid,
+//	    name,
+//	    surname,
+//	    patronymic,
+//	    nickname,
+//	    bio,
+//	    preferred_language,
+//	    profile_discovery,
+//	    avatar_url,
+//	    editing_locked_at
+//	) VALUES (
+//	    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+//	)
+//	ON CONFLICT (app_user_guid) DO UPDATE
+//	SET
+//	    name = EXCLUDED.name,
+//	    surname = EXCLUDED.surname,
+//	    patronymic = EXCLUDED.patronymic,
+//	    nickname = EXCLUDED.nickname,
+//	    bio = EXCLUDED.bio,
+//	    preferred_language = EXCLUDED.preferred_language,
+//	    profile_discovery = EXCLUDED.profile_discovery,
+//	    avatar_url = EXCLUDED.avatar_url,
+//	    editing_locked_at = EXCLUDED.editing_locked_at
+//	WHERE deleted_at IS NULL
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+func (q *Queries) SaveAppUserProfile(ctx context.Context, arg SaveAppUserProfileParams) (AppUserProfile, error) {
+	row := q.db.QueryRow(ctx, saveAppUserProfile,
+		arg.AppUserGUID,
+		arg.Name,
+		arg.Surname,
+		arg.Patronymic,
+		arg.Nickname,
+		arg.Bio,
+		arg.PreferredLanguage,
+		arg.ProfileDiscovery,
+		arg.AvatarUrl,
+		arg.EditingLockedAt,
+	)
+	var i AppUserProfile
+	err := row.Scan(
+		&i.AppUserGUID,
+		&i.Name,
+		&i.Surname,
+		&i.Patronymic,
+		&i.Nickname,
+		&i.Bio,
+		&i.PreferredLanguage,
+		&i.ProfileDiscovery,
+		&i.AvatarUrl,
+		&i.EditingLockedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateAppUserProfile = `-- name: UpdateAppUserProfile :one
+UPDATE app_user_profile
+SET
+    name = $2,
+    surname = $3,
+    patronymic = $4,
+    nickname = $5,
+    bio = $6,
+    preferred_language = $7,
+    profile_discovery = $8,
+    avatar_url = $9,
+    editing_locked_at = $10
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+`
+
+type UpdateAppUserProfileParams struct {
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
+}
+
+// UpdateAppUserProfile
+//
+//	UPDATE app_user_profile
+//	SET
+//	    name = $2,
+//	    surname = $3,
+//	    patronymic = $4,
+//	    nickname = $5,
+//	    bio = $6,
+//	    preferred_language = $7,
+//	    profile_discovery = $8,
+//	    avatar_url = $9,
+//	    editing_locked_at = $10
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+func (q *Queries) UpdateAppUserProfile(ctx context.Context, arg UpdateAppUserProfileParams) (AppUserProfile, error) {
+	row := q.db.QueryRow(ctx, updateAppUserProfile,
+		arg.AppUserGUID,
+		arg.Name,
+		arg.Surname,
+		arg.Patronymic,
+		arg.Nickname,
+		arg.Bio,
+		arg.PreferredLanguage,
+		arg.ProfileDiscovery,
+		arg.AvatarUrl,
+		arg.EditingLockedAt,
 	)
 	var i AppUserProfile
 	err := row.Scan(

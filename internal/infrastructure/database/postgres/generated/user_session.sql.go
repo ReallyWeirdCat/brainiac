@@ -12,10 +12,36 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+const countAppUserSessions = `-- name: CountAppUserSessions :one
+SELECT COUNT(*)
+FROM app_user_session
+WHERE deleted_at IS NULL
+`
+
+// CountAppUserSessions
+//
+//	SELECT COUNT(*)
+//	FROM app_user_session
+//	WHERE deleted_at IS NULL
+func (q *Queries) CountAppUserSessions(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAppUserSessions)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAppUserSession = `-- name: CreateAppUserSession :one
-INSERT INTO app_user_session(guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at)
-VALUES
-($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO app_user_session (
+    guid,
+    app_user_guid,
+    last_ipv4,
+    last_ipv6,
+    last_agent,
+    last_seen_at,
+    expire_at
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7
+)
 RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 `
 
@@ -31,12 +57,469 @@ type CreateAppUserSessionParams struct {
 
 // CreateAppUserSession
 //
-//	INSERT INTO app_user_session(guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at)
-//	VALUES
-//	($1, $2, $3, $4, $5, $6, $7)
+//	INSERT INTO app_user_session (
+//	    guid,
+//	    app_user_guid,
+//	    last_ipv4,
+//	    last_ipv6,
+//	    last_agent,
+//	    last_seen_at,
+//	    expire_at
+//	) VALUES (
+//	    $1, $2, $3, $4, $5, $6, $7
+//	)
 //	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 func (q *Queries) CreateAppUserSession(ctx context.Context, arg CreateAppUserSessionParams) (AppUserSession, error) {
 	row := q.db.QueryRow(ctx, createAppUserSession,
+		arg.GUID,
+		arg.AppUserGUID,
+		arg.LastIPV4,
+		arg.LastIPV6,
+		arg.LastAgent,
+		arg.LastSeenAt,
+		arg.ExpireAt,
+	)
+	var i AppUserSession
+	err := row.Scan(
+		&i.GUID,
+		&i.AppUserGUID,
+		&i.LastIPV4,
+		&i.LastIPV6,
+		&i.LastAgent,
+		&i.LastSeenAt,
+		&i.ExpireAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const deleteAppUserSession = `-- name: DeleteAppUserSession :exec
+UPDATE app_user_session
+SET deleted_at = now()
+WHERE guid = $1 AND deleted_at IS NULL
+`
+
+// DeleteAppUserSession
+//
+//	UPDATE app_user_session
+//	SET deleted_at = now()
+//	WHERE guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserSession(ctx context.Context, guid valueobject.GUID) error {
+	_, err := q.db.Exec(ctx, deleteAppUserSession, guid)
+	return err
+}
+
+const existsAppUserSession = `-- name: ExistsAppUserSession :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user_session
+    WHERE guid = $1 AND deleted_at IS NULL
+)
+`
+
+// ExistsAppUserSession
+//
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user_session
+//	    WHERE guid = $1 AND deleted_at IS NULL
+//	)
+func (q *Queries) ExistsAppUserSession(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUserSession, guid)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getAllActiveSessionsByUsername = `-- name: GetAllActiveSessionsByUsername :many
+SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+FROM app_user_session s
+JOIN app_user u ON s.app_user_guid = u.guid
+WHERE u.username = $1
+  AND u.deleted_at IS NULL
+  AND s.deleted_at IS NULL
+  AND (s.expire_at IS NULL OR s.expire_at > now())
+ORDER BY s.created_at DESC
+`
+
+// GetAllActiveSessionsByUsername
+//
+//	SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+//	FROM app_user_session s
+//	JOIN app_user u ON s.app_user_guid = u.guid
+//	WHERE u.username = $1
+//	  AND u.deleted_at IS NULL
+//	  AND s.deleted_at IS NULL
+//	  AND (s.expire_at IS NULL OR s.expire_at > now())
+//	ORDER BY s.created_at DESC
+func (q *Queries) GetAllActiveSessionsByUsername(ctx context.Context, username valueobject.Username) ([]AppUserSession, error) {
+	rows, err := q.db.Query(ctx, getAllActiveSessionsByUsername, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserSession
+	for rows.Next() {
+		var i AppUserSession
+		if err := rows.Scan(
+			&i.GUID,
+			&i.AppUserGUID,
+			&i.LastIPV4,
+			&i.LastIPV6,
+			&i.LastAgent,
+			&i.LastSeenAt,
+			&i.ExpireAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllAppUserGUIDsByIP = `-- name: GetAllAppUserGUIDsByIP :many
+SELECT DISTINCT app_user_guid
+FROM app_user_session
+WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+  AND deleted_at IS NULL
+`
+
+// GetAllAppUserGUIDsByIP
+//
+//	SELECT DISTINCT app_user_guid
+//	FROM app_user_session
+//	WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+//	  AND deleted_at IS NULL
+func (q *Queries) GetAllAppUserGUIDsByIP(ctx context.Context, lastIpv4 *string) ([]valueobject.GUID, error) {
+	rows, err := q.db.Query(ctx, getAllAppUserGUIDsByIP, lastIpv4)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []valueobject.GUID
+	for rows.Next() {
+		var app_user_guid valueobject.GUID
+		if err := rows.Scan(&app_user_guid); err != nil {
+			return nil, err
+		}
+		items = append(items, app_user_guid)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllAppUserSessions = `-- name: GetAllAppUserSessions :many
+SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+FROM app_user_session
+WHERE deleted_at IS NULL
+`
+
+// GetAllAppUserSessions
+//
+//	SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+//	FROM app_user_session
+//	WHERE deleted_at IS NULL
+func (q *Queries) GetAllAppUserSessions(ctx context.Context) ([]AppUserSession, error) {
+	rows, err := q.db.Query(ctx, getAllAppUserSessions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserSession
+	for rows.Next() {
+		var i AppUserSession
+		if err := rows.Scan(
+			&i.GUID,
+			&i.AppUserGUID,
+			&i.LastIPV4,
+			&i.LastIPV6,
+			&i.LastAgent,
+			&i.LastSeenAt,
+			&i.ExpireAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllInactiveSessionsByUsername = `-- name: GetAllInactiveSessionsByUsername :many
+SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+FROM app_user_session s
+JOIN app_user u ON s.app_user_guid = u.guid
+WHERE u.username = $1
+  AND u.deleted_at IS NULL
+  AND s.deleted_at IS NULL
+  AND s.expire_at IS NOT NULL
+  AND s.expire_at <= now()
+ORDER BY s.created_at DESC
+`
+
+// GetAllInactiveSessionsByUsername
+//
+//	SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
+//	FROM app_user_session s
+//	JOIN app_user u ON s.app_user_guid = u.guid
+//	WHERE u.username = $1
+//	  AND u.deleted_at IS NULL
+//	  AND s.deleted_at IS NULL
+//	  AND s.expire_at IS NOT NULL
+//	  AND s.expire_at <= now()
+//	ORDER BY s.created_at DESC
+func (q *Queries) GetAllInactiveSessionsByUsername(ctx context.Context, username valueobject.Username) ([]AppUserSession, error) {
+	rows, err := q.db.Query(ctx, getAllInactiveSessionsByUsername, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserSession
+	for rows.Next() {
+		var i AppUserSession
+		if err := rows.Scan(
+			&i.GUID,
+			&i.AppUserGUID,
+			&i.LastIPV4,
+			&i.LastIPV6,
+			&i.LastAgent,
+			&i.LastSeenAt,
+			&i.ExpireAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllSessionsByLastIP = `-- name: GetAllSessionsByLastIP :many
+SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+FROM app_user_session
+WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+  AND deleted_at IS NULL
+`
+
+// GetAllSessionsByLastIP
+//
+//	SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+//	FROM app_user_session
+//	WHERE (last_ipv4 = $1 OR last_ipv6 = $1)
+//	  AND deleted_at IS NULL
+func (q *Queries) GetAllSessionsByLastIP(ctx context.Context, lastIpv4 *string) ([]AppUserSession, error) {
+	rows, err := q.db.Query(ctx, getAllSessionsByLastIP, lastIpv4)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AppUserSession
+	for rows.Next() {
+		var i AppUserSession
+		if err := rows.Scan(
+			&i.GUID,
+			&i.AppUserGUID,
+			&i.LastIPV4,
+			&i.LastIPV6,
+			&i.LastAgent,
+			&i.LastSeenAt,
+			&i.ExpireAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAppUserSession = `-- name: GetAppUserSession :one
+SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+FROM app_user_session
+WHERE guid = $1 AND deleted_at IS NULL
+LIMIT 1
+`
+
+// GetAppUserSession
+//
+//	SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+//	FROM app_user_session
+//	WHERE guid = $1 AND deleted_at IS NULL
+//	LIMIT 1
+func (q *Queries) GetAppUserSession(ctx context.Context, guid valueobject.GUID) (AppUserSession, error) {
+	row := q.db.QueryRow(ctx, getAppUserSession, guid)
+	var i AppUserSession
+	err := row.Scan(
+		&i.GUID,
+		&i.AppUserGUID,
+		&i.LastIPV4,
+		&i.LastIPV6,
+		&i.LastAgent,
+		&i.LastSeenAt,
+		&i.ExpireAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const isDeletedAppUserSession = `-- name: IsDeletedAppUserSession :one
+SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+FROM app_user_session
+WHERE guid = $1
+`
+
+// IsDeletedAppUserSession
+//
+//	SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
+//	FROM app_user_session
+//	WHERE guid = $1
+func (q *Queries) IsDeletedAppUserSession(ctx context.Context, guid valueobject.GUID) (bool, error) {
+	row := q.db.QueryRow(ctx, isDeletedAppUserSession, guid)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const saveAppUserSession = `-- name: SaveAppUserSession :one
+INSERT INTO app_user_session (
+    guid,
+    app_user_guid,
+    last_ipv4,
+    last_ipv6,
+    last_agent,
+    last_seen_at,
+    expire_at
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7
+)
+ON CONFLICT (guid) DO UPDATE
+SET
+    app_user_guid = EXCLUDED.app_user_guid,
+    last_ipv4 = EXCLUDED.last_ipv4,
+    last_ipv6 = EXCLUDED.last_ipv6,
+    last_agent = EXCLUDED.last_agent,
+    last_seen_at = EXCLUDED.last_seen_at,
+    expire_at = EXCLUDED.expire_at
+WHERE deleted_at IS NULL
+RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+`
+
+type SaveAppUserSessionParams struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+}
+
+// SaveAppUserSession
+//
+//	INSERT INTO app_user_session (
+//	    guid,
+//	    app_user_guid,
+//	    last_ipv4,
+//	    last_ipv6,
+//	    last_agent,
+//	    last_seen_at,
+//	    expire_at
+//	) VALUES (
+//	    $1, $2, $3, $4, $5, $6, $7
+//	)
+//	ON CONFLICT (guid) DO UPDATE
+//	SET
+//	    app_user_guid = EXCLUDED.app_user_guid,
+//	    last_ipv4 = EXCLUDED.last_ipv4,
+//	    last_ipv6 = EXCLUDED.last_ipv6,
+//	    last_agent = EXCLUDED.last_agent,
+//	    last_seen_at = EXCLUDED.last_seen_at,
+//	    expire_at = EXCLUDED.expire_at
+//	WHERE deleted_at IS NULL
+//	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+func (q *Queries) SaveAppUserSession(ctx context.Context, arg SaveAppUserSessionParams) (AppUserSession, error) {
+	row := q.db.QueryRow(ctx, saveAppUserSession,
+		arg.GUID,
+		arg.AppUserGUID,
+		arg.LastIPV4,
+		arg.LastIPV6,
+		arg.LastAgent,
+		arg.LastSeenAt,
+		arg.ExpireAt,
+	)
+	var i AppUserSession
+	err := row.Scan(
+		&i.GUID,
+		&i.AppUserGUID,
+		&i.LastIPV4,
+		&i.LastIPV6,
+		&i.LastAgent,
+		&i.LastSeenAt,
+		&i.ExpireAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateAppUserSession = `-- name: UpdateAppUserSession :one
+UPDATE app_user_session
+SET
+    app_user_guid = $2,
+    last_ipv4 = $3,
+    last_ipv6 = $4,
+    last_agent = $5,
+    last_seen_at = $6,
+    expire_at = $7
+WHERE guid = $1 AND deleted_at IS NULL
+RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+`
+
+type UpdateAppUserSessionParams struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+}
+
+// UpdateAppUserSession
+//
+//	UPDATE app_user_session
+//	SET
+//	    app_user_guid = $2,
+//	    last_ipv4 = $3,
+//	    last_ipv6 = $4,
+//	    last_agent = $5,
+//	    last_seen_at = $6,
+//	    expire_at = $7
+//	WHERE guid = $1 AND deleted_at IS NULL
+//	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+func (q *Queries) UpdateAppUserSession(ctx context.Context, arg UpdateAppUserSessionParams) (AppUserSession, error) {
+	row := q.db.QueryRow(ctx, updateAppUserSession,
 		arg.GUID,
 		arg.AppUserGUID,
 		arg.LastIPV4,

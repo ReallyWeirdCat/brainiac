@@ -10,6 +10,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 	"github.com/jackc/pgx/v5"
 )
@@ -103,6 +104,316 @@ func (b *CreateAppUserBatchBatchResults) Close() error {
 	return b.br.Close()
 }
 
+const createAppUserCredentialBatch = `-- name: CreateAppUserCredentialBatch :batchmany
+INSERT INTO app_user_credential (
+    app_user_guid,
+    email,
+    password_hash
+) VALUES ($1, $2, $3)
+RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+`
+
+type CreateAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type CreateAppUserCredentialBatchParams struct {
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
+}
+
+// CreateAppUserCredentialBatch
+//
+//	INSERT INTO app_user_credential (
+//	    app_user_guid,
+//	    email,
+//	    password_hash
+//	) VALUES ($1, $2, $3)
+//	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+func (q *Queries) CreateAppUserCredentialBatch(ctx context.Context, arg []CreateAppUserCredentialBatchParams) *CreateAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Email,
+			a.PasswordHash,
+		}
+		batch.Queue(createAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &CreateAppUserCredentialBatchBatchResults{br, len(arg), false}
+}
+
+func (b *CreateAppUserCredentialBatchBatchResults) Query(f func(int, []AppUserCredential, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserCredential
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserCredential
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Email,
+					&i.PasswordHash,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *CreateAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const createAppUserProfileBatch = `-- name: CreateAppUserProfileBatch :batchmany
+INSERT INTO app_user_profile (
+    app_user_guid,
+    name,
+    surname,
+    patronymic,
+    nickname,
+    bio,
+    preferred_language,
+    profile_discovery,
+    avatar_url,
+    editing_locked_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+`
+
+type CreateAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type CreateAppUserProfileBatchParams struct {
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
+}
+
+// CreateAppUserProfileBatch
+//
+//	INSERT INTO app_user_profile (
+//	    app_user_guid,
+//	    name,
+//	    surname,
+//	    patronymic,
+//	    nickname,
+//	    bio,
+//	    preferred_language,
+//	    profile_discovery,
+//	    avatar_url,
+//	    editing_locked_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+func (q *Queries) CreateAppUserProfileBatch(ctx context.Context, arg []CreateAppUserProfileBatchParams) *CreateAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Name,
+			a.Surname,
+			a.Patronymic,
+			a.Nickname,
+			a.Bio,
+			a.PreferredLanguage,
+			a.ProfileDiscovery,
+			a.AvatarUrl,
+			a.EditingLockedAt,
+		}
+		batch.Queue(createAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &CreateAppUserProfileBatchBatchResults{br, len(arg), false}
+}
+
+func (b *CreateAppUserProfileBatchBatchResults) Query(f func(int, []AppUserProfile, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserProfile
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserProfile
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Name,
+					&i.Surname,
+					&i.Patronymic,
+					&i.Nickname,
+					&i.Bio,
+					&i.PreferredLanguage,
+					&i.ProfileDiscovery,
+					&i.AvatarUrl,
+					&i.EditingLockedAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *CreateAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const createAppUserSessionBatch = `-- name: CreateAppUserSessionBatch :batchmany
+INSERT INTO app_user_session (
+    guid,
+    app_user_guid,
+    last_ipv4,
+    last_ipv6,
+    last_agent,
+    last_seen_at,
+    expire_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+`
+
+type CreateAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type CreateAppUserSessionBatchParams struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+}
+
+// CreateAppUserSessionBatch
+//
+//	INSERT INTO app_user_session (
+//	    guid,
+//	    app_user_guid,
+//	    last_ipv4,
+//	    last_ipv6,
+//	    last_agent,
+//	    last_seen_at,
+//	    expire_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7)
+//	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+func (q *Queries) CreateAppUserSessionBatch(ctx context.Context, arg []CreateAppUserSessionBatchParams) *CreateAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.GUID,
+			a.AppUserGUID,
+			a.LastIPV4,
+			a.LastIPV6,
+			a.LastAgent,
+			a.LastSeenAt,
+			a.ExpireAt,
+		}
+		batch.Queue(createAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &CreateAppUserSessionBatchBatchResults{br, len(arg), false}
+}
+
+func (b *CreateAppUserSessionBatchBatchResults) Query(f func(int, []AppUserSession, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserSession
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserSession
+				if err := rows.Scan(
+					&i.GUID,
+					&i.AppUserGUID,
+					&i.LastIPV4,
+					&i.LastIPV6,
+					&i.LastAgent,
+					&i.LastSeenAt,
+					&i.ExpireAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *CreateAppUserSessionBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
 const deleteAppUserBatch = `-- name: DeleteAppUserBatch :batchexec
 UPDATE app_user
 SET 
@@ -151,6 +462,156 @@ func (b *DeleteAppUserBatchBatchResults) Exec(f func(int, error)) {
 }
 
 func (b *DeleteAppUserBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const deleteAppUserCredentialBatch = `-- name: DeleteAppUserCredentialBatch :batchexec
+UPDATE app_user_credential
+SET deleted_at = now()
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type DeleteAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// DeleteAppUserCredentialBatch
+//
+//	UPDATE app_user_credential
+//	SET deleted_at = now()
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *DeleteAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(deleteAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &DeleteAppUserCredentialBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *DeleteAppUserCredentialBatchBatchResults) Exec(f func(int, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		if b.closed {
+			if f != nil {
+				f(t, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		_, err := b.br.Exec()
+		if f != nil {
+			f(t, err)
+		}
+	}
+}
+
+func (b *DeleteAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const deleteAppUserProfileBatch = `-- name: DeleteAppUserProfileBatch :batchexec
+UPDATE app_user_profile
+SET deleted_at = now()
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type DeleteAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// DeleteAppUserProfileBatch
+//
+//	UPDATE app_user_profile
+//	SET deleted_at = now()
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *DeleteAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(deleteAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &DeleteAppUserProfileBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *DeleteAppUserProfileBatchBatchResults) Exec(f func(int, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		if b.closed {
+			if f != nil {
+				f(t, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		_, err := b.br.Exec()
+		if f != nil {
+			f(t, err)
+		}
+	}
+}
+
+func (b *DeleteAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const deleteAppUserSessionBatch = `-- name: DeleteAppUserSessionBatch :batchexec
+UPDATE app_user_session
+SET deleted_at = now()
+WHERE guid = $1 AND deleted_at IS NULL
+`
+
+type DeleteAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// DeleteAppUserSessionBatch
+//
+//	UPDATE app_user_session
+//	SET deleted_at = now()
+//	WHERE guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range guid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(deleteAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &DeleteAppUserSessionBatchBatchResults{br, len(guid), false}
+}
+
+func (b *DeleteAppUserSessionBatchBatchResults) Exec(f func(int, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		if b.closed {
+			if f != nil {
+				f(t, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		_, err := b.br.Exec()
+		if f != nil {
+			f(t, err)
+		}
+	}
+}
+
+func (b *DeleteAppUserSessionBatchBatchResults) Close() error {
 	b.closed = true
 	return b.br.Close()
 }
@@ -214,6 +675,195 @@ func (b *ExistsAppUserBatchBatchResults) Query(f func(int, []valueobject.GUID, e
 }
 
 func (b *ExistsAppUserBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const existsAppUserCredentialBatch = `-- name: ExistsAppUserCredentialBatch :batchmany
+SELECT app_user_guid FROM app_user_credential
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type ExistsAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// ExistsAppUserCredentialBatch
+//
+//	SELECT app_user_guid FROM app_user_credential
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) ExistsAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *ExistsAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(existsAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &ExistsAppUserCredentialBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *ExistsAppUserCredentialBatchBatchResults) Query(f func(int, []valueobject.GUID, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []valueobject.GUID
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var app_user_guid valueobject.GUID
+				if err := rows.Scan(&app_user_guid); err != nil {
+					return err
+				}
+				items = append(items, app_user_guid)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *ExistsAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const existsAppUserProfileBatch = `-- name: ExistsAppUserProfileBatch :batchmany
+SELECT app_user_guid FROM app_user_profile
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type ExistsAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// ExistsAppUserProfileBatch
+//
+//	SELECT app_user_guid FROM app_user_profile
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) ExistsAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *ExistsAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(existsAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &ExistsAppUserProfileBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *ExistsAppUserProfileBatchBatchResults) Query(f func(int, []valueobject.GUID, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []valueobject.GUID
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var app_user_guid valueobject.GUID
+				if err := rows.Scan(&app_user_guid); err != nil {
+					return err
+				}
+				items = append(items, app_user_guid)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *ExistsAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const existsAppUserSessionBatch = `-- name: ExistsAppUserSessionBatch :batchmany
+SELECT guid FROM app_user_session
+WHERE guid = $1 AND deleted_at IS NULL
+`
+
+type ExistsAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// ExistsAppUserSessionBatch
+//
+//	SELECT guid FROM app_user_session
+//	WHERE guid = $1 AND deleted_at IS NULL
+func (q *Queries) ExistsAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range guid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(existsAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &ExistsAppUserSessionBatchBatchResults{br, len(guid), false}
+}
+
+func (b *ExistsAppUserSessionBatchBatchResults) Query(f func(int, []valueobject.GUID, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []valueobject.GUID
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var guid valueobject.GUID
+				if err := rows.Scan(&guid); err != nil {
+					return err
+				}
+				items = append(items, guid)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *ExistsAppUserSessionBatchBatchResults) Close() error {
 	b.closed = true
 	return b.br.Close()
 }
@@ -283,6 +933,224 @@ func (b *GetAppUserBatchBatchResults) Query(f func(int, []AppUser, error)) {
 }
 
 func (b *GetAppUserBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const getAppUserCredentialBatch = `-- name: GetAppUserCredentialBatch :batchmany
+SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type GetAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// GetAppUserCredentialBatch
+//
+//	SELECT app_user_guid, email, password_hash, created_at, deleted_at FROM app_user_credential
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) GetAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *GetAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(getAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &GetAppUserCredentialBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *GetAppUserCredentialBatchBatchResults) Query(f func(int, []AppUserCredential, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserCredential
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserCredential
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Email,
+					&i.PasswordHash,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *GetAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const getAppUserProfileBatch = `-- name: GetAppUserProfileBatch :batchmany
+SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at FROM app_user_profile
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+`
+
+type GetAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// GetAppUserProfileBatch
+//
+//	SELECT app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at FROM app_user_profile
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+func (q *Queries) GetAppUserProfileBatch(ctx context.Context, appUserGuid []valueobject.GUID) *GetAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range appUserGuid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(getAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &GetAppUserProfileBatchBatchResults{br, len(appUserGuid), false}
+}
+
+func (b *GetAppUserProfileBatchBatchResults) Query(f func(int, []AppUserProfile, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserProfile
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserProfile
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Name,
+					&i.Surname,
+					&i.Patronymic,
+					&i.Nickname,
+					&i.Bio,
+					&i.PreferredLanguage,
+					&i.ProfileDiscovery,
+					&i.AvatarUrl,
+					&i.EditingLockedAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *GetAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const getAppUserSessionBatch = `-- name: GetAppUserSessionBatch :batchmany
+SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at FROM app_user_session
+WHERE guid = $1 AND deleted_at IS NULL
+`
+
+type GetAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+// GetAppUserSessionBatch
+//
+//	SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at FROM app_user_session
+//	WHERE guid = $1 AND deleted_at IS NULL
+func (q *Queries) GetAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range guid {
+		vals := []interface{}{
+			a,
+		}
+		batch.Queue(getAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &GetAppUserSessionBatchBatchResults{br, len(guid), false}
+}
+
+func (b *GetAppUserSessionBatchBatchResults) Query(f func(int, []AppUserSession, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserSession
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserSession
+				if err := rows.Scan(
+					&i.GUID,
+					&i.AppUserGUID,
+					&i.LastIPV4,
+					&i.LastIPV6,
+					&i.LastAgent,
+					&i.LastSeenAt,
+					&i.ExpireAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *GetAppUserSessionBatchBatchResults) Close() error {
 	b.closed = true
 	return b.br.Close()
 }
@@ -386,6 +1254,368 @@ func (b *SaveAppUserBatchBatchResults) Close() error {
 	return b.br.Close()
 }
 
+const saveAppUserCredentialBatch = `-- name: SaveAppUserCredentialBatch :batchmany
+INSERT INTO app_user_credential (
+    app_user_guid,
+    email,
+    password_hash
+) VALUES ($1, $2, $3)
+ON CONFLICT (app_user_guid) DO UPDATE
+SET
+    email = EXCLUDED.email,
+    password_hash = EXCLUDED.password_hash
+WHERE deleted_at IS NULL
+RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+`
+
+type SaveAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type SaveAppUserCredentialBatchParams struct {
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
+}
+
+// SaveAppUserCredentialBatch
+//
+//	INSERT INTO app_user_credential (
+//	    app_user_guid,
+//	    email,
+//	    password_hash
+//	) VALUES ($1, $2, $3)
+//	ON CONFLICT (app_user_guid) DO UPDATE
+//	SET
+//	    email = EXCLUDED.email,
+//	    password_hash = EXCLUDED.password_hash
+//	WHERE deleted_at IS NULL
+//	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+func (q *Queries) SaveAppUserCredentialBatch(ctx context.Context, arg []SaveAppUserCredentialBatchParams) *SaveAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Email,
+			a.PasswordHash,
+		}
+		batch.Queue(saveAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &SaveAppUserCredentialBatchBatchResults{br, len(arg), false}
+}
+
+func (b *SaveAppUserCredentialBatchBatchResults) Query(f func(int, []AppUserCredential, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserCredential
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserCredential
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Email,
+					&i.PasswordHash,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *SaveAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const saveAppUserProfileBatch = `-- name: SaveAppUserProfileBatch :batchmany
+INSERT INTO app_user_profile (
+    app_user_guid,
+    name,
+    surname,
+    patronymic,
+    nickname,
+    bio,
+    preferred_language,
+    profile_discovery,
+    avatar_url,
+    editing_locked_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+ON CONFLICT (app_user_guid) DO UPDATE
+SET
+    name = EXCLUDED.name,
+    surname = EXCLUDED.surname,
+    patronymic = EXCLUDED.patronymic,
+    nickname = EXCLUDED.nickname,
+    bio = EXCLUDED.bio,
+    preferred_language = EXCLUDED.preferred_language,
+    profile_discovery = EXCLUDED.profile_discovery,
+    avatar_url = EXCLUDED.avatar_url,
+    editing_locked_at = EXCLUDED.editing_locked_at
+WHERE deleted_at IS NULL
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+`
+
+type SaveAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type SaveAppUserProfileBatchParams struct {
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
+}
+
+// SaveAppUserProfileBatch
+//
+//	INSERT INTO app_user_profile (
+//	    app_user_guid,
+//	    name,
+//	    surname,
+//	    patronymic,
+//	    nickname,
+//	    bio,
+//	    preferred_language,
+//	    profile_discovery,
+//	    avatar_url,
+//	    editing_locked_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+//	ON CONFLICT (app_user_guid) DO UPDATE
+//	SET
+//	    name = EXCLUDED.name,
+//	    surname = EXCLUDED.surname,
+//	    patronymic = EXCLUDED.patronymic,
+//	    nickname = EXCLUDED.nickname,
+//	    bio = EXCLUDED.bio,
+//	    preferred_language = EXCLUDED.preferred_language,
+//	    profile_discovery = EXCLUDED.profile_discovery,
+//	    avatar_url = EXCLUDED.avatar_url,
+//	    editing_locked_at = EXCLUDED.editing_locked_at
+//	WHERE deleted_at IS NULL
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+func (q *Queries) SaveAppUserProfileBatch(ctx context.Context, arg []SaveAppUserProfileBatchParams) *SaveAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Name,
+			a.Surname,
+			a.Patronymic,
+			a.Nickname,
+			a.Bio,
+			a.PreferredLanguage,
+			a.ProfileDiscovery,
+			a.AvatarUrl,
+			a.EditingLockedAt,
+		}
+		batch.Queue(saveAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &SaveAppUserProfileBatchBatchResults{br, len(arg), false}
+}
+
+func (b *SaveAppUserProfileBatchBatchResults) Query(f func(int, []AppUserProfile, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserProfile
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserProfile
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Name,
+					&i.Surname,
+					&i.Patronymic,
+					&i.Nickname,
+					&i.Bio,
+					&i.PreferredLanguage,
+					&i.ProfileDiscovery,
+					&i.AvatarUrl,
+					&i.EditingLockedAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *SaveAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const saveAppUserSessionBatch = `-- name: SaveAppUserSessionBatch :batchmany
+INSERT INTO app_user_session (
+    guid,
+    app_user_guid,
+    last_ipv4,
+    last_ipv6,
+    last_agent,
+    last_seen_at,
+    expire_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (guid) DO UPDATE
+SET
+    app_user_guid = EXCLUDED.app_user_guid,
+    last_ipv4 = EXCLUDED.last_ipv4,
+    last_ipv6 = EXCLUDED.last_ipv6,
+    last_agent = EXCLUDED.last_agent,
+    last_seen_at = EXCLUDED.last_seen_at,
+    expire_at = EXCLUDED.expire_at
+WHERE deleted_at IS NULL
+RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+`
+
+type SaveAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type SaveAppUserSessionBatchParams struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+}
+
+// SaveAppUserSessionBatch
+//
+//	INSERT INTO app_user_session (
+//	    guid,
+//	    app_user_guid,
+//	    last_ipv4,
+//	    last_ipv6,
+//	    last_agent,
+//	    last_seen_at,
+//	    expire_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7)
+//	ON CONFLICT (guid) DO UPDATE
+//	SET
+//	    app_user_guid = EXCLUDED.app_user_guid,
+//	    last_ipv4 = EXCLUDED.last_ipv4,
+//	    last_ipv6 = EXCLUDED.last_ipv6,
+//	    last_agent = EXCLUDED.last_agent,
+//	    last_seen_at = EXCLUDED.last_seen_at,
+//	    expire_at = EXCLUDED.expire_at
+//	WHERE deleted_at IS NULL
+//	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+func (q *Queries) SaveAppUserSessionBatch(ctx context.Context, arg []SaveAppUserSessionBatchParams) *SaveAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.GUID,
+			a.AppUserGUID,
+			a.LastIPV4,
+			a.LastIPV6,
+			a.LastAgent,
+			a.LastSeenAt,
+			a.ExpireAt,
+		}
+		batch.Queue(saveAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &SaveAppUserSessionBatchBatchResults{br, len(arg), false}
+}
+
+func (b *SaveAppUserSessionBatchBatchResults) Query(f func(int, []AppUserSession, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserSession
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserSession
+				if err := rows.Scan(
+					&i.GUID,
+					&i.AppUserGUID,
+					&i.LastIPV4,
+					&i.LastIPV6,
+					&i.LastAgent,
+					&i.LastSeenAt,
+					&i.ExpireAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *SaveAppUserSessionBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
 const updateAppUserBatch = `-- name: UpdateAppUserBatch :batchmany
 UPDATE app_user
 SET 
@@ -467,6 +1697,316 @@ func (b *UpdateAppUserBatchBatchResults) Query(f func(int, []AppUser, error)) {
 }
 
 func (b *UpdateAppUserBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const updateAppUserCredentialBatch = `-- name: UpdateAppUserCredentialBatch :batchmany
+UPDATE app_user_credential
+SET
+    email = $2,
+    password_hash = $3
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+`
+
+type UpdateAppUserCredentialBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type UpdateAppUserCredentialBatchParams struct {
+	AppUserGUID  valueobject.GUID   `db:"app_user_guid" json:"app_user_guid"`
+	Email        *valueobject.Email `db:"email" json:"email"`
+	PasswordHash string             `db:"password_hash" json:"password_hash"`
+}
+
+// UpdateAppUserCredentialBatch
+//
+//	UPDATE app_user_credential
+//	SET
+//	    email = $2,
+//	    password_hash = $3
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	RETURNING app_user_guid, email, password_hash, created_at, deleted_at
+func (q *Queries) UpdateAppUserCredentialBatch(ctx context.Context, arg []UpdateAppUserCredentialBatchParams) *UpdateAppUserCredentialBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Email,
+			a.PasswordHash,
+		}
+		batch.Queue(updateAppUserCredentialBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &UpdateAppUserCredentialBatchBatchResults{br, len(arg), false}
+}
+
+func (b *UpdateAppUserCredentialBatchBatchResults) Query(f func(int, []AppUserCredential, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserCredential
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserCredential
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Email,
+					&i.PasswordHash,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *UpdateAppUserCredentialBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const updateAppUserProfileBatch = `-- name: UpdateAppUserProfileBatch :batchmany
+UPDATE app_user_profile
+SET
+    name = $2,
+    surname = $3,
+    patronymic = $4,
+    nickname = $5,
+    bio = $6,
+    preferred_language = $7,
+    profile_discovery = $8,
+    avatar_url = $9,
+    editing_locked_at = $10
+WHERE app_user_guid = $1 AND deleted_at IS NULL
+RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+`
+
+type UpdateAppUserProfileBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type UpdateAppUserProfileBatchParams struct {
+	AppUserGUID       valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	Name              *valueobject.Name         `db:"name" json:"name"`
+	Surname           *valueobject.Name         `db:"surname" json:"surname"`
+	Patronymic        *valueobject.Name         `db:"patronymic" json:"patronymic"`
+	Nickname          *valueobject.Nickname     `db:"nickname" json:"nickname"`
+	Bio               *valueobject.Bio          `db:"bio" json:"bio"`
+	PreferredLanguage *valueobject.LanguageCode `db:"preferred_language" json:"preferred_language"`
+	ProfileDiscovery  enum.ProfileDiscoveryEnum `db:"profile_discovery" json:"profile_discovery"`
+	AvatarUrl         *valueobject.HttpUrl      `db:"avatar_url" json:"avatar_url"`
+	EditingLockedAt   *time.Time                `db:"editing_locked_at" json:"editing_locked_at"`
+}
+
+// UpdateAppUserProfileBatch
+//
+//	UPDATE app_user_profile
+//	SET
+//	    name = $2,
+//	    surname = $3,
+//	    patronymic = $4,
+//	    nickname = $5,
+//	    bio = $6,
+//	    preferred_language = $7,
+//	    profile_discovery = $8,
+//	    avatar_url = $9,
+//	    editing_locked_at = $10
+//	WHERE app_user_guid = $1 AND deleted_at IS NULL
+//	RETURNING app_user_guid, name, surname, patronymic, nickname, bio, preferred_language, profile_discovery, avatar_url, editing_locked_at, created_at, deleted_at
+func (q *Queries) UpdateAppUserProfileBatch(ctx context.Context, arg []UpdateAppUserProfileBatchParams) *UpdateAppUserProfileBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.AppUserGUID,
+			a.Name,
+			a.Surname,
+			a.Patronymic,
+			a.Nickname,
+			a.Bio,
+			a.PreferredLanguage,
+			a.ProfileDiscovery,
+			a.AvatarUrl,
+			a.EditingLockedAt,
+		}
+		batch.Queue(updateAppUserProfileBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &UpdateAppUserProfileBatchBatchResults{br, len(arg), false}
+}
+
+func (b *UpdateAppUserProfileBatchBatchResults) Query(f func(int, []AppUserProfile, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserProfile
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserProfile
+				if err := rows.Scan(
+					&i.AppUserGUID,
+					&i.Name,
+					&i.Surname,
+					&i.Patronymic,
+					&i.Nickname,
+					&i.Bio,
+					&i.PreferredLanguage,
+					&i.ProfileDiscovery,
+					&i.AvatarUrl,
+					&i.EditingLockedAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *UpdateAppUserProfileBatchBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
+const updateAppUserSessionBatch = `-- name: UpdateAppUserSessionBatch :batchmany
+UPDATE app_user_session
+SET
+    app_user_guid = $2,
+    last_ipv4 = $3,
+    last_ipv6 = $4,
+    last_agent = $5,
+    last_seen_at = $6,
+    expire_at = $7
+WHERE guid = $1 AND deleted_at IS NULL
+RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+`
+
+type UpdateAppUserSessionBatchBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type UpdateAppUserSessionBatchParams struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	LastIPV4    *string          `db:"last_ipv4" json:"last_ipv4"`
+	LastIPV6    *string          `db:"last_ipv6" json:"last_ipv6"`
+	LastAgent   *string          `db:"last_agent" json:"last_agent"`
+	LastSeenAt  time.Time        `db:"last_seen_at" json:"last_seen_at"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+}
+
+// UpdateAppUserSessionBatch
+//
+//	UPDATE app_user_session
+//	SET
+//	    app_user_guid = $2,
+//	    last_ipv4 = $3,
+//	    last_ipv6 = $4,
+//	    last_agent = $5,
+//	    last_seen_at = $6,
+//	    expire_at = $7
+//	WHERE guid = $1 AND deleted_at IS NULL
+//	RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
+func (q *Queries) UpdateAppUserSessionBatch(ctx context.Context, arg []UpdateAppUserSessionBatchParams) *UpdateAppUserSessionBatchBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.GUID,
+			a.AppUserGUID,
+			a.LastIPV4,
+			a.LastIPV6,
+			a.LastAgent,
+			a.LastSeenAt,
+			a.ExpireAt,
+		}
+		batch.Queue(updateAppUserSessionBatch, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &UpdateAppUserSessionBatchBatchResults{br, len(arg), false}
+}
+
+func (b *UpdateAppUserSessionBatchBatchResults) Query(f func(int, []AppUserSession, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var items []AppUserSession
+		if b.closed {
+			if f != nil {
+				f(t, items, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		err := func() error {
+			rows, err := b.br.Query()
+			if err != nil {
+				return err
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var i AppUserSession
+				if err := rows.Scan(
+					&i.GUID,
+					&i.AppUserGUID,
+					&i.LastIPV4,
+					&i.LastIPV6,
+					&i.LastAgent,
+					&i.LastSeenAt,
+					&i.ExpireAt,
+					&i.CreatedAt,
+					&i.DeletedAt,
+				); err != nil {
+					return err
+				}
+				items = append(items, i)
+			}
+			return rows.Err()
+		}()
+		if f != nil {
+			f(t, items, err)
+		}
+	}
+}
+
+func (b *UpdateAppUserSessionBatchBatchResults) Close() error {
 	b.closed = true
 	return b.br.Close()
 }

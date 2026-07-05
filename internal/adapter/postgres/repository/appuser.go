@@ -298,7 +298,6 @@ func (p *PgAppUserRepo) SaveBatch(ctx context.Context, objs []*entity.AppUser) (
 			GUID:        obj.GUID,
 			Username:    obj.Username,
 			ActivatedAt: obj.ActivatedAt,
-			DeletedAt:   obj.DeletedAt,
 		})
 	}
 	batch := p.queries.SaveAppUserBatch(ctx, params)
@@ -350,7 +349,6 @@ func (p *PgAppUserRepo) UpdateBatch(ctx context.Context, objs []*entity.AppUser)
 			GUID:        obj.GUID,
 			Username:    obj.Username,
 			ActivatedAt: obj.ActivatedAt,
-			DeletedAt:   obj.DeletedAt,
 		})
 	}
 	batch := p.queries.UpdateAppUserBatch(ctx, params)

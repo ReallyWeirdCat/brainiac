@@ -28,6 +28,7 @@ ON CONFLICT (guid) DO UPDATE
 SET
     username = EXCLUDED.username,
     activated_at = EXCLUDED.activated_at
+WHERE deleted_at IS NULL
 RETURNING *;
 
 -- name: DeleteAppUser :exec
