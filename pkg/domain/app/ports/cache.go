@@ -22,14 +22,33 @@ import (
 	"time"
 )
 
-type Cache interface {
-	Get(ctx context.Context, key string) (string, bool, error)
+type Cache[T any] interface {
+	// nil if object does not exist in cache
+	Get(ctx context.Context, key string) (*T, error)
 
-	Set(ctx context.Context, key string, value string, ttl time.Duration) error
+	Set(ctx context.Context, key string, value T, ttl time.Duration) error
 
 	// SetNX sets a value only if the key does not exist (atomic lock).
 	// Returns true if the lock was acquired, false if the key already exists.
-	SetNX(ctx context.Context, key string, value string, ttl time.Duration) (bool, error)
+	SetNX(ctx context.Context, key string, value T, ttl time.Duration) (bool, error)
 
+	// Discards cache by key. Must not error when key is unset.
 	Delete(ctx context.Context, key string) error
+
+	Exists(ctx context.Context, key string) (bool, error)
+
+	// Get time-to-live for key.
+	TTL(ctx context.Context, key string) (time.Duration, error)
+
+	// Set time-to-live for key.
+	SetTTL(ctx context.Context, key string, ttl time.Duration) error
+
+	// Returns a map of key -> *value (nil if missing)
+	MGet(ctx context.Context, keys ...string) (map[string]*T, error)
+
+	// Sets multiple keys atomically (or via pipeline)
+	MSet(ctx context.Context, items map[string]T, ttl time.Duration) error
+
+	// Delete multiple keys. Unexistent keys must be skipped.
+	MDelete(ctx context.Context, keys ...string) error
 }
