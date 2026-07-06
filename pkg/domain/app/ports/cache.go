@@ -22,6 +22,10 @@ import (
 	"time"
 )
 
+const (
+	CacheDurationInfinite = time.Duration(-1) * time.Nanosecond
+)
+
 type Cache[T any] interface {
 	// nil if object does not exist in cache
 	Get(ctx context.Context, key string) (*T, error)
