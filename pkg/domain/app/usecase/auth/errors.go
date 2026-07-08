@@ -15,17 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package repository
+package auth
 
-import (
-	"context"
+import domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+var (
+	ErrRegistrationDisabled = domerr.NewDomainError("registration is disabled", nil).WithType(domerr.Forbidden)
+	ErrCodeAlreadySent      = domerr.NewDomainError("code has already be sent", nil).WithType(domerr.LimitExceeded)
+	ErrEmailRequired        = domerr.NewDomainError("provider requires email for registration", nil).WithType(domerr.Validation)
+	ErrUsernameTaken        = domerr.NewDomainError("username taken", nil).WithType(domerr.Conflict)
 )
-
-type AppUserCredentialRepository interface {
-	Repository[entity.AppUserCredential]
-	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error)
-	ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error)
-}

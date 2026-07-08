@@ -75,6 +75,13 @@ func (p *PgAppUserCredentialRepo) GetByEmail(ctx context.Context, email valueobj
 	return &model, nil
 }
 
+func (p *PgAppUserCredentialRepo) ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.queries.ExistsAppUserCredentialByEmail(ctx, &email)
+}
+
 func (p *PgAppUserCredentialRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()

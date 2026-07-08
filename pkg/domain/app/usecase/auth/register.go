@@ -19,40 +19,138 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"math/rand"
+	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/mail"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
 type RegisterUsecase struct {
-	userRepo       repository.AppUserRepository
-	credentialRepo repository.AppUserCredentialRepository
-	profileRepo    repository.AppUserProfileRepository
-	uow            ports.UnitOfWork
-	hasher         ports.PasswordHasher
-	tokenGenerator ports.TokenGenerator
+	uow              ports.UnitOfWorkProvider
+	regCodeCache     ports.Cache[entity.RegistrationCode]
+	hasher           ports.PasswordHasher
+	pwdChecker       ports.CompromisedPasswordChecker
+	sendEmailUsecase *mail.SendEmailUsecase
+	config           config.AppConfig
 }
 
 func NewRegisterUseCase(
-	userRepo repository.AppUserRepository,
-	credentialRepo repository.AppUserCredentialRepository,
-	profileRepo repository.AppUserProfileRepository,
-	uow ports.UnitOfWork,
+	uow ports.UnitOfWorkProvider,
+	regCodeCache ports.Cache[entity.RegistrationCode],
 	hasher ports.PasswordHasher,
-	tokenGenerator ports.TokenGenerator,
-	tokenValidator ports.TokenValidator,
+	pwdChecker ports.CompromisedPasswordChecker,
+	sendEmailUsecase *mail.SendEmailUsecase,
+	config config.AppConfig,
 ) *RegisterUsecase {
 	return &RegisterUsecase{
-		userRepo:       userRepo,
-		credentialRepo: credentialRepo,
-		profileRepo:    profileRepo,
-		uow:            uow,
-		hasher:         hasher,
-		tokenGenerator: tokenGenerator,
+		uow:              uow,
+		regCodeCache:     regCodeCache,
+		hasher:           hasher,
+		pwdChecker:       pwdChecker,
+		sendEmailUsecase: sendEmailUsecase,
+		config:           config,
 	}
 }
 
-func (r *RegisterUsecase) Execute(ctx context.Context, req RegisterRequest) (RegisterResponse, error) {
-	// TODO:
-	panic("not implemented")
+func (r *RegisterUsecase) Execute(ctx context.Context, req RegistrationBeginRequest) (*RegistrationBeginResponse, error) {
+	if !r.config.Registration.Enable {
+		return nil, ErrRegistrationDisabled
+	}
+
+	randDelay(ctx)
+
+	email, err := valueobject.NewEmail(req.Email)
+	if err != nil {
+		return nil, err
+	}
+	username, err := valueobject.NewUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}
+	password, err := valueobject.NewPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	passwordCompromised, err := r.pwdChecker.IsCompromised(string(password))
+	if err != nil {
+		return nil, err
+	}
+	if passwordCompromised {
+		return nil, domerr.ErrCompromisedPassword
+	}
+
+	uow, err := r.uow.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer uow.Rollback(ctx)
+
+	usernameTaken, err := uow.AppUsers().ExistsByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	if usernameTaken {
+		return nil, ErrUsernameTaken
+	}
+
+	emailRegistered, err := uow.AppUserCredentials().ExistsByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	exists, err := r.regCodeCache.Exists(ctx, username.String())
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, ErrCodeAlreadySent
+	}
+
+	regcode, err := entity.NewRegistrationCode(username)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.regCodeCache.SetNX(ctx, username.String(), regcode, regcode.ExpireAt.Sub(time.Now()))
+	if err != nil {
+		return nil, err
+	}
+
+	if !emailRegistered {
+		_, err = r.sendEmailUsecase.Execute(ctx, mail.SendEmailRequest{
+			To:      []string{email.String()},
+			Subject: "Brainiac Registration",
+			Body:    "Your registration code is " + regcode.Code.String(),
+			IsHTML:  false,
+		})
+		if err != nil {
+			errDelCache := r.regCodeCache.Delete(ctx, username.String())
+			if errDelCache != nil {
+				return nil, errors.Join(err, errDelCache)
+			}
+			return nil, err
+		}
+		return &RegistrationBeginResponse{
+			Username: username.String(),
+		}, nil
+	}
+
+	// Proceed as if email is not yet registered to prevent email enumeration attacks
+	return &RegistrationBeginResponse{
+		Username: username.String(),
+	}, nil
+}
+
+func randDelay(ctx context.Context) {
+	select {
+	case <-time.After(time.Duration(rand.Intn(3)+1) * time.Second):
+	case <-ctx.Done():
+	}
 }

@@ -75,6 +75,13 @@ func (p *PgAppUserRepo) GetByUsername(ctx context.Context, username valueobject.
 	return &model, err
 }
 
+func (p *PgAppUserRepo) ExistsByUsername(ctx context.Context, username valueobject.Username) (bool, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.queries.ExistsAppUserByUsername(ctx, username)
+}
+
 func (p *PgAppUserRepo) IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()

@@ -108,6 +108,28 @@ func (q *Queries) ExistsAppUser(ctx context.Context, guid valueobject.GUID) (boo
 	return exists, err
 }
 
+const existsAppUserByUsername = `-- name: ExistsAppUserByUsername :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user
+    WHERE username = $1 AND deleted_at IS NULL
+)
+`
+
+// ExistsAppUserByUsername
+//
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user
+//	    WHERE username = $1 AND deleted_at IS NULL
+//	)
+func (q *Queries) ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUserByUsername, username)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getAllAppUsers = `-- name: GetAllAppUsers :many
 SELECT guid, username, activated_at, created_at, deleted_at
 FROM app_user

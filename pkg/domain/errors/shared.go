@@ -18,10 +18,15 @@
 package errors
 
 var (
-	ErrInvalidInput       = NewDomainError("invalid input data", nil).WithType(Validation)
-	ErrUsernameExists     = NewDomainError("username already exists", nil).WithType(Conflict)
-	ErrUserDoesNotExist   = NewDomainError("user does not exist", nil).WithType(NotFound)
+	ErrInvalidInput = NewDomainError("invalid input data", nil).WithType(Validation)
+	// FIXME: move to usecase
+	ErrUsernameExists = NewDomainError("username already exists", nil).WithType(Conflict)
+	// FIXME: move to usecase
+	ErrUserDoesNotExist = NewDomainError("user does not exist", nil).WithType(NotFound)
+	// FIXME: move to usecase
 	ErrInvalidCredentials = NewDomainError("invalid credentials", nil).WithType(Unauthorized)
 	ErrTooManyAttempts    = NewDomainError("too many attempts", nil).WithType(LimitExceeded)
-	ErrEntityNotFound     = NewDomainError("entity not found or does not exist", nil).WithType(NotFound)
+
+	// FIXME: move to repository
+	ErrEntityNotFound = NewDomainError("entity not found or does not exist", nil).WithType(NotFound)
 )

@@ -107,6 +107,28 @@ func (q *Queries) ExistsAppUserCredential(ctx context.Context, appUserGuid value
 	return exists, err
 }
 
+const existsAppUserCredentialByEmail = `-- name: ExistsAppUserCredentialByEmail :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user_credential
+    WHERE email = $1 AND deleted_at IS NULL
+)
+`
+
+// ExistsAppUserCredentialByEmail
+//
+//	SELECT EXISTS (
+//	    SELECT 1
+//	    FROM app_user_credential
+//	    WHERE email = $1 AND deleted_at IS NULL
+//	)
+func (q *Queries) ExistsAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (bool, error) {
+	row := q.db.QueryRow(ctx, existsAppUserCredentialByEmail, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getAllAppUserCredentials = `-- name: GetAllAppUserCredentials :many
 SELECT app_user_guid, email, password_hash, created_at, deleted_at
 FROM app_user_credential

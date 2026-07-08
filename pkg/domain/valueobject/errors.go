@@ -15,17 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package repository
+package valueobject
 
-import (
-	"context"
+import domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+var (
+	ErrZeroValue = domerr.NewDomainError("zero value object", nil).WithType(domerr.Validation)
 )
-
-type AppUserCredentialRepository interface {
-	Repository[entity.AppUserCredential]
-	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error)
-	ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error)
-}

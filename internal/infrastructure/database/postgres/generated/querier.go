@@ -199,6 +199,14 @@ type Querier interface {
 	//  SELECT guid FROM app_user
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	ExistsAppUserBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserBatchBatchResults
+	//ExistsAppUserByUsername
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user
+	//      WHERE username = $1 AND deleted_at IS NULL
+	//  )
+	ExistsAppUserByUsername(ctx context.Context, username valueobject.Username) (bool, error)
 	//ExistsAppUserCredential
 	//
 	//  SELECT EXISTS (
@@ -212,6 +220,14 @@ type Querier interface {
 	//  SELECT app_user_guid FROM app_user_credential
 	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
 	ExistsAppUserCredentialBatch(ctx context.Context, appUserGuid []valueobject.GUID) *ExistsAppUserCredentialBatchBatchResults
+	//ExistsAppUserCredentialByEmail
+	//
+	//  SELECT EXISTS (
+	//      SELECT 1
+	//      FROM app_user_credential
+	//      WHERE email = $1 AND deleted_at IS NULL
+	//  )
+	ExistsAppUserCredentialByEmail(ctx context.Context, email *valueobject.Email) (bool, error)
 	//ExistsAppUserProfile
 	//
 	//  SELECT EXISTS (

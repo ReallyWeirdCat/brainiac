@@ -15,17 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package repository
+package ports
 
 import (
-	"context"
-
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
 )
 
-type AppUserCredentialRepository interface {
-	Repository[entity.AppUserCredential]
-	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error)
-	ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error)
+type AppConfigProvider interface {
+	Get() config.AppConfig
 }

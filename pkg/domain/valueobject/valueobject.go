@@ -20,6 +20,8 @@ package valueobject
 type ValueObject interface {
 	Equals(other any) bool
 	String() string
+	// TODO:
+	// Validate() error
 	IsValid() bool
 	IsZero() bool
 }

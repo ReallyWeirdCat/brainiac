@@ -15,17 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package repository
+package mail
 
-import (
-	"context"
+import domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+var (
+	ErrNoRecipients = domerr.NewDomainError("no recipients specified", nil).WithType(domerr.Validation)
+	ErrEmptySubject = domerr.NewDomainError("subject cannot be empty", nil).WithType(domerr.Validation)
+	ErrEmptyBody    = domerr.NewDomainError("body cannot be empty", nil).WithType(domerr.Validation)
+	ErrSenderNotSet = domerr.NewDomainError("sender not set", nil).WithType(domerr.InvalidState)
 )
-
-type AppUserCredentialRepository interface {
-	Repository[entity.AppUserCredential]
-	GetByEmail(ctx context.Context, email valueobject.Email) (*entity.AppUserCredential, error)
-	ExistsByEmail(ctx context.Context, email valueobject.Email) (bool, error)
-}

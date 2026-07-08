@@ -115,6 +115,13 @@ FROM app_user
 WHERE username = $1
   AND deleted_at IS NULL;
 
+-- name: ExistsAppUserByUsername :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user
+    WHERE username = $1 AND deleted_at IS NULL
+);
+
 -- name: GetAppUserByEmail :one
 SELECT au.*
 FROM app_user au

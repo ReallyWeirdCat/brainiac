@@ -18,16 +18,20 @@
 package auth
 
 // RegisterRequest contains the data needed to register a new user.
-type RegisterRequest struct {
+type RegistrationBeginRequest struct {
 	Username string `json:"username"`
-	Password string `json:"password"`
 	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // RegisterResponse returns the created user's identifier and basic info.
-type RegisterResponse struct {
-	GUID     string `json:"guid"`
+type RegistrationBeginResponse struct {
 	Username string `json:"username"`
+}
+
+type RegistrationFinishRequest struct {
+	Username         string `json:"username"`
+	ConfirmationCode string `json:"confirmation_code"`
 }
 
 // LoginRequest contains credentials for logging in.

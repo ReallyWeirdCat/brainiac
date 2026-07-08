@@ -112,3 +112,10 @@ FROM app_user_credential
 WHERE email = $1
   AND deleted_at IS NULL
 LIMIT 1;
+
+-- name: ExistsAppUserCredentialByEmail :one
+SELECT EXISTS (
+    SELECT 1
+    FROM app_user_credential
+    WHERE email = $1 AND deleted_at IS NULL
+);
