@@ -30,24 +30,28 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-type RegisterUsecase struct {
+type EmailSender interface {
+	Execute(ctx context.Context, req mail.SendEmailRequest) (*mail.SendEmailResponse, error)
+}
+
+type RegistrationBeginUsecase struct {
 	uow              ports.UnitOfWorkProvider
 	regCodeCache     ports.Cache[entity.RegistrationCode]
 	hasher           ports.PasswordHasher
 	pwdChecker       ports.CompromisedPasswordChecker
-	sendEmailUsecase *mail.SendEmailUsecase
+	sendEmailUsecase EmailSender
 	config           config.AppConfig
 }
 
-func NewRegisterUseCase(
+func NewRegistrationBeginUsecase(
 	uow ports.UnitOfWorkProvider,
 	regCodeCache ports.Cache[entity.RegistrationCode],
 	hasher ports.PasswordHasher,
 	pwdChecker ports.CompromisedPasswordChecker,
 	sendEmailUsecase *mail.SendEmailUsecase,
 	config config.AppConfig,
-) *RegisterUsecase {
-	return &RegisterUsecase{
+) *RegistrationBeginUsecase {
+	return &RegistrationBeginUsecase{
 		uow:              uow,
 		regCodeCache:     regCodeCache,
 		hasher:           hasher,
@@ -57,7 +61,7 @@ func NewRegisterUseCase(
 	}
 }
 
-func (r *RegisterUsecase) Execute(ctx context.Context, req RegistrationBeginRequest) (*RegistrationBeginResponse, error) {
+func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req RegistrationBeginRequest) (*RegistrationBeginResponse, error) {
 	if !r.config.Registration.Enable {
 		return nil, ErrRegistrationDisabled
 	}
