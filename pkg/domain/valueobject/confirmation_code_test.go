@@ -19,8 +19,6 @@ package valueobject
 
 import (
 	"testing"
-
-	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 func Test_generateCode(t *testing.T) {
@@ -142,8 +140,8 @@ func TestConfirmationCodeFromString(t *testing.T) {
 				t.Fatalf("ConfirmationCodeFromString() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.wantErr {
-				if err != domerr.ErrInvalidConfirmationCode {
-					t.Errorf("ConfirmationCodeFromString() error = %v, want %v", err, domerr.ErrInvalidConfirmationCode)
+				if err != ErrInvalidConfirmationCode {
+					t.Errorf("ConfirmationCodeFromString() error = %v, want %v", err, ErrInvalidConfirmationCode)
 				}
 				return
 			}

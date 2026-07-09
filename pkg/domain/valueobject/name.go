@@ -20,10 +20,11 @@ package valueobject
 import (
 	"regexp"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var namePattern = regexp.MustCompile(`^[\p{L}\p{M} -]{1,70}$`)
+var ErrInvalidName = domerr.NewDomainError("invalid name format", nil).WithType(domerr.Validation)
 
 // Name represents a validated name.
 type Name string
@@ -32,7 +33,7 @@ var _ ValueObject = Name("")
 
 func NewName(name string) (Name, error) {
 	if !namePattern.MatchString(name) {
-		return Name(""), errors.ErrInvalidName
+		return Name(""), ErrInvalidName
 	}
 	return Name(name), nil
 }

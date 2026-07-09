@@ -24,7 +24,6 @@ import (
 
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 	"github.com/jackc/pgx/v5"
@@ -52,7 +51,7 @@ func (p *PgAppUserProfileRepo) GetByUsername(ctx context.Context, username value
 	obj, err := p.queries.GetAppUserProfileByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domerr.ErrEntityNotFound.FromError(err)
+			return nil, repo.ErrEntityNotFound.FromError(err)
 		}
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func (p *PgAppUserProfileRepo) IsDeleted(ctx context.Context, guid valueobject.G
 	obj, err := p.queries.IsDeletedAppUserProfile(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return false, domerr.ErrEntityNotFound.FromError(err)
+			return false, repo.ErrEntityNotFound.FromError(err)
 		}
 		return false, err
 	}
@@ -156,7 +155,7 @@ func (p *PgAppUserProfileRepo) Delete(ctx context.Context, guid valueobject.GUID
 	err := p.queries.DeleteAppUserProfile(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return domerr.ErrEntityNotFound.FromError(err)
+			return repo.ErrEntityNotFound.FromError(err)
 		}
 		return err
 	}
@@ -172,7 +171,7 @@ func (p *PgAppUserProfileRepo) DeleteBatch(ctx context.Context, guids []valueobj
 	batch.Exec(func(_ int, err error) {
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				batchErrs = append(batchErrs, repo.ErrEntityNotFound.FromError(err))
 				return
 			}
 			batchErrs = append(batchErrs, err)
@@ -219,7 +218,7 @@ func (p *PgAppUserProfileRepo) Get(ctx context.Context, guid valueobject.GUID) (
 	obj, err := p.queries.GetAppUserProfile(ctx, guid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domerr.ErrEntityNotFound.FromError(err)
+			return nil, repo.ErrEntityNotFound.FromError(err)
 		}
 		return nil, err
 	}
@@ -256,7 +255,7 @@ func (p *PgAppUserProfileRepo) GetBatch(ctx context.Context, guids []valueobject
 	batch.Query(func(idx int, items []generated.AppUserProfile, err error) {
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				batchErrs = append(batchErrs, repo.ErrEntityNotFound.FromError(err))
 				return
 			}
 			batchErrs = append(batchErrs, err)
@@ -354,7 +353,7 @@ func (p *PgAppUserProfileRepo) Update(ctx context.Context, obj *entity.AppUserPr
 	newObj, err := p.queries.UpdateAppUserProfile(ctx, params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domerr.ErrEntityNotFound.FromError(err)
+			return nil, repo.ErrEntityNotFound.FromError(err)
 		}
 		return nil, err
 	}
@@ -387,7 +386,7 @@ func (p *PgAppUserProfileRepo) UpdateBatch(ctx context.Context, objs []*entity.A
 	batch.Query(func(idx int, items []generated.AppUserProfile, err error) {
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				batchErrs = append(batchErrs, domerr.ErrEntityNotFound.FromError(err))
+				batchErrs = append(batchErrs, repo.ErrEntityNotFound.FromError(err))
 				return
 			}
 			batchErrs = append(batchErrs, err)

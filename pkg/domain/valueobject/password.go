@@ -20,7 +20,7 @@ package valueobject
 import (
 	"regexp"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var (
@@ -35,6 +35,13 @@ var (
 	// hasSymbol requires at least one non-alphanumeric printable ASCII character.
 	hasSymbol = regexp.MustCompile(`[^a-zA-Z0-9]`)
 
+	ErrPasswordTooLong       = domerr.NewDomainError("password exceeds maximum length", nil).WithType(domerr.Validation)
+	ErrPasswordNotAcceptable = domerr.NewDomainError("password contains forbidden characters", nil).WithType(domerr.Validation)
+	ErrWeakPassword          = domerr.NewDomainError("password is too weak", nil).WithType(domerr.Validation)
+	ErrCompromisedPassword   = domerr.NewDomainError("password is known to be compromised", nil).WithType(domerr.Validation)
+)
+
+const (
 	MinPasswordLength = 8
 	MaxPasswordLength = 72
 )
@@ -47,25 +54,25 @@ var _ ValueObject = Password("")
 func NewPassword(password string) (Password, error) {
 
 	if len(password) < MinPasswordLength {
-		return Password(""), errors.ErrWeakPassword
+		return Password(""), ErrWeakPassword
 	}
 	if len(password) > MaxPasswordLength {
-		return Password(""), errors.ErrPasswordTooLong
+		return Password(""), ErrPasswordTooLong
 	}
 	if !allowedChars.MatchString(password) {
-		return Password(""), errors.ErrPasswordNotAcceptable
+		return Password(""), ErrPasswordNotAcceptable
 	}
 	if !hasDigit.MatchString(password) {
-		return Password(""), errors.ErrWeakPassword
+		return Password(""), ErrWeakPassword
 	}
 	if !hasLower.MatchString(password) {
-		return Password(""), errors.ErrWeakPassword
+		return Password(""), ErrWeakPassword
 	}
 	if !hasUpper.MatchString(password) {
-		return Password(""), errors.ErrWeakPassword
+		return Password(""), ErrWeakPassword
 	}
 	if !hasSymbol.MatchString(password) {
-		return Password(""), errors.ErrWeakPassword
+		return Password(""), ErrWeakPassword
 	}
 	return Password(password), nil
 }

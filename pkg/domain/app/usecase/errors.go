@@ -15,18 +15,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package errors
-
-var (
-	ErrInvalidInput = NewDomainError("invalid input data", nil).WithType(Validation)
-	// FIXME: move to usecase
-	ErrUsernameExists = NewDomainError("username already exists", nil).WithType(Conflict)
-	// FIXME: move to usecase
-	ErrUserDoesNotExist = NewDomainError("user does not exist", nil).WithType(NotFound)
-	// FIXME: move to usecase
-	ErrInvalidCredentials = NewDomainError("invalid credentials", nil).WithType(Unauthorized)
-	ErrTooManyAttempts    = NewDomainError("too many attempts", nil).WithType(LimitExceeded)
-
-	// FIXME: move to repository
-	ErrEntityNotFound = NewDomainError("entity not found or does not exist", nil).WithType(NotFound)
-)
+package usecase

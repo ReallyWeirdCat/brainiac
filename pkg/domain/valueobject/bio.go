@@ -21,12 +21,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var urlPattern = regexp.MustCompile(`\b(?:https?|ftp|file|sftp|ws|wss)://`)
+var ErrInvalidBio = domerr.NewDomainError("invalid bio format", nil).WithType(domerr.Validation)
 
-// Bio represents a validated bio.
 type Bio string
 
 var _ ValueObject = Bio("")
@@ -37,16 +37,16 @@ func NewBio(bio string) (Bio, error) {
 
 	// Check length
 	if len(sanitized) < 1 || len(sanitized) > 175 {
-		return Bio(""), &errors.ErrInvalidBio
+		return Bio(""), ErrInvalidBio
 	}
 
 	// Check for @ symbol
 	if strings.Contains(sanitized, "@") {
-		return Bio(""), &errors.ErrInvalidBio
+		return Bio(""), ErrInvalidBio
 	}
 
 	if urlPattern.MatchString(sanitized) {
-		return Bio(""), &errors.ErrInvalidBio
+		return Bio(""), ErrInvalidBio
 	}
 	return Bio(sanitized), nil
 }

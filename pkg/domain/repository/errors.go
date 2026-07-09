@@ -15,55 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package valueobject
+package repository
 
 import (
-	"regexp"
-
 	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
-const uuidPattern = `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
-
-var ErrInvalidGUID = domerr.NewDomainError("invalid GUID format", nil).WithType(domerr.Validation)
-
-type GUID string
-
-var _ ValueObject = GUID("")
-
-func NewGUID(guid string) (GUID, error) {
-	matched, _ := regexp.MatchString(uuidPattern, guid)
-
-	if !matched {
-		return GUID(""), ErrInvalidGUID
-	}
-
-	return GUID(guid), nil
-}
-
-func (g GUID) IsValid() bool {
-	_, err := NewGUID(string(g))
-	return err == nil
-}
-
-func (g GUID) Equals(other any) bool {
-	if other == nil {
-		return false
-	}
-	switch v := other.(type) {
-	case GUID:
-		return string(g) == string(v)
-	case string:
-		return string(g) == v
-	default:
-		return false
-	}
-}
-
-func (g GUID) IsZero() bool {
-	return string(g) == ""
-}
-
-func (g GUID) String() string {
-	return string(g)
-}
+var (
+	ErrEntityNotFound = domerr.NewDomainError("entity not found or does not exist", nil).WithType(domerr.NotFound)
+)

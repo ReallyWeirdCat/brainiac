@@ -21,8 +21,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
+
+var ErrInvalidHttpUrl = domerr.NewDomainError("invalid HTTP URL format", nil).WithType(domerr.Validation)
 
 // HttpUrl represents a validated HTTP/HTTPS URL.
 type HttpUrl string
@@ -35,7 +37,7 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 	sanitized := strings.TrimSpace(rawUrl)
 
 	if sanitized == "" {
-		return HttpUrl(""), errors.ErrInvalidHttpUrl
+		return HttpUrl(""), ErrInvalidHttpUrl
 	}
 
 	// Check if URL has a scheme; if not, add https://
@@ -45,15 +47,15 @@ func NewHttpUrl(rawUrl string) (HttpUrl, error) {
 
 	parsed, err := url.Parse(sanitized)
 	if err != nil {
-		return HttpUrl(""), errors.ErrInvalidHttpUrl
+		return HttpUrl(""), ErrInvalidHttpUrl
 	}
 
 	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return HttpUrl(""), errors.ErrInvalidHttpUrl
+		return HttpUrl(""), ErrInvalidHttpUrl
 	}
 
 	if parsed.Host == "" {
-		return HttpUrl(""), errors.ErrInvalidHttpUrl
+		return HttpUrl(""), ErrInvalidHttpUrl
 	}
 
 	// Reconstruct the URL to ensure consistent formatting

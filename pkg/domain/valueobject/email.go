@@ -21,8 +21,10 @@ import (
 	"net/mail"
 	"strings"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
+
+var ErrInvalidEmail = domerr.NewDomainError("invalid email format", nil).WithType(domerr.Validation)
 
 type Email string
 
@@ -35,20 +37,20 @@ func NewEmail(email string) (Email, error) {
 	parsed, err := mail.ParseAddress(sanitized)
 
 	if err != nil {
-		return Email(""), &errors.ErrInvalidEmail
+		return Email(""), ErrInvalidEmail
 	}
 
 	// Extract domain from parsed email
 	parts := strings.Split(parsed.Address, "@")
 	if len(parts) != 2 {
-		return Email(""), &errors.ErrInvalidEmail
+		return Email(""), ErrInvalidEmail
 	}
 
 	domain := parts[1]
 
 	// Check if domain contains a dot
 	if !strings.Contains(domain, ".") {
-		return Email(""), &errors.ErrInvalidEmail
+		return Email(""), ErrInvalidEmail
 	}
 
 	return Email(sanitized), nil

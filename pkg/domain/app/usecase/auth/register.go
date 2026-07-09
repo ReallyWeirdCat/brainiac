@@ -27,7 +27,6 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/mail"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
-	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
@@ -83,7 +82,7 @@ func (r *RegisterUsecase) Execute(ctx context.Context, req RegistrationBeginRequ
 		return nil, err
 	}
 	if passwordCompromised {
-		return nil, domerr.ErrCompromisedPassword
+		return nil, valueobject.ErrCompromisedPassword
 	}
 
 	uow, err := r.uow.Begin(ctx)

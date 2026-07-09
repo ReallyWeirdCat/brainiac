@@ -21,10 +21,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var languageCodePattern = regexp.MustCompile(`^[a-z]{2}$`)
+
+var ErrInvalidLanguageCode = domerr.NewDomainError("invalid language code format", nil).WithType(domerr.Validation)
 
 // LanguageCode represents a validated language code.
 type LanguageCode string
@@ -36,7 +38,7 @@ func NewLanguageCode(languageCode string) (LanguageCode, error) {
 	sanitized := strings.ToLower(languageCode)
 
 	if !languageCodePattern.MatchString(sanitized) {
-		return LanguageCode(""), errors.ErrInvalidLanguageCode
+		return LanguageCode(""), ErrInvalidLanguageCode
 	}
 	return LanguageCode(sanitized), nil
 }

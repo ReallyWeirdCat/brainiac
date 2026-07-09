@@ -21,10 +21,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 var nicknamePattern = regexp.MustCompile(`^[\p{L}\p{N}_ ]{3,30}$`)
+var ErrInvalidNickname = domerr.NewDomainError("invalid nickname format", nil).WithType(domerr.Validation)
 
 // Nickname represents a validated nickname.
 type Nickname string
@@ -37,7 +38,7 @@ func NewNickname(nickname string) (Nickname, error) {
 	sanitized := strings.TrimSpace(nickname)
 
 	if !nicknamePattern.MatchString(sanitized) {
-		return Nickname(""), errors.ErrInvalidNickname
+		return Nickname(""), ErrInvalidNickname
 	}
 	return Nickname(sanitized), nil
 }

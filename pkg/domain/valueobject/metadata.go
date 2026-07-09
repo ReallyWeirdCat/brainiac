@@ -21,7 +21,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
+
+var ErrInvalidMetadata = domerr.NewDomainError("invalid metadata", nil).WithType(domerr.Validation)
 
 type Metadata json.RawMessage
 
@@ -29,7 +32,7 @@ var _ ValueObject = Metadata([]byte("{}"))
 
 func NewMetadata(data []byte) (Metadata, error) {
 	if !json.Valid(data) {
-		return Metadata{}, errors.New("invalid JSON")
+		return Metadata{}, ErrInvalidMetadata.FromError(errors.New("invalid JSON"))
 	}
 	return Metadata(data), nil
 }
@@ -37,7 +40,7 @@ func NewMetadata(data []byte) (Metadata, error) {
 func NewMetadataFromMap(data map[string]any) (Metadata, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
-		return Metadata{}, err
+		return Metadata{}, ErrInvalidMetadata.FromError(err)
 	}
 	return Metadata(b), nil
 }
@@ -70,7 +73,7 @@ func (m Metadata) String() string {
 
 func canonicalize(m Metadata) ([]byte, error) {
 	if len(m) == 0 {
-		return nil, errors.New("nil or empty metadata")
+		return nil, ErrInvalidMetadata.FromError(errors.New("nil or empty metadata"))
 	}
 	var obj any
 	dec := json.NewDecoder(bytes.NewReader(m))

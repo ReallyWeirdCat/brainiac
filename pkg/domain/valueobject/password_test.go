@@ -21,8 +21,6 @@ import (
 	errs "errors"
 	"reflect"
 	"testing"
-
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
 
 func TestNewPassword(t *testing.T) {
@@ -57,7 +55,7 @@ func TestNewPassword(t *testing.T) {
 				password: "Abc1fa!",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "too long - more than 72 bytes",
@@ -65,7 +63,7 @@ func TestNewPassword(t *testing.T) {
 				password: string(make([]byte, 73)),
 			},
 			want:    Password(""),
-			wantErr: errors.ErrPasswordTooLong,
+			wantErr: ErrPasswordTooLong,
 		},
 		{
 			name: "missing digit",
@@ -73,7 +71,7 @@ func TestNewPassword(t *testing.T) {
 				password: "Abcdefgh!",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "missing lowercase",
@@ -81,7 +79,7 @@ func TestNewPassword(t *testing.T) {
 				password: "ABCDEF1!",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "missing uppercase",
@@ -89,7 +87,7 @@ func TestNewPassword(t *testing.T) {
 				password: "abcdef1!",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "missing symbol",
@@ -97,7 +95,7 @@ func TestNewPassword(t *testing.T) {
 				password: "Abcdefg1",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "invalid characters (tab)",
@@ -105,7 +103,7 @@ func TestNewPassword(t *testing.T) {
 				password: "Valid1!\t",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 		{
 			name: "invalid characters (Cyrillic)",
@@ -113,7 +111,7 @@ func TestNewPassword(t *testing.T) {
 				password: "Валид1!\t",
 			},
 			want:    Password(""),
-			wantErr: errors.ErrWeakPassword,
+			wantErr: ErrWeakPassword,
 		},
 	}
 

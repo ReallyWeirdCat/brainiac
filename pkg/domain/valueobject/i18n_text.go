@@ -22,7 +22,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	domerr "github.com/ReallyWeirdCat/brainiac/pkg/domain/errors"
 )
+
+var ErrInvalidI18nText = domerr.NewDomainError("invalid I18nText", nil).WithType(domerr.Validation)
 
 type I18nText json.RawMessage
 
@@ -30,15 +34,15 @@ var _ ValueObject = I18nText([]byte("{}"))
 
 func NewI18nText(data []byte) (I18nText, error) {
 	if !json.Valid(data) {
-		return I18nText{}, errors.New("invalid JSON")
+		return I18nText{}, ErrInvalidI18nText.FromError(errors.New("invalid json"))
 	}
 	var m map[string]json.RawMessage
 	if err := json.Unmarshal(data, &m); err != nil {
-		return I18nText{}, errors.New("I18nText must be a JSON object")
+		return I18nText{}, ErrInvalidI18nText.FromError(errors.New("I18nText must be a JSON object"))
 	}
 	for key := range m {
 		if _, err := NewLanguageCode(key); err != nil {
-			return I18nText{}, fmt.Errorf("invalid language code %q: %w", key, err)
+			return I18nText{}, ErrInvalidI18nText.FromError(fmt.Errorf("invalid language code %q: %w", key, err))
 		}
 	}
 	return I18nText(data), nil
@@ -47,7 +51,7 @@ func NewI18nText(data []byte) (I18nText, error) {
 func NewI18nTextFromMap(data map[string]any) (I18nText, error) {
 	for key := range data {
 		if _, err := NewLanguageCode(key); err != nil {
-			return I18nText{}, fmt.Errorf("invalid language code %q: %w", key, err)
+			return I18nText{}, ErrInvalidI18nText.FromError(fmt.Errorf("invalid language code %q: %w", key, err))
 		}
 	}
 	b, err := json.Marshal(data)
@@ -100,7 +104,7 @@ func (i I18nText) String() string {
 
 func canonicalizeI18n(i I18nText) ([]byte, error) {
 	if len(i) == 0 {
-		return nil, errors.New("nil or empty I18nText")
+		return nil, ErrInvalidI18nText.FromError(errors.New("nil or empty I18nText"))
 	}
 	var obj any
 	dec := json.NewDecoder(bytes.NewReader(i))

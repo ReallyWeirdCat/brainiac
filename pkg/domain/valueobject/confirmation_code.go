@@ -27,6 +27,7 @@ import (
 )
 
 var confirmationCodeRegex = regexp.MustCompile(`^[0-9]{6}$`)
+var ErrInvalidConfirmationCode = domerr.NewDomainError("invalid confirmation code", nil).WithType(domerr.Validation)
 
 func generateCode() (string, error) {
 	max := big.NewInt(1_000_000)
@@ -55,7 +56,7 @@ func NewConfirmationCode() (ConfirmationCode, error) {
 
 func ConfirmationCodeFromString(code string) (ConfirmationCode, error) {
 	if !validateCode(code) {
-		return ConfirmationCode(""), domerr.ErrInvalidConfirmationCode
+		return ConfirmationCode(""), ErrInvalidConfirmationCode
 	}
 	return ConfirmationCode(code), nil
 }
