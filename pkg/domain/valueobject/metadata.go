@@ -59,8 +59,15 @@ func (m Metadata) Equals(other any) bool {
 	return bytes.Equal(canon1, canon2)
 }
 
+func (m Metadata) Validate() error {
+	if !json.Valid([]byte(m)) {
+		return ErrInvalidMetadata.FromError(errors.New("invalid JSON"))
+	}
+	return nil
+}
+
 func (m Metadata) IsValid() bool {
-	return json.Valid(m)
+	return m.Validate() == nil
 }
 
 func (m Metadata) IsZero() bool {

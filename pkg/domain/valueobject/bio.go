@@ -63,9 +63,13 @@ func (b Bio) Equals(other any) bool {
 	return string(b) == string(otherBio)
 }
 
-func (b Bio) IsValid() bool {
+func (b Bio) Validate() error {
 	_, err := NewBio(string(b))
-	return err == nil
+	return err
+}
+
+func (b Bio) IsValid() bool {
+	return b.Validate() == nil
 }
 
 func (b Bio) IsZero() bool {

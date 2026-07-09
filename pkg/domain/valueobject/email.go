@@ -68,9 +68,13 @@ func (e Email) Equals(other any) bool {
 	return string(e) == string(otherEmail)
 }
 
-func (e Email) IsValid() bool {
+func (e Email) Validate() error {
 	_, err := NewEmail(string(e))
-	return err == nil
+	return err
+}
+
+func (e Email) IsValid() bool {
+	return e.Validate() == nil
 }
 
 func (e Email) IsZero() bool {

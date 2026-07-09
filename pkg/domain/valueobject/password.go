@@ -89,9 +89,13 @@ func (p Password) Equals(other any) bool {
 	return string(p) == string(otherPassword)
 }
 
-func (p Password) IsValid() bool {
+func (p Password) Validate() error {
 	_, err := NewPassword(string(p))
-	return err == nil
+	return err
+}
+
+func (p Password) IsValid() bool {
+	return p.Validate() == nil
 }
 
 func (p Password) IsZero() bool {

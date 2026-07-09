@@ -76,9 +76,13 @@ func (h HttpUrl) Equals(other any) bool {
 	return string(h) == string(otherUrl)
 }
 
-func (h HttpUrl) IsValid() bool {
+func (h HttpUrl) Validate() error {
 	_, err := NewHttpUrl(string(h))
-	return err == nil
+	return err
+}
+
+func (h HttpUrl) IsValid() bool {
+	return h.Validate() == nil
 }
 
 func (h HttpUrl) IsZero() bool {

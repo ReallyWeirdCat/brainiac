@@ -50,9 +50,13 @@ func (n Name) Equals(other any) bool {
 	return string(n) == string(otherName)
 }
 
-func (n Name) IsValid() bool {
+func (n Name) Validate() error {
 	_, err := NewName(string(n))
-	return err == nil
+	return err
+}
+
+func (n Name) IsValid() bool {
+	return n.Validate() == nil
 }
 
 func (n Name) IsZero() bool {

@@ -34,7 +34,7 @@ var _ ValueObject = I18nText([]byte("{}"))
 
 func NewI18nText(data []byte) (I18nText, error) {
 	if !json.Valid(data) {
-		return I18nText{}, ErrInvalidI18nText.FromError(errors.New("invalid json"))
+		return I18nText{}, ErrInvalidI18nText.FromError(errors.New("invalid JSON"))
 	}
 	var m map[string]json.RawMessage
 	if err := json.Unmarshal(data, &m); err != nil {
@@ -75,23 +75,27 @@ func (i I18nText) Equals(other any) bool {
 	return bytes.Equal(canon1, canon2)
 }
 
-func (i I18nText) IsValid() bool {
+func (i I18nText) Validate() error {
 	if !json.Valid(i) {
-		return false
+		return ErrInvalidI18nText.FromError(errors.New("invalid JSON"))
 	}
 	if len(i) == 0 {
-		return false
+		return ErrInvalidI18nText.FromError(errors.New("no entries"))
 	}
 	var m map[string]json.RawMessage
 	if err := json.Unmarshal(i, &m); err != nil {
-		return false
+		return ErrInvalidI18nText.FromError(err)
 	}
 	for key := range m {
 		if _, err := NewLanguageCode(key); err != nil {
-			return false
+			return ErrInvalidI18nText.FromError(err)
 		}
 	}
-	return true
+	return nil
+}
+
+func (i I18nText) IsValid() bool {
+	return i.Validate() == nil
 }
 
 func (i I18nText) IsZero() bool {

@@ -66,10 +66,13 @@ func (c ConfirmationCode) Equals(other any) bool {
 	return ok && c == o
 }
 
-func (c ConfirmationCode) IsValid() bool {
-	s := string(c)
+func (c ConfirmationCode) Validate() error {
+	_, err := ConfirmationCodeFromString(string(c))
+	return err
+}
 
-	return validateCode(s)
+func (c ConfirmationCode) IsValid() bool {
+	return c.Validate() == nil
 }
 
 func (c ConfirmationCode) IsZero() bool {

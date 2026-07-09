@@ -51,9 +51,13 @@ func (u Username) Equals(other any) bool {
 	return string(u) == string(otherUser)
 }
 
-func (u Username) IsValid() bool {
+func (u Username) Validate() error {
 	_, err := NewUsername(string(u))
-	return err == nil
+	return err
+}
+
+func (u Username) IsValid() bool {
+	return u.Validate() == nil
 }
 
 func (u Username) IsZero() bool {

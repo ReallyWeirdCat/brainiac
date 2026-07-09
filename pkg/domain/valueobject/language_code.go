@@ -55,9 +55,13 @@ func (l LanguageCode) Equals(other any) bool {
 	return string(l) == string(otherCode)
 }
 
-func (l LanguageCode) IsValid() bool {
+func (l LanguageCode) Validate() error {
 	_, err := NewLanguageCode(string(l))
-	return err == nil
+	return err
+}
+
+func (l LanguageCode) IsValid() bool {
+	return l.Validate() == nil
 }
 
 func (l LanguageCode) IsZero() bool {

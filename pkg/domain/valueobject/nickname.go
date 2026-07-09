@@ -55,9 +55,13 @@ func (n Nickname) Equals(other any) bool {
 	return string(n) == string(otherNick)
 }
 
-func (n Nickname) IsValid() bool {
+func (n Nickname) Validate() error {
 	_, err := NewNickname(string(n))
-	return err == nil
+	return err
+}
+
+func (n Nickname) IsValid() bool {
+	return n.Validate() == nil
 }
 
 func (n Nickname) IsZero() bool {

@@ -41,9 +41,13 @@ func NewGUID(guid string) (GUID, error) {
 	return GUID(guid), nil
 }
 
-func (g GUID) IsValid() bool {
+func (g GUID) Validate() error {
 	_, err := NewGUID(string(g))
-	return err == nil
+	return err
+}
+
+func (g GUID) IsValid() bool {
+	return g.Validate() == nil
 }
 
 func (g GUID) Equals(other any) bool {
