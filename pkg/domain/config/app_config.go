@@ -29,6 +29,10 @@ type AppConfig struct {
 	Login struct {
 		EnforceEmail bool `yaml:"enforce_email" envconfig:"LOGIN_ENFORCE_EMAIL"`
 	} `yaml:"login"`
+	Security struct {
+		CheckCompromisedPasswords    bool   `yaml:"check_compromised_passwords" envconfig:"SECURITY_CHECK_COMPROMISED_PASSWORDS"`
+		CompromisedPasswordsFilePath string `yaml:"compromised_passwords_file_path" envconfig:"SECURITY_COMPROMISED_PASSWORDS_FILE_PATH"`
+	} `yaml:"security"`
 	SMTP struct {
 		Enable   bool   `yaml:"enable" envconfig:"SMTP_ENABLE"`
 		Host     string `yaml:"host" envconfig:"SMTP_HOST"`

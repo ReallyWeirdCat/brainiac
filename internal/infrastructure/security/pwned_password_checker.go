@@ -19,16 +19,22 @@ package security
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 	"sync"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
+
+const maxFileCapacity = 800 * 1024 * 1024 // 800MB
 
 // PwnedPasswordChecker checks passwords against a local rockyou.txt file.
 type PwnedPasswordChecker struct {
 	compromised       map[string]struct{}
+	enabled           bool
 	once              sync.Once
 	minPasswordLength int
 	filePath          string
@@ -37,8 +43,12 @@ type PwnedPasswordChecker struct {
 
 var _ ports.CompromisedPasswordChecker = (*PwnedPasswordChecker)(nil)
 
-func NewPwnedPasswordChecker(filePath string) *PwnedPasswordChecker {
-	return &PwnedPasswordChecker{filePath: filePath}
+func NewPwnedPasswordChecker(config config.AppConfig) ports.CompromisedPasswordChecker {
+	return &PwnedPasswordChecker{
+		filePath:          config.Security.CompromisedPasswordsFilePath,
+		enabled:           config.Security.CheckCompromisedPasswords,
+		minPasswordLength: valueobject.MinPasswordLength,
+	}
 }
 
 func (p *PwnedPasswordChecker) load() {
@@ -52,9 +62,8 @@ func (p *PwnedPasswordChecker) load() {
 	p.compromised = make(map[string]struct{})
 	scanner := bufio.NewScanner(file)
 	// Increase buffer if lines are long (most passwords are short)
-	const maxCapacity = 512 * 1024 // 512KB
-	buf := make([]byte, maxCapacity)
-	scanner.Buffer(buf, maxCapacity)
+	buf := make([]byte, maxFileCapacity)
+	scanner.Buffer(buf, maxFileCapacity)
 
 	for scanner.Scan() {
 		pass := strings.TrimSpace(scanner.Text())
@@ -70,6 +79,13 @@ func (p *PwnedPasswordChecker) load() {
 }
 
 func (p *PwnedPasswordChecker) IsCompromised(password string) (bool, error) {
+	if !p.enabled {
+		p.once.Do(func() {
+			// TODO: use logger to warn about disabled feature
+			fmt.Println("Security.CheckCompromisedPasswords is disabled, make sure this is intended")
+		})
+		return false, nil
+	}
 	p.once.Do(p.load)
 	if p.loadErr != nil {
 		return false, p.loadErr

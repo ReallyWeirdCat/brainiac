@@ -24,13 +24,17 @@ import (
 
 type BcryptPasswordHasher struct{}
 
-var _ ports.PasswordHasher = BcryptPasswordHasher{}
+var _ ports.PasswordHasher = &BcryptPasswordHasher{}
 
-func (b BcryptPasswordHasher) Compare(hashedPassword string, password string) error {
+func NewBcryptHasher() ports.PasswordHasher {
+	return &BcryptPasswordHasher{}
+}
+
+func (b *BcryptPasswordHasher) Compare(hashedPassword string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func (b BcryptPasswordHasher) Hash(password string) (string, error) {
+func (b *BcryptPasswordHasher) Hash(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
