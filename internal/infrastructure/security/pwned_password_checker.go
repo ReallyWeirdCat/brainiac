@@ -19,7 +19,6 @@ package security
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -33,8 +32,10 @@ const maxFileCapacity = 800 * 1024 * 1024 // 800MB
 
 // PwnedPasswordChecker checks passwords against a local rockyou.txt file.
 type PwnedPasswordChecker struct {
+	logger            ports.Logger
 	compromised       map[string]struct{}
 	enabled           bool
+	repoURL           string
 	once              sync.Once
 	minPasswordLength int
 	filePath          string
@@ -43,10 +44,12 @@ type PwnedPasswordChecker struct {
 
 var _ ports.CompromisedPasswordChecker = (*PwnedPasswordChecker)(nil)
 
-func NewPwnedPasswordChecker(config config.AppConfig) ports.CompromisedPasswordChecker {
+func NewPwnedPasswordChecker(config config.AppConfig, logger ports.Logger) ports.CompromisedPasswordChecker {
 	return &PwnedPasswordChecker{
-		filePath:          config.Security.CompromisedPasswordsFilePath,
-		enabled:           config.Security.CheckCompromisedPasswords,
+		logger:            logger,
+		filePath:          config.Security.Passwords.CompromisedPasswordsFilePath,
+		enabled:           config.Security.Passwords.CheckCompromisedPasswords,
+		repoURL:           config.Security.Passwords.CompromisedPasswordsRepoURL,
 		minPasswordLength: valueobject.MinPasswordLength,
 	}
 }
@@ -81,8 +84,11 @@ func (p *PwnedPasswordChecker) load() {
 func (p *PwnedPasswordChecker) IsCompromised(password string) (bool, error) {
 	if !p.enabled {
 		p.once.Do(func() {
-			// TODO: use logger to warn about disabled feature
-			fmt.Println("Security.CheckCompromisedPasswords is disabled, make sure this is intended")
+			p.logger.Warn("Security.Passwords.CheckCompromisedPasswords is disabled, make sure this is intended")
+
+			if p.repoURL != "" {
+				p.logger.Warn("Security.Passwords.CompromisedPasswordsRepoURL is not supported by this implementation")
+			}
 		})
 		return false, nil
 	}

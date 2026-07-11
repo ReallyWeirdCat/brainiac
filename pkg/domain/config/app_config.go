@@ -30,8 +30,11 @@ type AppConfig struct {
 		EnforceEmail bool `yaml:"enforce_email" envconfig:"LOGIN_ENFORCE_EMAIL"`
 	} `yaml:"login"`
 	Security struct {
-		CheckCompromisedPasswords    bool   `yaml:"check_compromised_passwords" envconfig:"SECURITY_CHECK_COMPROMISED_PASSWORDS"`
-		CompromisedPasswordsFilePath string `yaml:"compromised_passwords_file_path" envconfig:"SECURITY_COMPROMISED_PASSWORDS_FILE_PATH"`
+		Passwords struct {
+			CheckCompromisedPasswords    bool   `yaml:"check_compromised_passwords" envconfig:"SECURITY_PASSWORDS_CHECK_COMPROMISED_PASSWORDS"`
+			CompromisedPasswordsFilePath string `yaml:"compromised_passwords_file_path" envconfig:"SECURITY_PASSWORDS_COMPROMISED_PASSWORDS_FILE_PATH"`
+			CompromisedPasswordsRepoURL  string `yaml:"compromised_passwords_repo_url" envconfig:"SECURITY_PASSWORDS_COMPROMISED_PASSWORDS_REPO_URL"`
+		} `yaml:"passwords"`
 	} `yaml:"security"`
 	SMTP struct {
 		Enable   bool   `yaml:"enable" envconfig:"SMTP_ENABLE"`

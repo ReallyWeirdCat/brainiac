@@ -27,6 +27,7 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/mail"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
@@ -39,6 +40,7 @@ type RegistrationBeginUsecase struct {
 	regCodeCache     ports.Cache[entity.RegistrationCode]
 	hasher           ports.PasswordHasher
 	pwdChecker       ports.CompromisedPasswordChecker
+	logger           ports.Logger
 	sendEmailUsecase EmailSender
 	config           config.AppConfig
 }
@@ -48,6 +50,7 @@ func NewRegistrationBeginUsecase(
 	regCodeCache ports.Cache[entity.RegistrationCode],
 	hasher ports.PasswordHasher,
 	pwdChecker ports.CompromisedPasswordChecker,
+	logger ports.Logger,
 	sendEmailUsecase *mail.SendEmailUsecase,
 	config config.AppConfig,
 ) *RegistrationBeginUsecase {
@@ -56,6 +59,7 @@ func NewRegistrationBeginUsecase(
 		regCodeCache:     regCodeCache,
 		hasher:           hasher,
 		pwdChecker:       pwdChecker,
+		logger:           logger,
 		sendEmailUsecase: sendEmailUsecase,
 		config:           config,
 	}
@@ -103,8 +107,8 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 		return nil, ErrUsernameTaken
 	}
 
-	emailRegistered, err := uow.AppUserCredentials().ExistsByEmail(ctx, email)
-	if err != nil {
+	existingCredential, err := uow.AppUserCredentials().GetByEmail(ctx, email)
+	if err != nil && !errors.Is(err, repository.ErrEntityNotFound) {
 		return nil, err
 	}
 
@@ -126,7 +130,7 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 		return nil, err
 	}
 
-	if !emailRegistered {
+	if existingCredential == nil {
 		_, err = r.sendEmailUsecase.Execute(ctx, mail.SendEmailRequest{
 			To:      []string{email.String()},
 			Subject: "Brainiac Registration",
@@ -140,12 +144,14 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 			}
 			return nil, err
 		}
+		r.logger.Info("requested registration", "username", username.String())
 		return &RegistrationBeginResponse{
 			Username: username.String(),
 		}, nil
 	}
 
 	// Proceed as if email is not yet registered to prevent email enumeration attacks
+	r.logger.Warn("attempted registration via registered credentials", "user", existingCredential.AppUserGUID, "username", username.String())
 	return &RegistrationBeginResponse{
 		Username: username.String(),
 	}, nil

@@ -21,6 +21,8 @@ import (
 	"os"
 	"sync"
 	"testing"
+
+	"github.com/ReallyWeirdCat/brainiac/internal/adapter/logger"
 )
 
 func TestPwnedPasswordChecker_load(t *testing.T) {
@@ -64,8 +66,12 @@ func TestPwnedPasswordChecker_load(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			// Create a new PwnedPasswordChecker with a fresh sync.Once (do not copy from tt.fields)
 			p := &PwnedPasswordChecker{
+				logger:            logger.NewMockLogger(),
+				enabled:           true,
+				repoURL:           "",
 				compromised:       tt.fields.compromised,
 				minPasswordLength: 8,
 				once:              sync.Once{}, // fresh, no copy
@@ -170,6 +176,9 @@ func TestPwnedPasswordChecker_IsCompromised(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PwnedPasswordChecker{
+				logger:      logger.NewMockLogger(),
+				enabled:     true,
+				repoURL:     "",
 				compromised: tt.fields.compromised,
 				once:        sync.Once{},
 				filePath:    tt.fields.filePath,
