@@ -21,6 +21,10 @@ import (
 	"errors"
 )
 
+type AppConfigProvider interface {
+	Get() AppConfig
+}
+
 type AppConfig struct {
 	Registration struct {
 		Enable       bool `yaml:"enable" envconfig:"REGISTRATION_ENABLE"`
@@ -31,9 +35,11 @@ type AppConfig struct {
 	} `yaml:"login"`
 	Security struct {
 		Passwords struct {
-			CheckCompromisedPasswords    bool   `yaml:"check_compromised_passwords" envconfig:"SECURITY_PASSWORDS_CHECK_COMPROMISED_PASSWORDS"`
-			CompromisedPasswordsFilePath string `yaml:"compromised_passwords_file_path" envconfig:"SECURITY_PASSWORDS_COMPROMISED_PASSWORDS_FILE_PATH"`
-			CompromisedPasswordsRepoURL  string `yaml:"compromised_passwords_repo_url" envconfig:"SECURITY_PASSWORDS_COMPROMISED_PASSWORDS_REPO_URL"`
+			Compromised struct {
+				CheckPasswords bool   `yaml:"check_compromised_passwords" envconfig:"SECURITY_PASSWORDS_COMPROMISED_CHECK_PASSWORDS"`
+				FilePath       string `yaml:"compromised_passwords_file_path" envconfig:"SECURITY_PASSWORDS_COMPROMISED_FILE_PATH"`
+				RepoURL        string `yaml:"compromised_passwords_repo_url" envconfig:"SECURITY_PASSWORDS_COMPROMISED_REPO_URL"`
+			} `yaml:"compromised"`
 		} `yaml:"passwords"`
 	} `yaml:"security"`
 	SMTP struct {
@@ -45,10 +51,19 @@ type AppConfig struct {
 		UseTLS   bool   `yaml:"use_tls" envconfig:"SMTP_USE_TLS"`
 		From     string `yaml:"from" envconfig:"SMTP_FROM"`
 	} `yaml:"smtp"`
+	Database struct {
+		URI string `yaml:"uri" envconfig:"DATABASE_URI"`
+	} `yaml:"database"`
 }
 
 func (a *AppConfig) Validate() error {
 	var errs []error
+
+	if a.Security.Passwords.Compromised.CheckPasswords {
+		if a.Security.Passwords.Compromised.FilePath == "" {
+			errs = append(errs, errors.New("Security.Passwords.Compromised.FilePath not specified. Set valid file path or disable Security.Passwords.Compromised.CheckPasswords"))
+		}
+	}
 
 	if a.SMTP.Enable {
 		if a.SMTP.Host == "" {
@@ -58,11 +73,15 @@ func (a *AppConfig) Validate() error {
 			errs = append(errs, errors.New("SMTP port not specified"))
 		}
 		if a.SMTP.Username == "" {
-			errs = append(errs, errors.New("SMTP username now specified"))
+			errs = append(errs, errors.New("SMTP username not specified"))
 		}
 		if a.SMTP.From == "" {
 			errs = append(errs, errors.New("SMTP from not specified"))
 		}
+	}
+
+	if a.Database.URI == "" {
+		errs = append(errs, errors.New("Database URI not specified"))
 	}
 
 	if len(errs) == 0 {
@@ -70,4 +89,25 @@ func (a *AppConfig) Validate() error {
 	}
 
 	return errors.Join(errs...)
+}
+
+func (a *AppConfig) SetDefault() {
+	a.Registration.Enable = false
+	a.Registration.RequireEmail = false
+
+	a.Login.EnforceEmail = false
+
+	a.Security.Passwords.Compromised.CheckPasswords = false
+	a.Security.Passwords.Compromised.FilePath = ""
+	a.Security.Passwords.Compromised.RepoURL = ""
+
+	a.SMTP.Enable = false
+	a.SMTP.Host = "example.com"
+	a.SMTP.Port = 465
+	a.SMTP.Username = "user"
+	a.SMTP.Password = "password"
+	a.SMTP.UseTLS = true
+	a.SMTP.From = "user@example.com"
+
+	a.Database.URI = "postgres://user:password@localhost:5432/dbname"
 }

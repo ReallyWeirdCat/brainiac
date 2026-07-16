@@ -47,9 +47,9 @@ var _ ports.CompromisedPasswordChecker = (*PwnedPasswordChecker)(nil)
 func NewPwnedPasswordChecker(config config.AppConfig, logger ports.Logger) ports.CompromisedPasswordChecker {
 	return &PwnedPasswordChecker{
 		logger:            logger,
-		filePath:          config.Security.Passwords.CompromisedPasswordsFilePath,
-		enabled:           config.Security.Passwords.CheckCompromisedPasswords,
-		repoURL:           config.Security.Passwords.CompromisedPasswordsRepoURL,
+		enabled:           config.Security.Passwords.Compromised.CheckPasswords,
+		filePath:          config.Security.Passwords.Compromised.FilePath,
+		repoURL:           config.Security.Passwords.Compromised.RepoURL,
 		minPasswordLength: valueobject.MinPasswordLength,
 	}
 }
