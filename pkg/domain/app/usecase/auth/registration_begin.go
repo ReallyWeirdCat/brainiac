@@ -52,7 +52,7 @@ func NewRegistrationBeginUsecase(
 	pwdChecker ports.CompromisedPasswordChecker,
 	logger ports.Logger,
 	sendEmailUsecase *mail.SendEmailUsecase,
-	config config.AppConfig,
+	config config.AppConfigProvider,
 ) *RegistrationBeginUsecase {
 	return &RegistrationBeginUsecase{
 		uow:              uow,
@@ -61,7 +61,7 @@ func NewRegistrationBeginUsecase(
 		pwdChecker:       pwdChecker,
 		logger:           logger,
 		sendEmailUsecase: sendEmailUsecase,
-		config:           config,
+		config:           config.Get(),
 	}
 }
 

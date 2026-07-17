@@ -36,8 +36,8 @@ type Teacher struct {
 	DeletedAt        *time.Time           `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Teacher{}
+var _ Entity = &Teacher{}
 
-func (t Teacher) IsValid() bool {
+func (t *Teacher) IsValid() bool {
 	return t.AppUserGUID.IsValid() && t.ContactInfo.IsValid()
 }

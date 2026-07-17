@@ -33,9 +33,9 @@ type CourseLanguage struct {
 	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = CourseLanguage{}
+var _ Entity = &CourseLanguage{}
 
-func (c CourseLanguage) IsValid() bool {
+func (c *CourseLanguage) IsValid() bool {
 
 	if c.CalculatedSupportPercentage < 0 || c.CalculatedSupportPercentage > 100 {
 		return false

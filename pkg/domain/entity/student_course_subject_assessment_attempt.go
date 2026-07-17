@@ -35,9 +35,9 @@ type StudentCourseSubjectAssessmentAttempt struct {
 	DeletedAt     *time.Time             `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = StudentCourseSubjectAssessmentAttempt{}
+var _ Entity = &StudentCourseSubjectAssessmentAttempt{}
 
-func (s StudentCourseSubjectAssessmentAttempt) IsValid() bool {
+func (s *StudentCourseSubjectAssessmentAttempt) IsValid() bool {
 	if s.Score < 0 || s.Score > 100 {
 		return false
 	}

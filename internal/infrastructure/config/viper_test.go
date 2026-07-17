@@ -75,7 +75,7 @@ database:
 `
 	cfgPath := writeConfigFile(t, tmpDir, "config.yaml", cfgContent)
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	cfg := provider.Get()
 
 	if !cfg.Registration.Enable {
@@ -129,7 +129,7 @@ registration:
   enable: true
 `)
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	cfg1 := provider.Get()
 
 	// Remove the file to ensure second call does not re‑read
@@ -152,7 +152,7 @@ func TestNewViperConfig_Get_CreatesDefaultConfig(t *testing.T) {
 	tmpDir := t.TempDir()
 	cfgPath := filepath.Join(tmpDir, "nonexistent.yaml")
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	cfg := provider.Get()
 
 	// Verify the file was created
@@ -203,7 +203,7 @@ smtp:
 	// Also set another env var to override a field not present in file
 	t.Setenv("SMTP_USERNAME", "envuser")
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	cfg := provider.Get()
 
 	if cfg.SMTP.Host != "envhost" {
@@ -224,7 +224,7 @@ smtp:
 `)
 
 	panicVal := recoverPanic(t, func() {
-		provider := NewViperConfig(cfgPath)
+		provider := NewViperConfigWithPath(cfgPath)
 		provider.Get()
 	})
 
@@ -242,7 +242,7 @@ func TestNewViperConfig_Get_InvalidYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 	cfgPath := writeConfigFile(t, tmpDir, "config.yaml", `broken: yaml: :`)
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	panicVal := recoverPanic(t, func() {
 		provider.Get()
 	})
@@ -315,7 +315,7 @@ func TestNewViperConfig_Get_PanicsOnLoadError(t *testing.T) {
 	// For example, a directory instead of a file.
 	tmpDir := t.TempDir()
 	// Provide a directory as config "file"
-	provider := NewViperConfig(tmpDir)
+	provider := NewViperConfigWithPath(tmpDir)
 	panicVal := recoverPanic(t, func() {
 		provider.Get()
 	})
@@ -329,7 +329,7 @@ func TestNewViperConfig_Get_DefaultConfigValidation(t *testing.T) {
 	tmpDir := t.TempDir()
 	cfgPath := filepath.Join(tmpDir, "config.yaml")
 
-	provider := NewViperConfig(cfgPath)
+	provider := NewViperConfigWithPath(cfgPath)
 	// Recover just in case
 	panicVal := recoverPanic(t, func() {
 		_ = provider.Get()

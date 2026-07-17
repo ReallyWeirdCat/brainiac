@@ -12,6 +12,8 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+const defaultConfigLocation = "./config.yaml"
+
 type viperConfig struct {
 	mu         sync.Mutex
 	loaded     bool
@@ -19,7 +21,11 @@ type viperConfig struct {
 	cfg        config.AppConfig
 }
 
-func NewViperConfig(configPath string) config.AppConfigProvider {
+func NewViperConfig() config.AppConfigProvider {
+	return &viperConfig{configPath: defaultConfigLocation}
+}
+
+func NewViperConfigWithPath(configPath string) config.AppConfigProvider {
 	return &viperConfig{configPath: configPath}
 }
 
@@ -38,7 +44,7 @@ func (v *viperConfig) Get() config.AppConfig {
 
 func (v *viperConfig) load() error {
 	if v.configPath == "" {
-		v.configPath = "./config.yaml"
+		v.configPath = defaultConfigLocation
 	}
 
 	vpr := viper.New()

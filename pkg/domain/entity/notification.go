@@ -38,9 +38,9 @@ type Notification struct {
 	DeletedAt   *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Notification{}
+var _ Entity = &Notification{}
 
-func (n Notification) IsValid() bool {
+func (n *Notification) IsValid() bool {
 	if !n.GUID.IsValid() || !n.AppUserGUID.IsValid() || !n.Urgency.IsValid() {
 		return false
 	}

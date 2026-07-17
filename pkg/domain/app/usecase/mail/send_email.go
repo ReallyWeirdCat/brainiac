@@ -31,8 +31,8 @@ type SendEmailUsecase struct {
 	mailer ports.Mailer
 }
 
-func NewSendEmailUsecase(config config.AppConfig, mailer ports.Mailer) *SendEmailUsecase {
-	return &SendEmailUsecase{config: config, mailer: mailer}
+func NewSendEmailUsecase(config config.AppConfigProvider, mailer ports.Mailer) *SendEmailUsecase {
+	return &SendEmailUsecase{config: config.Get(), mailer: mailer}
 }
 
 func (s *SendEmailUsecase) Execute(ctx context.Context, req SendEmailRequest) (*SendEmailResponse, error) {

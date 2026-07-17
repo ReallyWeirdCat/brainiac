@@ -35,9 +35,9 @@ type Language struct {
 	DeletedAt    *time.Time               `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Language{}
+var _ Entity = &Language{}
 
-func (l Language) IsValid() bool {
+func (l *Language) IsValid() bool {
 
 	if len(l.EnglishTitle) > 25 {
 		return false

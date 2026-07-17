@@ -36,9 +36,9 @@ type Chat struct {
 	DeletedAt          *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Chat{}
+var _ Entity = &Chat{}
 
-func (c Chat) IsValid() bool {
+func (c *Chat) IsValid() bool {
 	if len(c.Title) > 50 {
 		return false
 	}

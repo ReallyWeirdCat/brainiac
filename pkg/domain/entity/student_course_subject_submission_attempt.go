@@ -36,9 +36,9 @@ type StudentCourseSubjectSubmissionAttempt struct {
 	DeletedAt        *time.Time                `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = StudentCourseSubjectSubmissionAttempt{}
+var _ Entity = &StudentCourseSubjectSubmissionAttempt{}
 
-func (s StudentCourseSubjectSubmissionAttempt) IsValid() bool {
+func (s *StudentCourseSubjectSubmissionAttempt) IsValid() bool {
 	if s.Files != nil && !s.Files.IsValid() {
 		return false
 	}

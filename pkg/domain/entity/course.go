@@ -34,9 +34,9 @@ type Course struct {
 	DeletedAt       *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Course{}
+var _ Entity = &Course{}
 
-func (c Course) IsValid() bool {
+func (c *Course) IsValid() bool {
 
 	if c.TitleI18n != nil && !c.TitleI18n.IsValid() {
 		return false

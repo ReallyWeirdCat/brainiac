@@ -22,7 +22,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ReallyWeirdCat/brainiac/internal/adapter/logger"
+	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/logger"
 )
 
 func TestPwnedPasswordChecker_load(t *testing.T) {

@@ -35,9 +35,9 @@ type StudentGroupMember struct {
 	DeletedAt            *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = StudentGroupMember{}
+var _ Entity = &StudentGroupMember{}
 
-func (s StudentGroupMember) IsValid() bool {
+func (s *StudentGroupMember) IsValid() bool {
 
 	if s.Team != nil && len(*s.Team) > 18 {
 		return false

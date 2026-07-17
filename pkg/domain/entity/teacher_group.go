@@ -37,8 +37,8 @@ type TeacherGroup struct {
 	DeletedAt          *time.Time       `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = TeacherGroup{}
+var _ Entity = &TeacherGroup{}
 
-func (t TeacherGroup) IsValid() bool {
+func (t *TeacherGroup) IsValid() bool {
 	return t.GUID.IsValid() && t.TeacherGUID.IsValid() && t.StudentGroupGUID.IsValid()
 }

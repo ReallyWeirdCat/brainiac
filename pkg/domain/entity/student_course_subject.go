@@ -35,9 +35,9 @@ type StudentCourseSubject struct {
 	DeletedAt         *time.Time             `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = StudentCourseSubject{}
+var _ Entity = &StudentCourseSubject{}
 
-func (s StudentCourseSubject) IsValid() bool {
+func (s *StudentCourseSubject) IsValid() bool {
 	if s.Meta != nil && !s.Meta.IsValid() {
 		return false
 	}

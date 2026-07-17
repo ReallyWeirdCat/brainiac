@@ -54,6 +54,10 @@ type AppConfig struct {
 	Database struct {
 		URI string `yaml:"uri" envconfig:"DATABASE_URI"`
 	} `yaml:"database"`
+	Cache struct {
+		InMemory bool   `yaml:"in_memory" envconfig:"CACHE_IN_MEMORY"`
+		URI      string `yaml:"uri" envconfig:"CACHE_URI"`
+	} `yaml:"cache"`
 }
 
 func (a *AppConfig) Validate() error {
@@ -81,7 +85,13 @@ func (a *AppConfig) Validate() error {
 	}
 
 	if a.Database.URI == "" {
-		errs = append(errs, errors.New("Database URI not specified"))
+		errs = append(errs, errors.New("database URI not specified"))
+	}
+
+	if !a.Cache.InMemory {
+		if a.Cache.URI == "" {
+			errs = append(errs, errors.New("Cache.InMemory was set to false, but cache URI is not specified."))
+		}
 	}
 
 	if len(errs) == 0 {
@@ -105,9 +115,12 @@ func (a *AppConfig) SetDefault() {
 	a.SMTP.Host = "example.com"
 	a.SMTP.Port = 465
 	a.SMTP.Username = "user"
-	a.SMTP.Password = "password"
+	a.SMTP.Password = ""
 	a.SMTP.UseTLS = true
 	a.SMTP.From = "user@example.com"
 
 	a.Database.URI = "postgres://user:password@localhost:5432/dbname"
+
+	a.Cache.InMemory = false
+	a.Cache.URI = "redis://user:password@localhost:6379/0"
 }

@@ -40,9 +40,9 @@ type Message struct {
 	DeletedAt      *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Message{}
+var _ Entity = &Message{}
 
-func (m Message) IsValid() bool {
+func (m *Message) IsValid() bool {
 	if m.ResourceURL != nil && !m.ResourceURL.IsValid() {
 		return false
 	}

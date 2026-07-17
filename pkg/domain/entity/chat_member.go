@@ -37,9 +37,9 @@ type ChatMember struct {
 	DeletedAt      time.Time         `json:"deleted_at"`
 }
 
-var _ Entity = ChatMember{}
+var _ Entity = &ChatMember{}
 
-func (c ChatMember) IsValid() bool {
+func (c *ChatMember) IsValid() bool {
 	if c.Name != nil && len(*c.Name) > 150 {
 		return false
 	}

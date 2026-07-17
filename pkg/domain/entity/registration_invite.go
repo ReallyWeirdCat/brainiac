@@ -43,9 +43,9 @@ type RegistrationInvite struct {
 	DeletedAt            *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = Language{}
+var _ Entity = &Language{}
 
-func (r RegistrationInvite) IsValid() bool {
+func (r *RegistrationInvite) IsValid() bool {
 	if !r.AppUserGUID.IsValid() {
 		return false
 	}

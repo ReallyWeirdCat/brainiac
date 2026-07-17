@@ -34,9 +34,9 @@ type CourseSubjectAssessmentPass struct {
 	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = CourseSubjectAssessmentPass{}
+var _ Entity = &CourseSubjectAssessmentPass{}
 
-func (c CourseSubjectAssessmentPass) IsValid() bool {
+func (c *CourseSubjectAssessmentPass) IsValid() bool {
 	if c.AttemptsLeft < 0 {
 		return false
 	}

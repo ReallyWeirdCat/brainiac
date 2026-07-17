@@ -32,7 +32,7 @@ type RegistrationCode struct {
 	ExpireAt  time.Time                    `json:"expire_at"`
 }
 
-var _ Entity = RegistrationCode{}
+var _ Entity = &RegistrationCode{}
 
 func NewRegistrationCode(username valueobject.Username) (RegistrationCode, error) {
 	code, err := valueobject.NewConfirmationCode()
@@ -49,7 +49,7 @@ func NewRegistrationCode(username valueobject.Username) (RegistrationCode, error
 	}, nil
 }
 
-func (r RegistrationCode) IsValid() bool {
+func (r *RegistrationCode) IsValid() bool {
 	now := time.Now()
 	if now.After(r.ExpireAt) {
 		return false

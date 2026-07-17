@@ -37,9 +37,9 @@ type StudentGroupMemberClassAttendance struct {
 	DeletedAt              *time.Time            `json:"deleted_at,omitempty"`
 }
 
-var _ Entity = StudentGroupMemberClassAttendance{}
+var _ Entity = &StudentGroupMemberClassAttendance{}
 
-func (s StudentGroupMemberClassAttendance) IsValid() bool {
+func (s *StudentGroupMemberClassAttendance) IsValid() bool {
 	if s.ObjectivesCompletion != nil && !s.ObjectivesCompletion.IsValid() {
 		return false
 	}

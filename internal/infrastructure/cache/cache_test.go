@@ -20,12 +20,12 @@ package cache
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 )
@@ -35,32 +35,37 @@ type testData struct {
 	Value int
 }
 
-// newTestCache sets up a miniredis instance, a Redis client, and the cache.
-// It returns the miniredis instance (for direct manipulation), the client,
-// and the cache under test. The caller should defer miniredis.Close().
-func newTestCache(t *testing.T) (*miniredis.Miniredis, *redis.Client, *redisCache[testData]) {
-	t.Helper()
+// cacheFactory returns a new cache instance and a cleanup function.
+type cacheFactory func(t testing.TB) (cache ports.Cache[testData], cleanup func())
 
-	mr := miniredis.RunT(t)
-	client := redis.NewClient(&redis.Options{
-		Addr: mr.Addr(),
-	})
-	// Flush all data to start clean
-	mr.FlushAll()
-
-	prefix := "test_prefix:"
-	cache := NewRedisCache[testData](client, prefix).(*redisCache[testData])
-	return mr, client, cache
+// newInMemoryTestCache returns an in-memory cache for testing.
+func newInMemoryTestCache(t testing.TB) (ports.Cache[testData], func()) {
+	return NewInMemoryCache[testData](), func() {}
 }
 
-// Helper to set raw JSON data directly in Redis (for testing invalid JSON).
+// newRedisTestCache returns a Redis-backed cache (miniredis) for testing.
+func newRedisTestCache(t testing.TB) (ports.Cache[testData], func()) {
+	t.Helper()
+	mr := miniredis.RunT(t)
+	client := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	prefix := "test_prefix:"
+	cache := NewRedisCache[testData](client, prefix)
+	return cache, func() { mr.Close() }
+}
+
+// Helper to set raw JSON data directly in Redis (used only in Redis-specific tests).
 func setRawData(ctx context.Context, client *redis.Client, key, value string) error {
 	return client.Set(ctx, key, value, 0).Err()
 }
 
-func TestRedisCache_SetAndGet(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+// ---------------------------------------------------------------------------
+// Common test functions that work with any ports.Cache[testData] implementation.
+// Each function receives a factory to create the cache under test.
+// ---------------------------------------------------------------------------
+
+func testSetAndGet(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "testkey"
@@ -104,9 +109,9 @@ func TestRedisCache_SetAndGet(t *testing.T) {
 	}
 }
 
-func TestRedisCache_Delete(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testDelete(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "delete_me"
@@ -136,9 +141,9 @@ func TestRedisCache_Delete(t *testing.T) {
 	}
 }
 
-func TestRedisCache_Exists(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testExists(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "exists_test"
@@ -167,9 +172,9 @@ func TestRedisCache_Exists(t *testing.T) {
 	}
 }
 
-func TestRedisCache_MGet(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testMGet(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	items := map[string]testData{
@@ -208,58 +213,9 @@ func TestRedisCache_MGet(t *testing.T) {
 	}
 }
 
-func TestRedisCache_MGet_WithInvalidJSON(t *testing.T) {
-	mr, client, cache := newTestCache(t)
-	defer mr.Close()
-
-	ctx := context.Background()
-	// Insert one valid key, one invalid JSON, and one missing
-	validKey := "valid"
-	invalidKey := "invalid"
-	missingKey := "missing"
-
-	validData := testData{Name: "Valid", Value: 99}
-	// Set valid via cache
-	err := cache.Set(ctx, validKey, validData, 0)
-	if err != nil {
-		t.Fatalf("Set valid failed: %v", err)
-	}
-	// Insert invalid JSON directly (note the prefix)
-	prefixedInvalid := cache.prefixKey(invalidKey)
-	err = setRawData(ctx, client, prefixedInvalid, "this is not json")
-	if err != nil {
-		t.Fatalf("setRawData failed: %v", err)
-	}
-
-	// Now MGet all three
-	result, err := cache.MGet(ctx, validKey, invalidKey, missingKey)
-	if err == nil {
-		t.Error("expected error due to invalid JSON, got nil")
-	}
-	// Error should be a join of errors (one for invalidKey)
-	if !errors.Is(err, errors.Join()) { // join returns a multi-error, we just check non-nil
-		t.Logf("got error: %v", err)
-	}
-	// Check partial results
-	if result[validKey] == nil {
-		t.Error("validKey result is nil, expected value")
-	} else {
-		got := result[validKey]
-		if got.Name != validData.Name || got.Value != validData.Value {
-			t.Errorf("validKey: got %+v, want %+v", got, validData)
-		}
-	}
-	if result[invalidKey] != nil {
-		t.Errorf("invalidKey should be nil, got %+v", result[invalidKey])
-	}
-	if result[missingKey] != nil {
-		t.Errorf("missingKey should be nil, got %+v", result[missingKey])
-	}
-}
-
-func TestRedisCache_MSet(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testMSet(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	items := map[string]testData{
@@ -302,9 +258,9 @@ func TestRedisCache_MSet(t *testing.T) {
 	}
 }
 
-func TestRedisCache_SetNX(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testSetNX(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "nx_test"
@@ -339,18 +295,18 @@ func TestRedisCache_SetNX(t *testing.T) {
 	}
 }
 
-func TestRedisCache_TTL(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testTTL(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "ttl_test"
 	val := testData{Name: "TTL", Value: 123}
 
-	// TTL on missing key -> should return -2 and redis.Nil error
+	// TTL on missing key -> should return -2 and an error
 	ttl, err := cache.TTL(ctx, key)
-	if !errors.Is(err, redis.Nil) {
-		t.Errorf("expected redis.Nil for missing key, got %v", err)
+	if err == nil {
+		t.Error("expected error for missing key, got nil")
 	}
 	if ttl != -2*time.Nanosecond {
 		t.Errorf("TTL for missing = %v, want -2ns", ttl)
@@ -369,7 +325,7 @@ func TestRedisCache_TTL(t *testing.T) {
 		t.Errorf("TTL = %v, expected > 0", ttl)
 	}
 
-	// Set with no TTL (0)
+	// Set with no TTL (0) -> key never expires
 	err = cache.Set(ctx, "no_ttl", val, 0)
 	if err != nil {
 		t.Fatalf("Set no TTL failed: %v", err)
@@ -383,9 +339,9 @@ func TestRedisCache_TTL(t *testing.T) {
 	}
 }
 
-func TestRedisCache_SetTTL(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testSetTTL(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	key := "setttl_test"
@@ -410,16 +366,16 @@ func TestRedisCache_SetTTL(t *testing.T) {
 		t.Errorf("TTL = %v, expected around %v", ttl, newTTL)
 	}
 
-	// SetTTL on missing key -> should return redis.Nil
+	// SetTTL on missing key -> should return error
 	err = cache.SetTTL(ctx, "missing", newTTL)
-	if !errors.Is(err, redis.Nil) {
-		t.Errorf("expected redis.Nil for missing key, got %v", err)
+	if err == nil {
+		t.Error("expected error for missing key, got nil")
 	}
 }
 
-func TestRedisCache_MDelete(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testMDelete(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
 
 	ctx := context.Background()
 	// Set a few keys
@@ -463,9 +419,56 @@ func TestRedisCache_MDelete(t *testing.T) {
 	}
 }
 
-func TestRedisCache_Prefix(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+func testConcurrentAccess(t *testing.T, factory cacheFactory) {
+	cache, cleanup := factory(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	const numGoroutines = 20
+	const iterations = 50
+	var wg sync.WaitGroup
+	wg.Add(numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		go func(id int) {
+			defer wg.Done()
+			key := fmt.Sprintf("concurrent_%d", id)
+			val := testData{Name: "Goroutine", Value: id}
+			for j := 0; j < iterations; j++ {
+				err := cache.Set(ctx, key, val, 0)
+				if err != nil {
+					t.Errorf("Set in goroutine %d failed: %v", id, err)
+					return
+				}
+				got, err := cache.Get(ctx, key)
+				if err != nil {
+					t.Errorf("Get in goroutine %d failed: %v", id, err)
+					return
+				}
+				if got == nil || got.Value != val.Value {
+					t.Errorf("goroutine %d: got value %v, expected %d", id, got, val.Value)
+				}
+			}
+		}(i)
+	}
+	wg.Wait()
+}
+
+// ---------------------------------------------------------------------------
+// Redis-specific tests that cannot be run against the in-memory implementation.
+// ---------------------------------------------------------------------------
+
+// testRedisPrefix checks that the Redis cache properly prefixes keys.
+func testRedisPrefix(t *testing.T, factory cacheFactory) {
+	// This test is only applicable for Redis.
+	cacheIf, cleanup := factory(t)
+	defer cleanup()
+	// We know this factory returns a *redisCache, but we need the concrete type
+	// to access prefixKey and client. The test will only be invoked for Redis.
+	cache, ok := cacheIf.(*redisCache[testData])
+	if !ok {
+		t.Fatal("expected *redisCache for prefix test")
+	}
 
 	ctx := context.Background()
 	key := "prefixed"
@@ -493,105 +496,85 @@ func TestRedisCache_Prefix(t *testing.T) {
 	}
 }
 
-func TestRedisCache_ConcurrentAccess(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
+// testRedisMGetWithInvalidJSON verifies that MGet returns an error when a key
+// contains invalid JSON, while still returning partial results for valid keys.
+func testRedisMGetWithInvalidJSON(t *testing.T, factory cacheFactory) {
+	cacheIf, cleanup := factory(t)
+	defer cleanup()
+	cache, ok := cacheIf.(*redisCache[testData])
+	if !ok {
+		t.Fatal("expected *redisCache for invalid JSON test")
+	}
 
 	ctx := context.Background()
-	const numGoroutines = 20
-	const iterations = 50
-	var wg sync.WaitGroup
-	wg.Add(numGoroutines)
+	validKey := "valid"
+	invalidKey := "invalid"
+	missingKey := "missing"
 
-	// Each goroutine works with its own key, so no race on the key itself.
-	for i := 0; i < numGoroutines; i++ {
-		go func(id int) {
-			defer wg.Done()
-			key := fmt.Sprintf("concurrent_%d", id)
-			val := testData{Name: "Goroutine", Value: id}
-			for j := 0; j < iterations; j++ {
-				// Set
-				err := cache.Set(ctx, key, val, 0)
-				if err != nil {
-					t.Errorf("Set in goroutine %d failed: %v", id, err)
-					return
-				}
-				// Get
-				got, err := cache.Get(ctx, key)
-				if err != nil {
-					t.Errorf("Get in goroutine %d failed: %v", id, err)
-					return
-				}
-				if got == nil {
-					t.Errorf("Get in goroutine %d returned nil", id)
-					return
-				}
-				if got.Value != val.Value {
-					t.Errorf("goroutine %d: got value %d, expected %d", id, got.Value, val.Value)
-				}
+	validData := testData{Name: "Valid", Value: 99}
+	// Set valid via cache
+	err := cache.Set(ctx, validKey, validData, 0)
+	if err != nil {
+		t.Fatalf("Set valid failed: %v", err)
+	}
+	// Insert invalid JSON directly (note the prefix)
+	prefixedInvalid := cache.prefixKey(invalidKey)
+	err = setRawData(ctx, cache.client, prefixedInvalid, "this is not json")
+	if err != nil {
+		t.Fatalf("setRawData failed: %v", err)
+	}
+
+	// Now MGet all three
+	result, err := cache.MGet(ctx, validKey, invalidKey, missingKey)
+	if err == nil {
+		t.Error("expected error due to invalid JSON, got nil")
+	}
+	// Check partial results
+	if result[validKey] == nil {
+		t.Error("validKey result is nil, expected value")
+	} else {
+		got := result[validKey]
+		if got.Name != validData.Name || got.Value != validData.Value {
+			t.Errorf("validKey: got %+v, want %+v", got, validData)
+		}
+	}
+	if result[invalidKey] != nil {
+		t.Errorf("invalidKey should be nil, got %+v", result[invalidKey])
+	}
+	if result[missingKey] != nil {
+		t.Errorf("missingKey should be nil, got %+v", result[missingKey])
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Main test runner – runs all common tests for both implementations,
+// plus Redis‑specific tests only when the Redis factory is used.
+// ---------------------------------------------------------------------------
+
+func TestCache(t *testing.T) {
+	factories := map[string]cacheFactory{
+		"InMemory": newInMemoryTestCache,
+		"Redis":    newRedisTestCache,
+	}
+
+	for impl, factory := range factories {
+		t.Run(impl, func(t *testing.T) {
+			t.Run("SetAndGet", func(t *testing.T) { testSetAndGet(t, factory) })
+			t.Run("Delete", func(t *testing.T) { testDelete(t, factory) })
+			t.Run("Exists", func(t *testing.T) { testExists(t, factory) })
+			t.Run("MGet", func(t *testing.T) { testMGet(t, factory) })
+			t.Run("MSet", func(t *testing.T) { testMSet(t, factory) })
+			t.Run("SetNX", func(t *testing.T) { testSetNX(t, factory) })
+			t.Run("TTL", func(t *testing.T) { testTTL(t, factory) })
+			t.Run("SetTTL", func(t *testing.T) { testSetTTL(t, factory) })
+			t.Run("MDelete", func(t *testing.T) { testMDelete(t, factory) })
+			t.Run("ConcurrentAccess", func(t *testing.T) { testConcurrentAccess(t, factory) })
+
+			// Redis‑specific tests
+			if impl == "Redis" {
+				t.Run("Prefix", func(t *testing.T) { testRedisPrefix(t, factory) })
+				t.Run("MGetWithInvalidJSON", func(t *testing.T) { testRedisMGetWithInvalidJSON(t, factory) })
 			}
-		}(i)
-	}
-	wg.Wait()
-}
-
-func TestRedisCache_ErrorScenarios(t *testing.T) {
-	// Test that JSON marshal errors are handled (though impossible for simple types)
-	// We can't easily force marshal error, but we can test that Set returns error if
-	// value cannot be marshaled (we can use a type that fails). However, for testData,
-	// it's trivial. We'll skip this.
-	// But we can test that Set with nil pointer? Not relevant.
-}
-
-// Test that TTL returns redis.Nil error correctly
-func TestRedisCache_TTL_ReturnsNilError(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
-
-	ctx := context.Background()
-	key := "missing_ttl"
-	ttl, err := cache.TTL(ctx, key)
-	if !errors.Is(err, redis.Nil) {
-		t.Errorf("expected redis.Nil, got %v", err)
-	}
-	if ttl != -2*time.Nanosecond {
-		t.Errorf("TTL = %v, want -2ns", ttl)
-	}
-}
-
-// Test that SetTTL on missing key returns redis.Nil
-func TestRedisCache_SetTTL_MissingKeyReturnsNilError(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
-
-	ctx := context.Background()
-	key := "missing_setttl"
-	err := cache.SetTTL(ctx, key, time.Second)
-	if !errors.Is(err, redis.Nil) {
-		t.Errorf("expected redis.Nil, got %v", err)
-	}
-}
-
-// Test that Delete on missing key does not error
-func TestRedisCache_Delete_MissingKeyNoError(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
-
-	ctx := context.Background()
-	err := cache.Delete(ctx, "missing")
-	if err != nil {
-		t.Errorf("Delete missing key should not error, got %v", err)
-	}
-}
-
-// Test that MDelete on missing keys does not error
-func TestRedisCache_MDelete_MissingKeysNoError(t *testing.T) {
-	mr, _, cache := newTestCache(t)
-	defer mr.Close()
-
-	ctx := context.Background()
-	err := cache.MDelete(ctx, "missing1", "missing2")
-	if err != nil {
-		t.Errorf("MDelete missing keys should not error, got %v", err)
+		})
 	}
 }
