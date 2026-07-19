@@ -100,6 +100,7 @@ var InfrastructureModule = fx.Module(
 		),
 		guid.NewUuidGuidProvider,
 		security.NewBcryptHasher,
+		security.NewTokenProvider,
 		security.NewPwnedPasswordChecker,
 		mail.NewSmtpMailer,
 		repository.NewUnitOfWorkProvider,

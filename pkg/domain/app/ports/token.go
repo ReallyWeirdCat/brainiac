@@ -19,6 +19,12 @@ package ports
 
 import "time"
 
+const (
+	ScopeAccess  = "a"
+	ScopeRefresh = "r"
+	ScopeTOTP    = "t"
+)
+
 type TokenGenerator interface {
 	IssueAccessToken(userGUID, sessionGUID string) (string, error)
 	IssueRefreshToken(userGUID, sessionGUID string) (string, error)
@@ -29,6 +35,11 @@ type TokenValidator interface {
 	ValidateAccessToken(tokenString string) (*TokenClaims, error)
 	ValidateRefreshToken(tokenString string) (*TokenClaims, error)
 	ValidateTOTPToken(tokenString string) (*TokenClaims, error)
+}
+
+type TokenProvider interface {
+	TokenGenerator
+	TokenValidator
 }
 
 // TokenClaims represents claims of a JWT token.

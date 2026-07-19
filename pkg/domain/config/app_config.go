@@ -18,7 +18,10 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
+	"time"
 )
 
 type AppConfigProvider interface {
@@ -41,6 +44,13 @@ type AppConfig struct {
 				RepoURL        string `yaml:"compromised_passwords_repo_url" envconfig:"SECURITY_PASSWORDS_COMPROMISED_REPO_URL"`
 			} `yaml:"compromised"`
 		} `yaml:"passwords"`
+		JWT struct {
+			Secret          string        `yaml:"secret" envconfig:"SECURITY_JWT_SECRET"`
+			Issuer          string        `yaml:"issuer" envconfig:"SECURITY_JWT_ISSUER"`
+			AccessTokenTTL  time.Duration `yaml:"access_token_ttl" envconfig:"SECURITY_JWT_ACCESS_TOKEN_TTL"`
+			RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" envconfig:"SECURITY_JWT_REFRESH_TOKEN_TTL"`
+			TOTPTokenTTL    time.Duration `yaml:"totp_token_ttl" envconfig:"SECURITY_JWT_TOTP_TOKEN_TTL"`
+		} `yaml:"jwt"`
 	} `yaml:"security"`
 	SMTP struct {
 		Enable   bool   `yaml:"enable" envconfig:"SMTP_ENABLE"`
@@ -67,6 +77,18 @@ func (a *AppConfig) Validate() error {
 		if a.Security.Passwords.Compromised.FilePath == "" {
 			errs = append(errs, errors.New("Security.Passwords.Compromised.FilePath not specified. Set valid file path or disable Security.Passwords.Compromised.CheckPasswords"))
 		}
+	}
+
+	if len(a.Security.JWT.Secret) < 32 {
+		errs = append(errs, errors.New("JWT secret is too short or not provided"))
+	}
+
+	if a.Security.JWT.RefreshTokenTTL <= a.Security.JWT.AccessTokenTTL {
+		errs = append(errs, errors.New("the TTL for a JWT refresh token must be longer than that of the access token"))
+	}
+
+	if a.Security.JWT.AccessTokenTTL <= 0 || a.Security.JWT.RefreshTokenTTL <= 0 || a.Security.JWT.TOTPTokenTTL <= 0 {
+		errs = append(errs, errors.New("TTL for all tokens must be larger than 0"))
 	}
 
 	if a.SMTP.Enable {
@@ -111,16 +133,31 @@ func (a *AppConfig) SetDefault() {
 	a.Security.Passwords.Compromised.FilePath = ""
 	a.Security.Passwords.Compromised.RepoURL = ""
 
+	a.Security.JWT.Issuer = "brainiac"
+	a.Security.JWT.Secret = defaultJWTSecret()
+	a.Security.JWT.TOTPTokenTTL = time.Minute * 10
+	a.Security.JWT.AccessTokenTTL = time.Minute * 3
+	a.Security.JWT.RefreshTokenTTL = time.Hour * 24 * 7
+
 	a.SMTP.Enable = false
 	a.SMTP.Host = "example.com"
 	a.SMTP.Port = 465
 	a.SMTP.Username = "user"
-	a.SMTP.Password = ""
+	a.SMTP.Password = "password"
 	a.SMTP.UseTLS = true
 	a.SMTP.From = "user@example.com"
 
 	a.Database.URI = "postgres://user:password@localhost:5432/dbname"
 
-	a.Cache.InMemory = false
+	a.Cache.InMemory = true
 	a.Cache.URI = "redis://user:password@localhost:6379/0"
+}
+
+func defaultJWTSecret() string {
+	secret := base64.URLEncoding.EncodeToString(func() []byte {
+		b := make([]byte, 32)
+		rand.Read(b)
+		return b
+	}())
+	return secret
 }
