@@ -16,3 +16,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package di
+
+import "go.uber.org/fx"
+
+var App = fx.Options(
+	InfrastructureModule,
+	AdapterModule,
+	UsecaseModule,
+)

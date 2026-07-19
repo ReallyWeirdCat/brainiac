@@ -16,3 +16,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package di
+
+import "go.uber.org/fx"
+
+var UsecaseModule = fx.Module(
+	"usecase",
+	fx.Provide(),
+)

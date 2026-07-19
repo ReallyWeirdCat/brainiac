@@ -34,16 +34,14 @@ import (
 	"go.uber.org/fx"
 )
 
-func provideCache[T any](tag, prefix string) fx.Option {
-	return fx.Provide(
-		fx.Annotate(
-			func(redisClient *redis.Client) ports.Cache[T] {
-				if redisClient != nil {
-					return cache.NewRedisCache[T](redisClient, prefix)
-				}
-				return cache.NewInMemoryCache[T]()
-			},
-		),
+func provideCache[T any](tag, prefix string) interface{} {
+	return fx.Annotate(
+		func(redisClient *redis.Client) ports.Cache[T] {
+			if redisClient != nil {
+				return cache.NewRedisCache[T](redisClient, prefix)
+			}
+			return cache.NewInMemoryCache[T]()
+		},
 		fx.ResultTags(fmt.Sprintf(`name:"%s"`, tag)),
 	)
 }

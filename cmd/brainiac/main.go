@@ -17,8 +17,11 @@
 
 package main
 
-import "fmt"
+import (
+	"github.com/ReallyWeirdCat/brainiac/internal/di"
+	"go.uber.org/fx"
+)
 
 func main() {
-	fmt.Print("Hello")
+	fx.New(di.App).Run()
 }
