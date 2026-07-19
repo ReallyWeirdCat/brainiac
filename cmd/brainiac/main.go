@@ -23,5 +23,8 @@ import (
 )
 
 func main() {
-	fx.New(di.App).Run()
+	fx.New(
+		di.UseFxLogger(true),
+		di.App,
+	).Run()
 }

@@ -44,12 +44,13 @@ type PwnedPasswordChecker struct {
 
 var _ ports.CompromisedPasswordChecker = (*PwnedPasswordChecker)(nil)
 
-func NewPwnedPasswordChecker(config config.AppConfig, logger ports.Logger) ports.CompromisedPasswordChecker {
+func NewPwnedPasswordChecker(config config.AppConfigProvider, logger ports.Logger) ports.CompromisedPasswordChecker {
+	c := config.Get().Security.Passwords.Compromised
 	return &PwnedPasswordChecker{
 		logger:            logger,
-		enabled:           config.Security.Passwords.Compromised.CheckPasswords,
-		filePath:          config.Security.Passwords.Compromised.FilePath,
-		repoURL:           config.Security.Passwords.Compromised.RepoURL,
+		enabled:           c.CheckPasswords,
+		filePath:          c.FilePath,
+		repoURL:           c.RepoURL,
 		minPasswordLength: valueobject.MinPasswordLength,
 	}
 }

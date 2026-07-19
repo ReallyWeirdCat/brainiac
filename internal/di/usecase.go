@@ -17,9 +17,16 @@
 
 package di
 
-import "go.uber.org/fx"
+import (
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/auth"
+	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/mail"
+	"go.uber.org/fx"
+)
 
 var UsecaseModule = fx.Module(
 	"usecase",
-	fx.Provide(),
+	fx.Provide(
+		mail.NewSendEmailUsecase,
+		auth.NewRegistrationBeginUsecase,
+	),
 )

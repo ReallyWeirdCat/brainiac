@@ -20,10 +20,12 @@ package di
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/cache"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/config"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/guid"
+	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/logger"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/mail"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/repository"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/security"
@@ -32,19 +34,23 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 )
 
-func provideCache[T any](tag, prefix string) interface{} {
-	return fx.Annotate(
-		func(redisClient *redis.Client) ports.Cache[T] {
-			if redisClient != nil {
-				return cache.NewRedisCache[T](redisClient, prefix)
-			}
-			return cache.NewInMemoryCache[T]()
-		},
-		fx.ResultTags(fmt.Sprintf(`name:"%s"`, tag)),
-	)
+func provideZerolog() zerolog.Logger {
+	return zerolog.New(os.Stdout).With().Timestamp().Logger()
+}
+
+type cacheConstructor[T any] func(*redis.Client) ports.Cache[T]
+
+func provideCache[T any](tag, prefix string) cacheConstructor[T] {
+	return func(redisClient *redis.Client) ports.Cache[T] {
+		if redisClient != nil {
+			return cache.NewRedisCache[T](redisClient, prefix)
+		}
+		return cache.NewInMemoryCache[T]()
+	}
 }
 
 func newPgxPool(lc fx.Lifecycle, cfg cfg.AppConfigProvider) (*pgxpool.Pool, error) {
@@ -78,7 +84,9 @@ func newRedisClient(cfg cfg.AppConfigProvider) (*redis.Client, error) {
 var InfrastructureModule = fx.Module(
 	"infrastructure",
 	fx.Provide(
+		provideZerolog,
 		config.NewViperConfig,
+		logger.NewZerologLogger,
 		fx.Annotate(
 			newPgxPool,
 			fx.OnStart(func(ctx context.Context, pool *pgxpool.Pool) error {

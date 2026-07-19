@@ -18,15 +18,13 @@
 package di
 
 import (
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/auth"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 )
 
-var App = fx.Options(
-	InfrastructureModule,
-	AdapterModule,
-	UsecaseModule,
-	fx.Invoke(func(auth *auth.RegistrationBeginUsecase) {
-		// this is a test
-	}),
-)
+func UseFxLogger(enable bool) fx.Option {
+	if !enable {
+		return fx.WithLogger(func() fxevent.Logger { return fxevent.NopLogger })
+	}
+	return fx.Options()
+}
