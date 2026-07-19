@@ -17,6 +17,8 @@
 
 package ports
 
+import "context"
+
 type Mailer interface {
-	Send(from string, to []string, msg []byte) error
+	Send(ctx context.Context, from string, to []string, msg []byte) error
 }

@@ -73,7 +73,7 @@ func (s *SendEmailUsecase) Execute(ctx context.Context, req SendEmailRequest) (*
 	allRecipients := make([]string, 0, len(req.To))
 	allRecipients = append(allRecipients, req.To...)
 
-	err := s.mailer.Send(from, allRecipients, msg)
+	err := s.mailer.Send(ctx, from, allRecipients, msg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send email: %w", err)
 	}
