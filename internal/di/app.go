@@ -18,7 +18,6 @@
 package di
 
 import (
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/usecase/auth"
 	"go.uber.org/fx"
 )
 
@@ -26,7 +25,4 @@ var App = fx.Options(
 	InfrastructureModule,
 	AdapterModule,
 	UsecaseModule,
-	fx.Invoke(func(auth *auth.RegistrationBeginUsecase) {
-		// this is a test
-	}),
 )
