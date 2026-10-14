@@ -427,7 +427,7 @@ CREATE TABLE course_subject_assessment_question (
     published_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL,
-    CONSTRAINT check_max_answer_time CHECK (max_answer_time > 10)
+    CONSTRAINT check_max_answer_time CHECK (max_answer_time > 0)
 );
 
 -- 26. course_subject_assessment_pass

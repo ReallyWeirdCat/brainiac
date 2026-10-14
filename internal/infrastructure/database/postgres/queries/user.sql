@@ -98,7 +98,7 @@ RETURNING *;
 -- name: DeleteAppUserBatch :batchexec
 UPDATE app_user
 SET 
-    deleted_at = true
+    deleted_at = now()
 WHERE guid = $1 AND deleted_at IS NULL;
 
 -- name: GetAppUserBatch :batchmany

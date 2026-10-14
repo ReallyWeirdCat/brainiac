@@ -29,6 +29,7 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/mail"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/repository"
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/security"
+	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/storage"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
 	cfg "github.com/ReallyWeirdCat/brainiac/pkg/domain/config"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/entity"
@@ -111,6 +112,7 @@ var InfrastructureModule = fx.Module(
 		security.NewTokenProvider,
 		security.NewPwnedPasswordChecker,
 		mail.NewSmtpMailer,
+		storage.NewDiskStore,
 		repository.NewUnitOfWorkProvider,
 		provideCache[entity.AppUser]("appUsersCache", "usr"),
 		provideCache[entity.AppUserCredential]("appUserCredentialsCache", "crd"),

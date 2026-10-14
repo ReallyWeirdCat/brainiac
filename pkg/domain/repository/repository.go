@@ -23,20 +23,16 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+// Repository is the minimal persistence contract shared by every entity.
+//
+// It deliberately excludes batch, list-all, count and existence checks: those
+// are rarely needed on a per-aggregate basis and, when they are, should be
+// expressed as bespoke methods on the entity's own repository interface (or a
+// separate admin/analytics interface) rather than forced onto every entity.
 type Repository[T any] interface {
-	Create(ctx context.Context, obj *T) (*T, error)
-	CreateBatch(ctx context.Context, objs []*T) ([]*T, error)
-	Update(ctx context.Context, obj *T) (*T, error)
-	UpdateBatch(ctx context.Context, objs []*T) ([]*T, error)
-	Save(ctx context.Context, obj *T) (*T, error)
-	SaveBatch(ctx context.Context, objs []*T) ([]*T, error)
-	Delete(ctx context.Context, guid valueobject.GUID) error
-	DeleteBatch(ctx context.Context, guids []valueobject.GUID) error
 	Get(ctx context.Context, guid valueobject.GUID) (*T, error)
-	GetBatch(ctx context.Context, guids []valueobject.GUID) ([]*T, error)
-	GetAll(ctx context.Context) ([]*T, error)
-	Count(ctx context.Context) (int64, error)
-	Exists(ctx context.Context, guid valueobject.GUID) (bool, error)
-	ExistsBatch(ctx context.Context, guids []valueobject.GUID) ([]valueobject.GUID, error)
-	IsDeleted(ctx context.Context, guid valueobject.GUID) (bool, error)
+	Create(ctx context.Context, obj *T) (*T, error)
+	Save(ctx context.Context, obj *T) (*T, error)
+	Update(ctx context.Context, obj *T) (*T, error)
+	Delete(ctx context.Context, guid valueobject.GUID) error
 }

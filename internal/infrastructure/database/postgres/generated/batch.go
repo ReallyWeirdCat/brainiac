@@ -417,7 +417,7 @@ func (b *CreateAppUserSessionBatchBatchResults) Close() error {
 const deleteAppUserBatch = `-- name: DeleteAppUserBatch :batchexec
 UPDATE app_user
 SET 
-    deleted_at = true
+    deleted_at = now()
 WHERE guid = $1 AND deleted_at IS NULL
 `
 
@@ -431,7 +431,7 @@ type DeleteAppUserBatchBatchResults struct {
 //
 //	UPDATE app_user
 //	SET
-//	    deleted_at = true
+//	    deleted_at = now()
 //	WHERE guid = $1 AND deleted_at IS NULL
 func (q *Queries) DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults {
 	batch := &pgx.Batch{}

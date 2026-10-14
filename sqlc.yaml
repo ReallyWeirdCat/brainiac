@@ -119,7 +119,7 @@ sql:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
               type: "I18nText"
               pointer: true
-          - column: "notification.description_i18n"
+          - column: "notification.content_i18n"
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
               type: "I18nText"

@@ -18,38 +18,37 @@
 package auth
 
 import (
+	"context"
+	"errors"
+
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
-	"github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
 )
 
+// ErrNotImplemented is returned until the login flow is implemented.
+var ErrNotImplemented = errors.New("login usecase is not implemented yet")
+
+// LoginUsecase depends on the UnitOfWorkProvider (not on a concrete
+// UnitOfWork value or standalone repositories) so it gets a fresh transaction
+// per request, matching the RegistrationBeginUsecase pattern.
 type LoginUsecase struct {
-	userRepo       repository.AppUserRepository
-	credentialRepo repository.AppUserCredentialRepository
-	profileRepo    repository.AppUserProfileRepository
-	uow            ports.UnitOfWork
+	uow            ports.UnitOfWorkProvider
 	hasher         ports.PasswordHasher
 	tokenGenerator ports.TokenGenerator
 }
 
 func NewLoginUsecase(
-	userRepo repository.AppUserRepository,
-	credentialRepo repository.AppUserCredentialRepository,
-	profileRepo repository.AppUserProfileRepository,
-	uow ports.UnitOfWork,
+	uow ports.UnitOfWorkProvider,
 	hasher ports.PasswordHasher,
 	tokenGenerator ports.TokenGenerator,
 ) *LoginUsecase {
 	return &LoginUsecase{
-		userRepo:       userRepo,
-		credentialRepo: credentialRepo,
-		profileRepo:    profileRepo,
 		uow:            uow,
 		hasher:         hasher,
 		tokenGenerator: tokenGenerator,
 	}
 }
 
-func (u *LoginUsecase) Execute(req LoginRequest) (LoginResponse, error) {
-	// TODO:
-	panic("not implemented")
+func (u *LoginUsecase) Execute(ctx context.Context, _ LoginRequest) (LoginResponse, error) {
+	// TODO: verify credentials, issue access/refresh tokens, persist a session.
+	return LoginResponse{}, ErrNotImplemented
 }

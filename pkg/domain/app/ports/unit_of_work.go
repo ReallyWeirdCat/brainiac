@@ -34,6 +34,7 @@ type UnitOfWork interface {
 	AppUsers() repository.AppUserRepository
 	AppUserCredentials() repository.AppUserCredentialRepository
 	AppUserProfiles() repository.AppUserProfileRepository
+	AppUserSessions() repository.AppUserSessionRepository
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
 }

@@ -15,11 +15,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createRouter, createWebHistory } from 'vue-router'
+package repository
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [],
-})
+import (
+	"errors"
 
-export default router
+	repo "github.com/ReallyWeirdCat/brainiac/pkg/domain/repository"
+	"github.com/jackc/pgx/v5"
+)
+
+// MapNotFound translates a pgx "no rows" error into the domain not-found error.
+// Every other error passes through unchanged.
+func MapNotFound(err error) error {
+	if errors.Is(err, pgx.ErrNoRows) {
+		return repo.ErrEntityNotFound.FromError(err)
+	}
+	return err
+}
+
+// ptr returns a pointer to v. Kept as a tiny helper so generated adapters read
+// as "return ptr(entity.X(m)), nil" instead of a local variable + &x.
+func ptr[T any](v T) *T { return &v }

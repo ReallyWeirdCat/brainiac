@@ -13,14 +13,14 @@ import (
 
 const getCourseByGUID = `-- name: GetCourseByGUID :one
 SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
-WHERE guid = $1
+WHERE guid = $1 AND deleted_at IS NULL
 LIMIT 1
 `
 
 // GetCourseByGUID
 //
 //	SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
-//	WHERE guid = $1
+//	WHERE guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
 func (q *Queries) GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error) {
 	row := q.db.QueryRow(ctx, getCourseByGUID, guid)

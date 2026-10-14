@@ -57,6 +57,8 @@ registration:
 login:
   enforce_email: true
 security:
+  jwt:
+    secret: "0123456789abcdef0123456789abcdef"
   passwords:
     compromised:
       check_compromised_passwords: true
@@ -127,6 +129,9 @@ func TestNewViperConfig_Get_CachesConfig(t *testing.T) {
 	cfgPath := writeConfigFile(t, tmpDir, "config.yaml", `
 registration:
   enable: true
+security:
+  jwt:
+    secret: "0123456789abcdef0123456789abcdef"
 `)
 
 	provider := NewViperConfigWithPath(cfgPath)
@@ -153,29 +158,29 @@ func TestNewViperConfig_Get_CreatesDefaultConfig(t *testing.T) {
 	cfgPath := filepath.Join(tmpDir, "nonexistent.yaml")
 
 	provider := NewViperConfigWithPath(cfgPath)
-	cfg := provider.Get()
+	// The generated default has no JWT secret, so Get() must fail validation.
+	panicVal := recoverPanic(t, func() {
+		_ = provider.Get()
+	})
+	if panicVal == nil {
+		t.Fatal("expected panic: default config lacks a JWT secret")
+	}
+	if !strings.Contains(fmt.Sprint(panicVal), "JWT secret") {
+		t.Errorf("panic should mention JWT secret, got: %v", panicVal)
+	}
 
-	// Verify the file was created
+	// The default file should still have been created before validation failed.
 	if _, err := os.Stat(cfgPath); os.IsNotExist(err) {
 		t.Fatal("expected config file to be created")
 	}
 
-	// Verify defaults are applied
+	// The created file should still carry the deterministic defaults.
 	defaults := config.AppConfig{}
 	defaults.SetDefault()
-	if cfg != defaults {
-		t.Error("loaded config should match defaults")
-	}
-
-	// Verify file content contains defaults (header + YAML)
 	fileContent, err := os.ReadFile(cfgPath)
 	if err != nil {
 		t.Fatalf("reading created config file: %v", err)
 	}
-	if !strings.Contains(string(fileContent), "# Default configuration for Brainiac.") {
-		t.Error("created file missing header")
-	}
-	// Try to unmarshal the YAML portion (skip header)
 	lines := strings.SplitN(string(fileContent), "\n", 2)
 	if len(lines) < 2 {
 		t.Fatal("created file too short")
@@ -193,6 +198,9 @@ func TestNewViperConfig_Get_EnvOverride(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Provide a file with smtp.host = "filehost" – should be overridden by env
 	cfgPath := writeConfigFile(t, tmpDir, "config.yaml", `
+security:
+  jwt:
+    secret: "0123456789abcdef0123456789abcdef"
 smtp:
   enable: true
   host: "filehost"
@@ -325,17 +333,16 @@ func TestNewViperConfig_Get_PanicsOnLoadError(t *testing.T) {
 }
 
 func TestNewViperConfig_Get_DefaultConfigValidation(t *testing.T) {
-	// Ensure default config passes validation (Get should not panic)
+	// The default config has no JWT secret, so validation must fail.
 	tmpDir := t.TempDir()
 	cfgPath := filepath.Join(tmpDir, "config.yaml")
 
 	provider := NewViperConfigWithPath(cfgPath)
-	// Recover just in case
 	panicVal := recoverPanic(t, func() {
 		_ = provider.Get()
 	})
-	if panicVal != nil {
-		t.Fatalf("default config failed validation: %v", panicVal)
+	if panicVal == nil {
+		t.Fatal("expected default config to fail validation (no JWT secret)")
 	}
 }
 

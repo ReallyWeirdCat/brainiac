@@ -804,3 +804,14 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,windows,git,vim,visualstudiocode,visualstudio,jetbrains,go,node,vuejs,dotenv
 
 config.yaml
+
+# Local Go build/module caches
+.gocache/
+.gomodcache/
+.gotmp/
+
+# Local pnpm store and XDG dirs
+.pnpm-store/
+.xdg-cache/
+.xdg-data/
+.xdg-config/

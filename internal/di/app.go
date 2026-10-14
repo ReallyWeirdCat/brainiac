@@ -18,6 +18,7 @@
 package di
 
 import (
+	"github.com/ReallyWeirdCat/brainiac/internal/transport"
 	"go.uber.org/fx"
 )
 
@@ -25,4 +26,5 @@ var App = fx.Options(
 	InfrastructureModule,
 	AdapterModule,
 	UsecaseModule,
+	transport.Module(),
 )

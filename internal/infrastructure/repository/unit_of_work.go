@@ -20,7 +20,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/ReallyWeirdCat/brainiac/internal/infrastructure/database/postgres/generated"
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
@@ -54,7 +53,6 @@ func (u *UnitOfWorkProvider) New(ctx context.Context) (ports.UnitOfWork, error) 
 var _ ports.UnitOfWorkProvider = &UnitOfWorkProvider{}
 
 type UnitOfWork struct {
-	mu                 sync.Mutex
 	queries            *generated.Queries
 	tx                 pgx.Tx
 	committed          bool
@@ -69,10 +67,10 @@ func NewUnitOfWork(queries *generated.Queries, tx pgx.Tx) ports.UnitOfWork {
 		queries: queries,
 		tx:      tx,
 	}
-	uow.appUsers = NewPgAppUserRepo(queries, &uow.mu)
-	uow.appUserCredentials = NewPgAppUserCredentialRepo(queries, &uow.mu)
-	uow.appUserProfiles = NewPgAppUserProfileRepo(queries, &uow.mu)
-	uow.appUserSessions = NewPgAppUserSessionRepo(queries, &uow.mu)
+	uow.appUsers = newPgAppUserRepo(queries)
+	uow.appUserCredentials = newPgAppUserCredentialRepo(queries)
+	uow.appUserProfiles = newPgAppUserProfileRepo(queries)
+	uow.appUserSessions = newPgAppUserSessionRepo(queries)
 	return uow
 }
 
@@ -88,10 +86,11 @@ func (u *UnitOfWork) AppUsers() repository.AppUserRepository {
 	return u.appUsers
 }
 
-func (u *UnitOfWork) Commit(ctx context.Context) error {
-	u.mu.Lock()
-	defer u.mu.Unlock()
+func (u *UnitOfWork) AppUserSessions() repository.AppUserSessionRepository {
+	return u.appUserSessions
+}
 
+func (u *UnitOfWork) Commit(ctx context.Context) error {
 	if u.tx == nil {
 		return nil
 	}
@@ -106,9 +105,6 @@ func (u *UnitOfWork) Commit(ctx context.Context) error {
 }
 
 func (u *UnitOfWork) Rollback(ctx context.Context) error {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-
 	if u.tx == nil {
 		return nil
 	}

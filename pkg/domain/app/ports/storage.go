@@ -23,23 +23,28 @@ import (
 	"time"
 )
 
-type Storage interface {
-	// Uploads a file to the specified path with the given content type.
-	// Returns file identifier.
-	Upload(ctx context.Context, path string, reader io.Reader, size int64, contentType string) (string, error)
+// ObjectStore is the minimal object-store capability: put, get, delete.
+// A local filesystem backend implements this fully; an S3/Garage backend can
+// implement the same contract later without changing consumers.
+type ObjectStore interface {
+	// Put writes a file and returns its storage key.
+	Put(ctx context.Context, key string, r io.Reader, size int64, contentType string) (string, error)
 
-	// Retrieves a file from storage.
-	Download(ctx context.Context, path string) (io.ReadCloser, error)
+	// Get opens a file for reading. The caller must close it.
+	Get(ctx context.Context, key string) (io.ReadCloser, error)
 
-	// Removes a file from storage.
-	Delete(ctx context.Context, path string) error
-
-	// Returns the public URL for a file.
-	GetPublicURL(ctx context.Context, path string) (string, error)
-
-	// Returns a presigned URL for a file with an expiration time.
-	GetSignedURL(ctx context.Context, path string, expiry time.Duration) (string, error)
-
-	// Generates a presigned URL for direct client uploads.
-	GenerateUploadURL(ctx context.Context, path string, contentType string, expiry time.Duration) (string, error)
+	// Delete removes a file. Deleting a missing key is a no-op.
+	Delete(ctx context.Context, key string) error
 }
+
+// UrlSigner is an optional capability for backends that can produce URLs
+// (public or presigned). Backends that cannot (e.g. local disk) do not
+// implement it; consumers should type-assert for it.
+type UrlSigner interface {
+	PublicURL(ctx context.Context, key string) (string, error)
+	SignedURL(ctx context.Context, key string, expiry time.Duration) (string, error)
+	UploadURL(ctx context.Context, key, contentType string, expiry time.Duration) (string, error)
+}
+
+// Storage is a backwards-compatible alias for ObjectStore.
+type Storage = ObjectStore

@@ -147,7 +147,7 @@ type Querier interface {
 	//
 	//  UPDATE app_user
 	//  SET
-	//      deleted_at = true
+	//      deleted_at = now()
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	DeleteAppUserBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserBatchBatchResults
 	//DeleteAppUserCredential
@@ -400,7 +400,7 @@ type Querier interface {
 	//GetCourseByGUID
 	//
 	//  SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
-	//  WHERE guid = $1
+	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  LIMIT 1
 	GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error)
 	//IsDeletedAppUser

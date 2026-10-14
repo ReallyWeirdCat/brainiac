@@ -360,3 +360,17 @@ README.md
 LICENSE
 *.yml
 *.yaml
+
+## Local build caches
+.gocache/
+.gomodcache/
+.gotmp/
+.pnpm-store/
+.xdg-cache/
+.xdg-data/
+.xdg-config/
+
+## Re-include frontend manifests required by the frontend build stage
+!web/package.json
+!web/pnpm-lock.yaml
+!web/pnpm-workspace.yaml
