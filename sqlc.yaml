@@ -194,7 +194,7 @@ sql:
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
               type: "I18nText"
-              pointer: true
+              pointer: false
           - column: "achievement.description_i18n"
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
@@ -205,7 +205,7 @@ sql:
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
               type: "I18nText"
-              pointer: true
+              pointer: false
           - column: "item.description_i18n"
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
@@ -367,4 +367,104 @@ sql:
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
               type: "StudentRoleEnum"
+              pointer: true
+
+          - db_type: "submission_status_enum"
+            nullable: false
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
+              type: "SubmissionStatusEnum"
+          - db_type: "submission_status_enum"
+            nullable: true
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/enum"
+              type: "SubmissionStatusEnum"
+              pointer: true
+
+          # URL columns
+          - column: "chat.avatar_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "achievement.resource_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "item.resource_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "notification.resource_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "message.resource_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "course_subject_assessment_question.attachment_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+          - column: "course_subject_assessment_question.example_url"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "HttpUrl"
+              pointer: true
+
+          # Language code
+          - column: "language.language_code"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "LanguageCode"
+              pointer: false
+          - column: "course_subject_doc_md.language_code"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "LanguageCode"
+              pointer: false
+
+          # Registration invite profile fields
+          - column: "registration_invite.email"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Email"
+              pointer: true
+          - column: "registration_invite.name"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Name"
+              pointer: true
+          - column: "registration_invite.surname"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Name"
+              pointer: true
+          - column: "registration_invite.patronymic"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Name"
+              pointer: true
+          - column: "registration_invite.nickname"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Nickname"
+              pointer: true
+          - column: "registration_invite.username"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Username"
+              pointer: true
+
+          # Question correct text answer is i18n JSON, not generic metadata
+          - column: "course_subject_assessment_question.correct_text_answer"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "I18nText"
               pointer: true

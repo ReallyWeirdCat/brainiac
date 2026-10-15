@@ -7,23 +7,231 @@ package generated
 
 import (
 	"context"
+	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-const getCourseByGUID = `-- name: GetCourseByGUID :one
-SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
+const createCourse = `-- name: CreateCourse :one
+INSERT INTO course (
+    guid,
+    title_i18n,
+    description_i18n,
+    style,
+    meta,
+    published_at
+) VALUES (
+    $1, $2, $3, $4, $5, $6
+)
+RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+`
+
+type CreateCourseParams struct {
+	GUID            valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	Style           *valueobject.Metadata `db:"style" json:"style"`
+	Meta            *valueobject.Metadata `db:"meta" json:"meta"`
+	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
+}
+
+// CreateCourse
+//
+//	INSERT INTO course (
+//	    guid,
+//	    title_i18n,
+//	    description_i18n,
+//	    style,
+//	    meta,
+//	    published_at
+//	) VALUES (
+//	    $1, $2, $3, $4, $5, $6
+//	)
+//	RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error) {
+	row := q.db.QueryRow(ctx, createCourse,
+		arg.GUID,
+		arg.TitleI18n,
+		arg.DescriptionI18n,
+		arg.Style,
+		arg.Meta,
+		arg.PublishedAt,
+	)
+	var i Course
+	err := row.Scan(
+		&i.GUID,
+		&i.TitleI18n,
+		&i.DescriptionI18n,
+		&i.Style,
+		&i.Meta,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const deleteCourse = `-- name: DeleteCourse :exec
+UPDATE course
+SET deleted_at = now()
+WHERE guid = $1 AND deleted_at IS NULL
+`
+
+// DeleteCourse
+//
+//	UPDATE course
+//	SET deleted_at = now()
+//	WHERE guid = $1 AND deleted_at IS NULL
+func (q *Queries) DeleteCourse(ctx context.Context, guid valueobject.GUID) error {
+	_, err := q.db.Exec(ctx, deleteCourse, guid)
+	return err
+}
+
+const getCourse = `-- name: GetCourse :one
+SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+FROM course
 WHERE guid = $1 AND deleted_at IS NULL
 LIMIT 1
 `
 
-// GetCourseByGUID
+// GetCourse
 //
-//	SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
+//	SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+//	FROM course
 //	WHERE guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
-func (q *Queries) GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error) {
-	row := q.db.QueryRow(ctx, getCourseByGUID, guid)
+func (q *Queries) GetCourse(ctx context.Context, guid valueobject.GUID) (Course, error) {
+	row := q.db.QueryRow(ctx, getCourse, guid)
+	var i Course
+	err := row.Scan(
+		&i.GUID,
+		&i.TitleI18n,
+		&i.DescriptionI18n,
+		&i.Style,
+		&i.Meta,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const saveCourse = `-- name: SaveCourse :one
+INSERT INTO course (
+    guid,
+    title_i18n,
+    description_i18n,
+    style,
+    meta,
+    published_at
+) VALUES (
+    $1, $2, $3, $4, $5, $6
+)
+ON CONFLICT (guid) DO UPDATE
+SET
+    title_i18n = EXCLUDED.title_i18n,
+    description_i18n = EXCLUDED.description_i18n,
+    style = EXCLUDED.style,
+    meta = EXCLUDED.meta,
+    published_at = EXCLUDED.published_at
+WHERE deleted_at IS NULL
+RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+`
+
+type SaveCourseParams struct {
+	GUID            valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	Style           *valueobject.Metadata `db:"style" json:"style"`
+	Meta            *valueobject.Metadata `db:"meta" json:"meta"`
+	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
+}
+
+// SaveCourse
+//
+//	INSERT INTO course (
+//	    guid,
+//	    title_i18n,
+//	    description_i18n,
+//	    style,
+//	    meta,
+//	    published_at
+//	) VALUES (
+//	    $1, $2, $3, $4, $5, $6
+//	)
+//	ON CONFLICT (guid) DO UPDATE
+//	SET
+//	    title_i18n = EXCLUDED.title_i18n,
+//	    description_i18n = EXCLUDED.description_i18n,
+//	    style = EXCLUDED.style,
+//	    meta = EXCLUDED.meta,
+//	    published_at = EXCLUDED.published_at
+//	WHERE deleted_at IS NULL
+//	RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+func (q *Queries) SaveCourse(ctx context.Context, arg SaveCourseParams) (Course, error) {
+	row := q.db.QueryRow(ctx, saveCourse,
+		arg.GUID,
+		arg.TitleI18n,
+		arg.DescriptionI18n,
+		arg.Style,
+		arg.Meta,
+		arg.PublishedAt,
+	)
+	var i Course
+	err := row.Scan(
+		&i.GUID,
+		&i.TitleI18n,
+		&i.DescriptionI18n,
+		&i.Style,
+		&i.Meta,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateCourse = `-- name: UpdateCourse :one
+UPDATE course
+SET
+    title_i18n = $2,
+    description_i18n = $3,
+    style = $4,
+    meta = $5,
+    published_at = $6
+WHERE guid = $1 AND deleted_at IS NULL
+RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+`
+
+type UpdateCourseParams struct {
+	GUID            valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	Style           *valueobject.Metadata `db:"style" json:"style"`
+	Meta            *valueobject.Metadata `db:"meta" json:"meta"`
+	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
+}
+
+// UpdateCourse
+//
+//	UPDATE course
+//	SET
+//	    title_i18n = $2,
+//	    description_i18n = $3,
+//	    style = $4,
+//	    meta = $5,
+//	    published_at = $6
+//	WHERE guid = $1 AND deleted_at IS NULL
+//	RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+func (q *Queries) UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error) {
+	row := q.db.QueryRow(ctx, updateCourse,
+		arg.GUID,
+		arg.TitleI18n,
+		arg.DescriptionI18n,
+		arg.Style,
+		arg.Meta,
+		arg.PublishedAt,
+	)
 	var i Course
 	err := row.Scan(
 		&i.GUID,

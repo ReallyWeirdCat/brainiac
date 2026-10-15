@@ -28,7 +28,7 @@ type Item struct {
 	GUID            valueobject.GUID      `json:"guid"`
 	TitleI18n       valueobject.I18nText  `json:"title_i18n"`
 	DescriptionI18n *valueobject.I18nText `json:"description_i18n,omitempty"`
-	ResourceURL     *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	ResourceUrl     *valueobject.HttpUrl  `json:"resource_url,omitempty"`
 	Meta            valueobject.Metadata  `json:"meta"`
 	StackSize       int16                 `json:"stack_size"`
 	Rarity          enum.RarityEnum       `json:"rarity"`
@@ -56,7 +56,7 @@ func (i *Item) IsValid() bool {
 	if i.DescriptionI18n != nil && !i.DescriptionI18n.IsValid() {
 		return false
 	}
-	if i.ResourceURL != nil && !i.ResourceURL.IsValid() {
+	if i.ResourceUrl != nil && !i.ResourceUrl.IsValid() {
 		return false
 	}
 	if !i.Meta.IsValid() {

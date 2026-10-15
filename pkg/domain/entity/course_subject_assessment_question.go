@@ -30,10 +30,10 @@ type CourseSubjectAssessmentQuestion struct {
 	TitleI18n                   *valueobject.I18nText `json:"title_i18n,omitempty"`
 	DescriptionI18n             *valueobject.I18nText `json:"description_i18n,omitempty"`
 	QuestionType                enum.QuestionTypeEnum `json:"question_type"`
-	AttachmentURL               *valueobject.HttpUrl  `json:"attachment_url,omitempty"`
+	AttachmentUrl               *valueobject.HttpUrl  `json:"attachment_url,omitempty"`
 	Options                     *valueobject.I18nText `json:"options,omitempty"`
 	CorrectOptions              *valueobject.I18nText `json:"correct_options,omitempty"`
-	MaxCorrectOptions           int16                 `json:"max_correct_options"`
+	MaxCorrectOptions           *int16                `json:"max_correct_options"`
 	IsMultipleChoice            bool                  `json:"is_multiple_choice"`
 	MaxOptions                  int16                 `json:"max_options"`
 	MaxAnswerTime               int16                 `json:"max_answer_time"`
@@ -54,7 +54,7 @@ func (c *CourseSubjectAssessmentQuestion) IsValid() bool {
 	if c.DescriptionI18n != nil && !c.DescriptionI18n.IsValid() {
 		return false
 	}
-	if c.AttachmentURL != nil && !c.AttachmentURL.IsValid() {
+	if c.AttachmentUrl != nil && !c.AttachmentUrl.IsValid() {
 		return false
 	}
 	if c.CorrectOptions != nil && !c.CorrectOptions.IsValid() {
@@ -66,7 +66,7 @@ func (c *CourseSubjectAssessmentQuestion) IsValid() bool {
 	if c.ExampleUrl != nil && !c.ExampleUrl.IsValid() {
 		return false
 	}
-	if c.MaxCorrectOptions < 1 || c.MaxCorrectOptions > c.MaxOptions {
+	if c.MaxCorrectOptions != nil && (*c.MaxCorrectOptions < 1 || *c.MaxCorrectOptions > c.MaxOptions) {
 		return false
 	}
 	if c.MaxAnswerTime < 10 {

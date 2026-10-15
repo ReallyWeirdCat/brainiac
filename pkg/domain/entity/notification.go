@@ -29,7 +29,7 @@ type Notification struct {
 	AppUserGUID valueobject.GUID      `json:"app_user_guid"`
 	TitleI18n   *valueobject.I18nText `json:"title_i18n,omitempty"`
 	ContentI18n *valueobject.I18nText `json:"content_i18n,omitempty"`
-	ResourceURL *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	ResourceUrl *valueobject.HttpUrl  `json:"resource_url,omitempty"`
 	Urgency     enum.UrgencyEnum      `json:"urgency"`
 	Meta        *valueobject.Metadata `json:"meta,omitempty"`
 	SeenAt      *time.Time            `json:"seen_at,omitempty"`
@@ -50,7 +50,7 @@ func (n *Notification) IsValid() bool {
 	if n.ContentI18n != nil && !n.ContentI18n.IsValid() {
 		return false
 	}
-	if n.ResourceURL != nil && !n.ResourceURL.IsValid() {
+	if n.ResourceUrl != nil && !n.ResourceUrl.IsValid() {
 		return false
 	}
 	if n.Meta != nil && !n.Meta.IsValid() {

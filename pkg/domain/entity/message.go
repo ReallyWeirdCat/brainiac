@@ -28,7 +28,7 @@ type Message struct {
 	GUID           valueobject.GUID      `json:"guid"`
 	ChatMemberGUID valueobject.GUID      `json:"chat_member_guid"`
 	ChatGUID       valueobject.GUID      `json:"chat_guid"`
-	ResourceURL    *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	ResourceUrl    *valueobject.HttpUrl  `json:"resource_url,omitempty"`
 	Content        *string               `json:"content,omitempty"`
 	Urgency        enum.UrgencyEnum      `json:"urgency"`
 	Meta           *valueobject.Metadata `json:"meta,omitempty"`
@@ -43,7 +43,7 @@ type Message struct {
 var _ Entity = &Message{}
 
 func (m *Message) IsValid() bool {
-	if m.ResourceURL != nil && !m.ResourceURL.IsValid() {
+	if m.ResourceUrl != nil && !m.ResourceUrl.IsValid() {
 		return false
 	}
 	if m.Content != nil && len(*m.Content) > 1024 {

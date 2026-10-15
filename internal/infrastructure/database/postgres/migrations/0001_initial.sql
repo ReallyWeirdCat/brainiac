@@ -339,7 +339,7 @@ CREATE TABLE student_group_member_class_attendance (
 CREATE TABLE course_subject (
     guid UUID PRIMARY KEY,
     course_guid UUID NOT NULL REFERENCES course(guid),
-    parent UUID NULL REFERENCES course_subject(guid),
+    parent_guid UUID NULL REFERENCES course_subject(guid),
     title_i18n JSONB NULL,
     description_i18n JSONB NULL,
     reward_experience BIGINT NOT NULL DEFAULT 0,
@@ -352,7 +352,7 @@ CREATE TABLE course_subject (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE INDEX idx_coursesubject_parent_not_deleted ON course_subject (parent) WHERE deleted_at IS NULL;
+CREATE INDEX idx_coursesubject_parent_not_deleted ON course_subject (parent_guid) WHERE deleted_at IS NULL;
 
 -- 22. course_subject_doc
 CREATE TABLE course_subject_doc (

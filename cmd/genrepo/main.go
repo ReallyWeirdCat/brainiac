@@ -10,6 +10,10 @@
 // The output is plain, typed Go — no runtime reflection. Bespoke queries
 // (GetByUsername, ExistsByEmail, ...) remain hand-written next to the generated
 // file in the same package.
+//
+// Model is only set when sqlc's struct name differs from the domain entity name
+// (sqlc singularises table names, so e.g. table student_course_stats yields
+// generated.StudentCourseStat while the entity is entity.StudentCourseStats).
 package main
 
 import (
@@ -23,12 +27,18 @@ import (
 )
 
 type entitySpec struct {
-	Name string   // "AppUser" — used as entity.<Name>, generated.<Name>, and query prefixes
-	File string   // base filename without the zz_generated_ prefix and .go suffix
-	Writable []string // entity fields copied into Create/Save/Update params (column == field name)
+	Name     string   // "AppUser" — used as entity.<Name> and as the query prefix
+	File     string   // base filename without the zz_generated_ prefix and .go suffix
+	Model    string   // generated struct name if it differs from Name (else empty)
+	Writable []string // fields copied into Create/Save/Update params (column == field name)
 }
 
 var specs = []entitySpec{
+	{
+		Name:     "Achievement",
+		File:     "achievement",
+		Writable: []string{"GUID", "TitleI18n", "DescriptionI18n", "ResourceUrl", "IsHidden", "Meta", "Conditions", "RewardExperience", "RewardMoney", "PublishedAt"},
+	},
 	{
 		Name:     "AppUser",
 		File:     "appuser",
@@ -40,19 +50,186 @@ var specs = []entitySpec{
 		Writable: []string{"AppUserGUID", "Email", "PasswordHash"},
 	},
 	{
-		Name: "AppUserProfile",
-		File: "appuser_profile",
-		Writable: []string{
-			"AppUserGUID", "Name", "Surname", "Patronymic", "Nickname", "Bio",
-			"PreferredLanguage", "ProfileDiscovery", "AvatarUrl", "EditingLockedAt",
-		},
+		Name:     "AppUserProfile",
+		File:     "appuser_profile",
+		Writable: []string{"AppUserGUID", "Name", "Surname", "Patronymic", "Nickname", "Bio", "PreferredLanguage", "ProfileDiscovery", "AvatarUrl", "EditingLockedAt"},
 	},
 	{
-		Name: "AppUserSession",
-		File: "appuser_session",
-		Writable: []string{
-			"GUID", "AppUserGUID", "LastIPV4", "LastIPV6", "LastAgent", "LastSeenAt", "ExpireAt",
-		},
+		Name:     "AppUserSession",
+		File:     "appuser_session",
+		Writable: []string{"GUID", "AppUserGUID", "LastIPV4", "LastIPV6", "LastAgent", "LastSeenAt", "ExpireAt"},
+	},
+	{
+		Name:     "AppUserSuspension",
+		File:     "app_user_suspension",
+		Writable: []string{"GUID", "AppUserGUID", "Reason", "ExpireAt", "ExpiredAt"},
+	},
+	{
+		Name:     "Chat",
+		File:     "chat",
+		Writable: []string{"GUID", "Title", "Topic", "AvatarUrl", "StudentsCanText", "StudentsSeeMembers", "PreserveMessages", "Meta"},
+	},
+	{
+		Name:     "ChatMember",
+		File:     "chat_member",
+		Writable: []string{"GUID", "AppUserGUID", "ChatGUID", "ChatRole", "Name", "CustomRoleName", "LeftAt", "SeenAt"},
+	},
+	{
+		Name:     "Course",
+		File:     "course",
+		Writable: []string{"GUID", "TitleI18n", "DescriptionI18n", "Style", "Meta", "PublishedAt"},
+	},
+	{
+		Name:     "CourseLanguage",
+		File:     "course_language",
+		Writable: []string{"GUID", "CourseGUID", "LanguageGUID", "CalculatedSupportPercentage", "IsBeta", "IsNew"},
+	},
+	{
+		Name:     "CourseSubject",
+		File:     "course_subject",
+		Writable: []string{"GUID", "CourseGUID", "ParentGUID", "TitleI18n", "DescriptionI18n", "RewardExperience", "CompletionCondition", "HideChildren", "Style", "Meta", "PublishedAt"},
+	},
+	{
+		Name:     "CourseSubjectAssessment",
+		File:     "course_subject_assessment",
+		Writable: []string{"GUID", "CourseSubjectGUID", "TitleI18n", "DescriptionI18n", "IsAttestation", "HideAnswers", "HideAnswerValidity", "HideScore", "UseTimedQuestions", "MaxTime", "MaxAttempts", "ScoringMethod", "RequiredScore", "ShortQuestionsCount", "NormalQuestionsCount", "LongQuestionsCount", "PublishedAt"},
+	},
+	{
+		Name:     "CourseSubjectAssessmentPass",
+		File:     "course_subject_assessment_pass",
+		Writable: []string{"GUID", "CourseSubjectAssessmentGUID", "AppUserGUID", "IsActive", "AttemptsLeft", "ExpireAt"},
+	},
+	{
+		Name:     "CourseSubjectAssessmentQuestion",
+		File:     "course_subject_assessment_question",
+		Writable: []string{"GUID", "CourseSubjectAssessmentGUID", "TitleI18n", "DescriptionI18n", "QuestionType", "AttachmentUrl", "Options", "CorrectOptions", "MaxCorrectOptions", "IsMultipleChoice", "MaxOptions", "MaxAnswerTime", "UseTextAnswer", "CorrectTextAnswer", "ExampleUrl", "PublishedAt"},
+	},
+	{
+		Name:     "CourseSubjectDoc",
+		File:     "course_subject_doc",
+		Writable: []string{"GUID", "CourseSubjectGUID", "TitleI18n", "DescriptionI18n", "SubjectDocType", "ExampleMeta", "SubmissionMeta", "LiteratureMeta", "DocIndex", "PublishedAt"},
+	},
+	{
+		Name:     "CourseSubjectDocMd",
+		File:     "course_subject_doc_md",
+		Writable: []string{"GUID", "CourseSubjectDocGUID", "LanguageCode", "Md", "PublishedAt"},
+	},
+	{
+		Name:     "CourseSubjectItem",
+		File:     "course_subject_item",
+		Writable: []string{"GUID", "CourseSubjectGUID", "ItemGUID", "Amount"},
+	},
+	{
+		Name:     "DailyActivity",
+		File:     "daily_activity",
+		Writable: []string{"GUID", "AppUserGUID", "Day", "ExperienceEarned", "LevelsEarned", "SubjectsCompleted", "AssessmentsCompleted", "PracticesCompleted"},
+	},
+	{
+		Name:     "Inventory",
+		File:     "inventory",
+		Writable: []string{"AppUserGUID", "MaxSlots"},
+	},
+	{
+		Name:     "InventorySlot",
+		File:     "inventory_slot",
+		Writable: []string{"GUID", "InventoryGUID", "ItemGUID", "Amount", "AmountInExchange", "ExpireAt"},
+	},
+	{
+		Name:     "Item",
+		File:     "item",
+		Writable: []string{"GUID", "TitleI18n", "DescriptionI18n", "ResourceUrl", "Meta", "StackSize", "Rarity", "AllowExchange", "ShopPrice", "OneTimePurchase", "ShopQuantity", "LevelRequired", "OnSaleSince", "OnSaleUntil", "PublishedAt"},
+	},
+	{
+		Name:     "Language",
+		File:     "language",
+		Writable: []string{"GUID", "LanguageCode", "EnglishTitle", "LocalTitle", "Emoji", "IsSupported", "IsBeta"},
+	},
+	{
+		Name:     "Message",
+		File:     "message",
+		Writable: []string{"GUID", "ChatMemberGUID", "ChatGUID", "ResourceUrl", "Content", "Urgency", "Meta", "SeenBy", "EditedAt", "PinnedAt", "ExpireAt"},
+	},
+	{
+		Name:     "Notification",
+		File:     "notification",
+		Writable: []string{"GUID", "AppUserGUID", "TitleI18n", "ContentI18n", "ResourceUrl", "Urgency", "Meta", "SeenAt", "ExpireAt"},
+	},
+	{
+		Name:     "RegistrationInvite",
+		File:     "registration_invite",
+		Writable: []string{"AppUserGUID", "InvitedByAppUserGUID", "InviteCode", "Email", "Message", "Name", "Surname", "Patronymic", "Nickname", "Username", "StudentGroups", "TeacherGroups", "Chats", "ExpireAt", "UsedAt"},
+	},
+	{
+		Name:     "StudentAchievement",
+		File:     "student_achievement",
+		Writable: []string{"GUID", "AppUserGUID", "AchievementGUID"},
+	},
+	{
+		Name:     "StudentCourseStats",
+		File:     "student_course_stats",
+		Model:    "StudentCourseStat",
+		Writable: []string{"GUID", "AppUserGUID", "CourseGUID", "Experience", "Level", "Meta"},
+	},
+	{
+		Name:     "StudentCourseSubject",
+		File:     "student_course_subject",
+		Writable: []string{"GUID", "AppUserGUID", "CourseSubjectGUID", "CompletedAt", "SubjectStatus", "IsFavorite", "Meta"},
+	},
+	{
+		Name:     "StudentCourseSubjectAssessmentAttempt",
+		File:     "student_course_subject_assessment_attempt",
+		Writable: []string{"GUID", "AppUserGUID", "CourseSubjectAssessmentGUID", "AttemptStatus", "Score", "IsSuccess", "Answers"},
+	},
+	{
+		Name:     "StudentCourseSubjectSubmissionAttempt",
+		File:     "student_course_subject_submission_attempt",
+		Writable: []string{"GUID", "AppUserGUID", "CourseSubjectDocGUID", "SubmissionStatus", "Files", "Meta", "StudentComment", "TeacherComment"},
+	},
+	{
+		Name:     "StudentGlobalStats",
+		File:     "student_global_stats",
+		Model:    "StudentGlobalStat",
+		Writable: []string{"AppUserGUID", "Level", "OtherExperience", "Money", "MoneyEarned", "SubjectsCompleted", "AssessmentsCompleted", "AssessmentsFailed", "AssessmentsTerminated", "WorksSubmitted", "ItemsCollected", "ItemsUsed", "ItemsSold", "ItemsExchanged", "BoxesOpened", "MaxDailyStreak", "MessagesSent"},
+	},
+	{
+		Name:     "StudentGroup",
+		File:     "student_group",
+		Writable: []string{"GUID", "Title", "Description", "EnableGamification"},
+	},
+	{
+		Name:     "StudentGroupClass",
+		File:     "student_group_class",
+		Writable: []string{"GUID", "StudentGroupGUID", "Title", "StartTime", "EndTime", "Objectives", "AttestationAssessmentsEnabled", "AttendanceClosedAt", "MarksApprovedAt", "TOTPSecret", "Room", "ClassType"},
+	},
+	{
+		Name:     "StudentGroupCourse",
+		File:     "student_group_course",
+		Writable: []string{"GUID", "StudentGroupGUID", "CourseGUID", "FullAccess", "CloseSubmissions"},
+	},
+	{
+		Name:     "StudentGroupMember",
+		File:     "student_group_member",
+		Writable: []string{"GUID", "AppUserGUID", "StudentGroupGUID", "StudentRole", "Notes", "Team", "TeamResponsibilities"},
+	},
+	{
+		Name:     "StudentGroupMemberClassAttendance",
+		File:     "student_group_member_class_attendance",
+		Writable: []string{"GUID", "StudentGroupMemberGUID", "StudentGroupClassGUID", "FirstSeenAt", "LastSeenAt", "PresentAt", "ObjectivesCompletion", "Comment", "Grade"},
+	},
+	{
+		Name:     "TOTPSecret",
+		File:     "totp_secret",
+		Writable: []string{"AppUserGUID", "SecretBase32", "LastUsedAt"},
+	},
+	{
+		Name:     "Teacher",
+		File:     "teacher",
+		Writable: []string{"AppUserGUID", "ActiveSince", "ManageStudents", "ManageAttendance", "ManageResults", "ManageCourses", "IsAdmin", "ContactInfo"},
+	},
+	{
+		Name:     "TeacherGroup",
+		File:     "teacher_group",
+		Writable: []string{"GUID", "TeacherGUID", "StudentGroupGUID", "ActiveSince", "ManageAttendance", "ManageResults", "ManageStudents", "ManageAchievements", "TeacherUntil"},
 	},
 }
 
@@ -74,6 +251,11 @@ func main() {
 }
 
 func render(s entitySpec) ([]byte, error) {
+	model := s.Model
+	if model == "" {
+		model = s.Name
+	}
+
 	var b bytes.Buffer
 
 	structName := "pg" + s.Name + "Repo"

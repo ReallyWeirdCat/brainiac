@@ -100,7 +100,7 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 	}
 	defer uow.Rollback(ctx)
 
-	usernameTaken, err := uow.AppUsers().ExistsByUsername(ctx, username)
+	usernameTaken, err := uow.AppUser().ExistsByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 		return nil, ErrUsernameTaken
 	}
 
-	existingCredential, err := uow.AppUserCredentials().GetByEmail(ctx, email)
+	existingCredential, err := uow.AppUserCredential().GetByEmail(ctx, email)
 	if err != nil && !errors.Is(err, repository.ErrEntityNotFound) {
 		return nil, err
 	}

@@ -35,6 +35,24 @@ type Querier interface {
 	//  FROM app_user
 	//  WHERE deleted_at IS NULL
 	CountAppUsers(ctx context.Context) (int64, error)
+	//CreateAchievement
+	//
+	//  INSERT INTO achievement (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      resource_url,
+	//      is_hidden,
+	//      meta,
+	//      conditions,
+	//      reward_experience,
+	//      reward_money,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+	//  )
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, is_hidden, meta, conditions, reward_experience, reward_money, published_at, created_at, deleted_at
+	CreateAchievement(ctx context.Context, arg CreateAchievementParams) (Achievement, error)
 	//CreateAppUser
 	//
 	//  INSERT INTO app_user (
@@ -137,6 +155,564 @@ type Querier interface {
 	//  ) VALUES ($1, $2, $3, $4, $5, $6, $7)
 	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 	CreateAppUserSessionBatch(ctx context.Context, arg []CreateAppUserSessionBatchParams) *CreateAppUserSessionBatchBatchResults
+	//CreateAppUserSuspension
+	//
+	//  INSERT INTO app_user_suspension (
+	//      guid,
+	//      app_user_guid,
+	//      reason,
+	//      expire_at,
+	//      expired_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  RETURNING guid, app_user_guid, reason, expire_at, expired_at, created_at, deleted_at
+	CreateAppUserSuspension(ctx context.Context, arg CreateAppUserSuspensionParams) (AppUserSuspension, error)
+	//CreateChat
+	//
+	//  INSERT INTO chat (
+	//      guid,
+	//      title,
+	//      topic,
+	//      avatar_url,
+	//      students_can_text,
+	//      students_see_members,
+	//      preserve_messages,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  RETURNING guid, title, topic, avatar_url, students_can_text, students_see_members, preserve_messages, meta, created_at, deleted_at
+	CreateChat(ctx context.Context, arg CreateChatParams) (Chat, error)
+	//CreateChatMember
+	//
+	//  INSERT INTO chat_member (
+	//      guid,
+	//      app_user_guid,
+	//      chat_guid,
+	//      chat_role,
+	//      name,
+	//      custom_role_name,
+	//      left_at,
+	//      seen_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  RETURNING guid, app_user_guid, chat_guid, chat_role, name, custom_role_name, left_at, seen_at, created_at, deleted_at
+	CreateChatMember(ctx context.Context, arg CreateChatMemberParams) (ChatMember, error)
+	//CreateCourse
+	//
+	//  INSERT INTO course (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      style,
+	//      meta,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+	CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error)
+	//CreateCourseLanguage
+	//
+	//  INSERT INTO course_language (
+	//      guid,
+	//      course_guid,
+	//      language_guid,
+	//      calculated_support_percentage,
+	//      is_beta,
+	//      is_new
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  RETURNING guid, course_guid, language_guid, calculated_support_percentage, is_beta, is_new, created_at, deleted_at
+	CreateCourseLanguage(ctx context.Context, arg CreateCourseLanguageParams) (CourseLanguage, error)
+	//CreateCourseSubject
+	//
+	//  INSERT INTO course_subject (
+	//      guid,
+	//      course_guid,
+	//      parent_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      reward_experience,
+	//      completion_condition,
+	//      hide_children,
+	//      style,
+	//      meta,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+	//  )
+	//  RETURNING guid, course_guid, parent_guid, title_i18n, description_i18n, reward_experience, completion_condition, hide_children, style, meta, published_at, created_at, deleted_at
+	CreateCourseSubject(ctx context.Context, arg CreateCourseSubjectParams) (CourseSubject, error)
+	//CreateCourseSubjectAssessment
+	//
+	//  INSERT INTO course_subject_assessment (
+	//      guid,
+	//      course_subject_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      is_attestation,
+	//      hide_answers,
+	//      hide_answer_validity,
+	//      hide_score,
+	//      use_timed_questions,
+	//      max_time,
+	//      max_attempts,
+	//      scoring_method,
+	//      required_score,
+	//      short_questions_count,
+	//      normal_questions_count,
+	//      long_questions_count,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+	//  )
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, is_attestation, hide_answers, hide_answer_validity, hide_score, use_timed_questions, max_time, max_attempts, scoring_method, required_score, short_questions_count, normal_questions_count, long_questions_count, published_at, created_at, deleted_at
+	CreateCourseSubjectAssessment(ctx context.Context, arg CreateCourseSubjectAssessmentParams) (CourseSubjectAssessment, error)
+	//CreateCourseSubjectAssessmentPass
+	//
+	//  INSERT INTO course_subject_assessment_pass (
+	//      guid,
+	//      course_subject_assessment_guid,
+	//      app_user_guid,
+	//      is_active,
+	//      attempts_left,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	CreateCourseSubjectAssessmentPass(ctx context.Context, arg CreateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
+	//CreateCourseSubjectAssessmentQuestion
+	//
+	//  INSERT INTO course_subject_assessment_question (
+	//      guid,
+	//      course_subject_assessment_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      question_type,
+	//      attachment_url,
+	//      options,
+	//      correct_options,
+	//      max_correct_options,
+	//      is_multiple_choice,
+	//      max_options,
+	//      max_answer_time,
+	//      use_text_answer,
+	//      correct_text_answer,
+	//      example_url,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+	//  )
+	//  RETURNING guid, course_subject_assessment_guid, title_i18n, description_i18n, question_type, attachment_url, options, correct_options, max_correct_options, is_multiple_choice, max_options, max_answer_time, use_text_answer, correct_text_answer, example_url, published_at, created_at, deleted_at
+	CreateCourseSubjectAssessmentQuestion(ctx context.Context, arg CreateCourseSubjectAssessmentQuestionParams) (CourseSubjectAssessmentQuestion, error)
+	//CreateCourseSubjectDoc
+	//
+	//  INSERT INTO course_subject_doc (
+	//      guid,
+	//      course_subject_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      subject_doc_type,
+	//      example_meta,
+	//      submission_meta,
+	//      literature_meta,
+	//      doc_index,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+	//  )
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, subject_doc_type, example_meta, submission_meta, literature_meta, doc_index, published_at, created_at, deleted_at
+	CreateCourseSubjectDoc(ctx context.Context, arg CreateCourseSubjectDocParams) (CourseSubjectDoc, error)
+	//CreateCourseSubjectDocMd
+	//
+	//  INSERT INTO course_subject_doc_md (
+	//      guid,
+	//      course_subject_doc_guid,
+	//      language_code,
+	//      md,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  RETURNING guid, course_subject_doc_guid, language_code, md, published_at, created_at, deleted_at
+	CreateCourseSubjectDocMd(ctx context.Context, arg CreateCourseSubjectDocMdParams) (CourseSubjectDocMd, error)
+	//CreateCourseSubjectItem
+	//
+	//  INSERT INTO course_subject_item (
+	//      guid,
+	//      course_subject_guid,
+	//      item_guid,
+	//      amount
+	//  ) VALUES (
+	//      $1, $2, $3, $4
+	//  )
+	//  RETURNING guid, course_subject_guid, item_guid, amount, created_at, deleted_at
+	CreateCourseSubjectItem(ctx context.Context, arg CreateCourseSubjectItemParams) (CourseSubjectItem, error)
+	//CreateDailyActivity
+	//
+	//  INSERT INTO daily_activity (
+	//      guid,
+	//      app_user_guid,
+	//      day,
+	//      experience_earned,
+	//      levels_earned,
+	//      subjects_completed,
+	//      assessments_completed,
+	//      practices_completed
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  RETURNING guid, app_user_guid, day, experience_earned, levels_earned, subjects_completed, assessments_completed, practices_completed, created_at, deleted_at
+	CreateDailyActivity(ctx context.Context, arg CreateDailyActivityParams) (DailyActivity, error)
+	//CreateInventory
+	//
+	//  INSERT INTO inventory (
+	//      app_user_guid,
+	//      max_slots
+	//  ) VALUES (
+	//      $1, $2
+	//  )
+	//  RETURNING app_user_guid, max_slots, created_at, deleted_at
+	CreateInventory(ctx context.Context, arg CreateInventoryParams) (Inventory, error)
+	//CreateInventorySlot
+	//
+	//  INSERT INTO inventory_slot (
+	//      guid,
+	//      inventory_guid,
+	//      item_guid,
+	//      amount,
+	//      amount_in_exchange,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  RETURNING guid, inventory_guid, item_guid, amount, amount_in_exchange, expire_at, created_at, deleted_at
+	CreateInventorySlot(ctx context.Context, arg CreateInventorySlotParams) (InventorySlot, error)
+	//CreateItem
+	//
+	//  INSERT INTO item (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      resource_url,
+	//      meta,
+	//      stack_size,
+	//      rarity,
+	//      allow_exchange,
+	//      shop_price,
+	//      one_time_purchase,
+	//      shop_quantity,
+	//      level_required,
+	//      on_sale_since,
+	//      on_sale_until,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+	//  )
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, meta, stack_size, rarity, allow_exchange, shop_price, one_time_purchase, shop_quantity, level_required, on_sale_since, on_sale_until, published_at, created_at, deleted_at
+	CreateItem(ctx context.Context, arg CreateItemParams) (Item, error)
+	//CreateLanguage
+	//
+	//  INSERT INTO language (
+	//      guid,
+	//      language_code,
+	//      english_title,
+	//      local_title,
+	//      emoji,
+	//      is_supported,
+	//      is_beta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  RETURNING guid, language_code, english_title, local_title, emoji, is_supported, is_beta, created_at, deleted_at
+	CreateLanguage(ctx context.Context, arg CreateLanguageParams) (Language, error)
+	//CreateMessage
+	//
+	//  INSERT INTO message (
+	//      guid,
+	//      chat_member_guid,
+	//      chat_guid,
+	//      resource_url,
+	//      content,
+	//      urgency,
+	//      meta,
+	//      seen_by,
+	//      edited_at,
+	//      pinned_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+	//  )
+	//  RETURNING guid, chat_member_guid, chat_guid, resource_url, content, urgency, meta, seen_by, edited_at, pinned_at, expire_at, created_at, deleted_at
+	CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error)
+	//CreateNotification
+	//
+	//  INSERT INTO notification (
+	//      guid,
+	//      app_user_guid,
+	//      title_i18n,
+	//      content_i18n,
+	//      resource_url,
+	//      urgency,
+	//      meta,
+	//      seen_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  RETURNING guid, app_user_guid, title_i18n, content_i18n, resource_url, urgency, meta, seen_at, expire_at, created_at, deleted_at
+	CreateNotification(ctx context.Context, arg CreateNotificationParams) (Notification, error)
+	//CreateRegistrationInvite
+	//
+	//  INSERT INTO registration_invite (
+	//      app_user_guid,
+	//      invited_by_app_user_guid,
+	//      invite_code,
+	//      email,
+	//      message,
+	//      name,
+	//      surname,
+	//      patronymic,
+	//      nickname,
+	//      username,
+	//      student_groups,
+	//      teacher_groups,
+	//      chats,
+	//      expire_at,
+	//      used_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+	//  )
+	//  RETURNING app_user_guid, invited_by_app_user_guid, invite_code, email, message, name, surname, patronymic, nickname, username, student_groups, teacher_groups, chats, expire_at, used_at, created_at, deleted_at
+	CreateRegistrationInvite(ctx context.Context, arg CreateRegistrationInviteParams) (RegistrationInvite, error)
+	//CreateStudentAchievement
+	//
+	//  INSERT INTO student_achievement (
+	//      guid,
+	//      app_user_guid,
+	//      achievement_guid
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
+	//  RETURNING guid, app_user_guid, achievement_guid, created_at, deleted_at
+	CreateStudentAchievement(ctx context.Context, arg CreateStudentAchievementParams) (StudentAchievement, error)
+	//CreateStudentCourseStats
+	//
+	//  INSERT INTO student_course_stats (
+	//      guid,
+	//      app_user_guid,
+	//      course_guid,
+	//      experience,
+	//      level,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  RETURNING guid, app_user_guid, course_guid, experience, level, meta, created_at, deleted_at
+	CreateStudentCourseStats(ctx context.Context, arg CreateStudentCourseStatsParams) (StudentCourseStat, error)
+	//CreateStudentCourseSubject
+	//
+	//  INSERT INTO student_course_subject (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_guid,
+	//      completed_at,
+	//      subject_status,
+	//      is_favorite,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  RETURNING guid, app_user_guid, course_subject_guid, completed_at, subject_status, is_favorite, meta, created_at, deleted_at
+	CreateStudentCourseSubject(ctx context.Context, arg CreateStudentCourseSubjectParams) (StudentCourseSubject, error)
+	//CreateStudentCourseSubjectAssessmentAttempt
+	//
+	//  INSERT INTO student_course_subject_assessment_attempt (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_assessment_guid,
+	//      attempt_status,
+	//      score,
+	//      is_success,
+	//      answers
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  RETURNING guid, app_user_guid, course_subject_assessment_guid, attempt_status, score, is_success, answers, created_at, deleted_at
+	CreateStudentCourseSubjectAssessmentAttempt(ctx context.Context, arg CreateStudentCourseSubjectAssessmentAttemptParams) (StudentCourseSubjectAssessmentAttempt, error)
+	//CreateStudentCourseSubjectSubmissionAttempt
+	//
+	//  INSERT INTO student_course_subject_submission_attempt (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_doc_guid,
+	//      submission_status,
+	//      files,
+	//      meta,
+	//      student_comment,
+	//      teacher_comment
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  RETURNING guid, app_user_guid, course_subject_doc_guid, submission_status, files, meta, student_comment, teacher_comment, created_at, deleted_at
+	CreateStudentCourseSubjectSubmissionAttempt(ctx context.Context, arg CreateStudentCourseSubjectSubmissionAttemptParams) (StudentCourseSubjectSubmissionAttempt, error)
+	//CreateStudentGlobalStats
+	//
+	//  INSERT INTO student_global_stats (
+	//      app_user_guid,
+	//      level,
+	//      other_experience,
+	//      money,
+	//      money_earned,
+	//      subjects_completed,
+	//      assessments_completed,
+	//      assessments_failed,
+	//      assessments_terminated,
+	//      works_submitted,
+	//      items_collected,
+	//      items_used,
+	//      items_sold,
+	//      items_exchanged,
+	//      boxes_opened,
+	//      max_daily_streak,
+	//      messages_sent
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+	//  )
+	//  RETURNING app_user_guid, level, other_experience, money, money_earned, subjects_completed, assessments_completed, assessments_failed, assessments_terminated, works_submitted, items_collected, items_used, items_sold, items_exchanged, boxes_opened, max_daily_streak, messages_sent, created_at, deleted_at
+	CreateStudentGlobalStats(ctx context.Context, arg CreateStudentGlobalStatsParams) (StudentGlobalStat, error)
+	//CreateStudentGroup
+	//
+	//  INSERT INTO student_group (
+	//      guid,
+	//      title,
+	//      description,
+	//      enable_gamification
+	//  ) VALUES (
+	//      $1, $2, $3, $4
+	//  )
+	//  RETURNING guid, title, description, enable_gamification, created_at, deleted_at
+	CreateStudentGroup(ctx context.Context, arg CreateStudentGroupParams) (StudentGroup, error)
+	//CreateStudentGroupClass
+	//
+	//  INSERT INTO student_group_class (
+	//      guid,
+	//      student_group_guid,
+	//      title,
+	//      start_time,
+	//      end_time,
+	//      objectives,
+	//      attestation_assessments_enabled,
+	//      attendance_closed_at,
+	//      marks_approved_at,
+	//      totp_secret,
+	//      room,
+	//      class_type
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+	//  )
+	//  RETURNING guid, student_group_guid, title, start_time, end_time, objectives, attestation_assessments_enabled, attendance_closed_at, marks_approved_at, totp_secret, room, class_type, created_at, deleted_at
+	CreateStudentGroupClass(ctx context.Context, arg CreateStudentGroupClassParams) (StudentGroupClass, error)
+	//CreateStudentGroupCourse
+	//
+	//  INSERT INTO student_group_course (
+	//      guid,
+	//      student_group_guid,
+	//      course_guid,
+	//      full_access,
+	//      close_submissions
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  RETURNING guid, student_group_guid, course_guid, full_access, close_submissions, created_at, deleted_at
+	CreateStudentGroupCourse(ctx context.Context, arg CreateStudentGroupCourseParams) (StudentGroupCourse, error)
+	//CreateStudentGroupMember
+	//
+	//  INSERT INTO student_group_member (
+	//      guid,
+	//      app_user_guid,
+	//      student_group_guid,
+	//      student_role,
+	//      notes,
+	//      team,
+	//      team_responsibilities
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  RETURNING guid, app_user_guid, student_group_guid, student_role, notes, team, team_responsibilities, created_at, deleted_at
+	CreateStudentGroupMember(ctx context.Context, arg CreateStudentGroupMemberParams) (StudentGroupMember, error)
+	//CreateStudentGroupMemberClassAttendance
+	//
+	//  INSERT INTO student_group_member_class_attendance (
+	//      guid,
+	//      student_group_member_guid,
+	//      student_group_class_guid,
+	//      first_seen_at,
+	//      last_seen_at,
+	//      present_at,
+	//      objectives_completion,
+	//      comment,
+	//      grade
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  RETURNING guid, student_group_member_guid, student_group_class_guid, first_seen_at, last_seen_at, present_at, objectives_completion, comment, grade, created_at, deleted_at
+	CreateStudentGroupMemberClassAttendance(ctx context.Context, arg CreateStudentGroupMemberClassAttendanceParams) (StudentGroupMemberClassAttendance, error)
+	//CreateTOTPSecret
+	//
+	//  INSERT INTO totp_secret (
+	//      app_user_guid,
+	//      secret_base32,
+	//      last_used_at
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
+	//  RETURNING app_user_guid, secret_base32, last_used_at, created_at, deleted_at
+	CreateTOTPSecret(ctx context.Context, arg CreateTOTPSecretParams) (TOTPSecret, error)
+	//CreateTeacher
+	//
+	//  INSERT INTO teacher (
+	//      app_user_guid,
+	//      active_since,
+	//      manage_students,
+	//      manage_attendance,
+	//      manage_results,
+	//      manage_courses,
+	//      is_admin,
+	//      contact_info
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	CreateTeacher(ctx context.Context, arg CreateTeacherParams) (Teacher, error)
+	//CreateTeacherGroup
+	//
+	//  INSERT INTO teacher_group (
+	//      guid,
+	//      teacher_guid,
+	//      student_group_guid,
+	//      active_since,
+	//      manage_attendance,
+	//      manage_results,
+	//      manage_students,
+	//      manage_achievements,
+	//      teacher_until
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  RETURNING guid, teacher_guid, student_group_guid, active_since, manage_attendance, manage_results, manage_students, manage_achievements, teacher_until, created_at, deleted_at
+	CreateTeacherGroup(ctx context.Context, arg CreateTeacherGroupParams) (TeacherGroup, error)
+	//DeleteAchievement
+	//
+	//  UPDATE achievement
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteAchievement(ctx context.Context, guid valueobject.GUID) error
 	//DeleteAppUser
 	//
 	//  UPDATE app_user
@@ -186,6 +762,210 @@ type Querier interface {
 	//  SET deleted_at = now()
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	DeleteAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *DeleteAppUserSessionBatchBatchResults
+	//DeleteAppUserSuspension
+	//
+	//  UPDATE app_user_suspension
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteAppUserSuspension(ctx context.Context, guid valueobject.GUID) error
+	//DeleteChat
+	//
+	//  UPDATE chat
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteChat(ctx context.Context, guid valueobject.GUID) error
+	//DeleteChatMember
+	//
+	//  UPDATE chat_member
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteChatMember(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourse
+	//
+	//  UPDATE course
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourse(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseLanguage
+	//
+	//  UPDATE course_language
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseLanguage(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubject
+	//
+	//  UPDATE course_subject
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubject(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectAssessment
+	//
+	//  UPDATE course_subject_assessment
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectAssessment(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectAssessmentPass
+	//
+	//  UPDATE course_subject_assessment_pass
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectAssessmentPass(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectAssessmentQuestion
+	//
+	//  UPDATE course_subject_assessment_question
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectAssessmentQuestion(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectDoc
+	//
+	//  UPDATE course_subject_doc
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectDoc(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectDocMd
+	//
+	//  UPDATE course_subject_doc_md
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectDocMd(ctx context.Context, guid valueobject.GUID) error
+	//DeleteCourseSubjectItem
+	//
+	//  UPDATE course_subject_item
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteCourseSubjectItem(ctx context.Context, guid valueobject.GUID) error
+	//DeleteDailyActivity
+	//
+	//  UPDATE daily_activity
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteDailyActivity(ctx context.Context, guid valueobject.GUID) error
+	//DeleteInventory
+	//
+	//  UPDATE inventory
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteInventory(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteInventorySlot
+	//
+	//  UPDATE inventory_slot
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteInventorySlot(ctx context.Context, guid valueobject.GUID) error
+	//DeleteItem
+	//
+	//  UPDATE item
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteItem(ctx context.Context, guid valueobject.GUID) error
+	//DeleteLanguage
+	//
+	//  UPDATE language
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteLanguage(ctx context.Context, guid valueobject.GUID) error
+	//DeleteMessage
+	//
+	//  UPDATE message
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteMessage(ctx context.Context, guid valueobject.GUID) error
+	//DeleteNotification
+	//
+	//  UPDATE notification
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteNotification(ctx context.Context, guid valueobject.GUID) error
+	//DeleteRegistrationInvite
+	//
+	//  UPDATE registration_invite
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteRegistrationInvite(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteStudentAchievement
+	//
+	//  UPDATE student_achievement
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentAchievement(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentCourseStats
+	//
+	//  UPDATE student_course_stats
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentCourseStats(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentCourseSubject
+	//
+	//  UPDATE student_course_subject
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentCourseSubject(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentCourseSubjectAssessmentAttempt
+	//
+	//  UPDATE student_course_subject_assessment_attempt
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentCourseSubjectAssessmentAttempt(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentCourseSubjectSubmissionAttempt
+	//
+	//  UPDATE student_course_subject_submission_attempt
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentCourseSubjectSubmissionAttempt(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentGlobalStats
+	//
+	//  UPDATE student_global_stats
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteStudentGlobalStats(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteStudentGroup
+	//
+	//  UPDATE student_group
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentGroup(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentGroupClass
+	//
+	//  UPDATE student_group_class
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentGroupClass(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentGroupCourse
+	//
+	//  UPDATE student_group_course
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentGroupCourse(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentGroupMember
+	//
+	//  UPDATE student_group_member
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentGroupMember(ctx context.Context, guid valueobject.GUID) error
+	//DeleteStudentGroupMemberClassAttendance
+	//
+	//  UPDATE student_group_member_class_attendance
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteStudentGroupMemberClassAttendance(ctx context.Context, guid valueobject.GUID) error
+	//DeleteTOTPSecret
+	//
+	//  UPDATE totp_secret
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteTOTPSecret(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteTeacher
+	//
+	//  UPDATE teacher
+	//  SET deleted_at = now()
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	DeleteTeacher(ctx context.Context, appUserGuid valueobject.GUID) error
+	//DeleteTeacherGroup
+	//
+	//  UPDATE teacher_group
+	//  SET deleted_at = now()
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	DeleteTeacherGroup(ctx context.Context, guid valueobject.GUID) error
 	//ExistsAppUser
 	//
 	//  SELECT EXISTS (
@@ -254,6 +1034,13 @@ type Querier interface {
 	//  SELECT guid FROM app_user_session
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	ExistsAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *ExistsAppUserSessionBatchBatchResults
+	//GetAchievement
+	//
+	//  SELECT guid, title_i18n, description_i18n, resource_url, is_hidden, meta, conditions, reward_experience, reward_money, published_at, created_at, deleted_at
+	//  FROM achievement
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetAchievement(ctx context.Context, guid valueobject.GUID) (Achievement, error)
 	//GetAllActiveSessionsByUsername
 	//
 	//  SELECT s.guid, s.app_user_guid, s.last_ipv4, s.last_ipv6, s.last_agent, s.last_seen_at, s.expire_at, s.created_at, s.deleted_at
@@ -397,12 +1184,244 @@ type Querier interface {
 	//  SELECT guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at FROM app_user_session
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	GetAppUserSessionBatch(ctx context.Context, guid []valueobject.GUID) *GetAppUserSessionBatchBatchResults
-	//GetCourseByGUID
+	//GetAppUserSuspension
 	//
-	//  SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at FROM course
+	//  SELECT guid, app_user_guid, reason, expire_at, expired_at, created_at, deleted_at
+	//  FROM app_user_suspension
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  LIMIT 1
-	GetCourseByGUID(ctx context.Context, guid valueobject.GUID) (Course, error)
+	GetAppUserSuspension(ctx context.Context, guid valueobject.GUID) (AppUserSuspension, error)
+	//GetChat
+	//
+	//  SELECT guid, title, topic, avatar_url, students_can_text, students_see_members, preserve_messages, meta, created_at, deleted_at
+	//  FROM chat
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetChat(ctx context.Context, guid valueobject.GUID) (Chat, error)
+	//GetChatMember
+	//
+	//  SELECT guid, app_user_guid, chat_guid, chat_role, name, custom_role_name, left_at, seen_at, created_at, deleted_at
+	//  FROM chat_member
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetChatMember(ctx context.Context, guid valueobject.GUID) (ChatMember, error)
+	//GetCourse
+	//
+	//  SELECT guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+	//  FROM course
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourse(ctx context.Context, guid valueobject.GUID) (Course, error)
+	//GetCourseLanguage
+	//
+	//  SELECT guid, course_guid, language_guid, calculated_support_percentage, is_beta, is_new, created_at, deleted_at
+	//  FROM course_language
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseLanguage(ctx context.Context, guid valueobject.GUID) (CourseLanguage, error)
+	//GetCourseSubject
+	//
+	//  SELECT guid, course_guid, parent_guid, title_i18n, description_i18n, reward_experience, completion_condition, hide_children, style, meta, published_at, created_at, deleted_at
+	//  FROM course_subject
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubject(ctx context.Context, guid valueobject.GUID) (CourseSubject, error)
+	//GetCourseSubjectAssessment
+	//
+	//  SELECT guid, course_subject_guid, title_i18n, description_i18n, is_attestation, hide_answers, hide_answer_validity, hide_score, use_timed_questions, max_time, max_attempts, scoring_method, required_score, short_questions_count, normal_questions_count, long_questions_count, published_at, created_at, deleted_at
+	//  FROM course_subject_assessment
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectAssessment(ctx context.Context, guid valueobject.GUID) (CourseSubjectAssessment, error)
+	//GetCourseSubjectAssessmentPass
+	//
+	//  SELECT guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	//  FROM course_subject_assessment_pass
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectAssessmentPass(ctx context.Context, guid valueobject.GUID) (CourseSubjectAssessmentPass, error)
+	//GetCourseSubjectAssessmentQuestion
+	//
+	//  SELECT guid, course_subject_assessment_guid, title_i18n, description_i18n, question_type, attachment_url, options, correct_options, max_correct_options, is_multiple_choice, max_options, max_answer_time, use_text_answer, correct_text_answer, example_url, published_at, created_at, deleted_at
+	//  FROM course_subject_assessment_question
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectAssessmentQuestion(ctx context.Context, guid valueobject.GUID) (CourseSubjectAssessmentQuestion, error)
+	//GetCourseSubjectDoc
+	//
+	//  SELECT guid, course_subject_guid, title_i18n, description_i18n, subject_doc_type, example_meta, submission_meta, literature_meta, doc_index, published_at, created_at, deleted_at
+	//  FROM course_subject_doc
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectDoc(ctx context.Context, guid valueobject.GUID) (CourseSubjectDoc, error)
+	//GetCourseSubjectDocMd
+	//
+	//  SELECT guid, course_subject_doc_guid, language_code, md, published_at, created_at, deleted_at
+	//  FROM course_subject_doc_md
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectDocMd(ctx context.Context, guid valueobject.GUID) (CourseSubjectDocMd, error)
+	//GetCourseSubjectItem
+	//
+	//  SELECT guid, course_subject_guid, item_guid, amount, created_at, deleted_at
+	//  FROM course_subject_item
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetCourseSubjectItem(ctx context.Context, guid valueobject.GUID) (CourseSubjectItem, error)
+	//GetDailyActivity
+	//
+	//  SELECT guid, app_user_guid, day, experience_earned, levels_earned, subjects_completed, assessments_completed, practices_completed, created_at, deleted_at
+	//  FROM daily_activity
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetDailyActivity(ctx context.Context, guid valueobject.GUID) (DailyActivity, error)
+	//GetInventory
+	//
+	//  SELECT app_user_guid, max_slots, created_at, deleted_at
+	//  FROM inventory
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetInventory(ctx context.Context, appUserGuid valueobject.GUID) (Inventory, error)
+	//GetInventorySlot
+	//
+	//  SELECT guid, inventory_guid, item_guid, amount, amount_in_exchange, expire_at, created_at, deleted_at
+	//  FROM inventory_slot
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetInventorySlot(ctx context.Context, guid valueobject.GUID) (InventorySlot, error)
+	//GetItem
+	//
+	//  SELECT guid, title_i18n, description_i18n, resource_url, meta, stack_size, rarity, allow_exchange, shop_price, one_time_purchase, shop_quantity, level_required, on_sale_since, on_sale_until, published_at, created_at, deleted_at
+	//  FROM item
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetItem(ctx context.Context, guid valueobject.GUID) (Item, error)
+	//GetLanguage
+	//
+	//  SELECT guid, language_code, english_title, local_title, emoji, is_supported, is_beta, created_at, deleted_at
+	//  FROM language
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetLanguage(ctx context.Context, guid valueobject.GUID) (Language, error)
+	//GetMessage
+	//
+	//  SELECT guid, chat_member_guid, chat_guid, resource_url, content, urgency, meta, seen_by, edited_at, pinned_at, expire_at, created_at, deleted_at
+	//  FROM message
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetMessage(ctx context.Context, guid valueobject.GUID) (Message, error)
+	//GetNotification
+	//
+	//  SELECT guid, app_user_guid, title_i18n, content_i18n, resource_url, urgency, meta, seen_at, expire_at, created_at, deleted_at
+	//  FROM notification
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetNotification(ctx context.Context, guid valueobject.GUID) (Notification, error)
+	//GetRegistrationInvite
+	//
+	//  SELECT app_user_guid, invited_by_app_user_guid, invite_code, email, message, name, surname, patronymic, nickname, username, student_groups, teacher_groups, chats, expire_at, used_at, created_at, deleted_at
+	//  FROM registration_invite
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetRegistrationInvite(ctx context.Context, appUserGuid valueobject.GUID) (RegistrationInvite, error)
+	//GetStudentAchievement
+	//
+	//  SELECT guid, app_user_guid, achievement_guid, created_at, deleted_at
+	//  FROM student_achievement
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentAchievement(ctx context.Context, guid valueobject.GUID) (StudentAchievement, error)
+	//GetStudentCourseStats
+	//
+	//  SELECT guid, app_user_guid, course_guid, experience, level, meta, created_at, deleted_at
+	//  FROM student_course_stats
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentCourseStats(ctx context.Context, guid valueobject.GUID) (StudentCourseStat, error)
+	//GetStudentCourseSubject
+	//
+	//  SELECT guid, app_user_guid, course_subject_guid, completed_at, subject_status, is_favorite, meta, created_at, deleted_at
+	//  FROM student_course_subject
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentCourseSubject(ctx context.Context, guid valueobject.GUID) (StudentCourseSubject, error)
+	//GetStudentCourseSubjectAssessmentAttempt
+	//
+	//  SELECT guid, app_user_guid, course_subject_assessment_guid, attempt_status, score, is_success, answers, created_at, deleted_at
+	//  FROM student_course_subject_assessment_attempt
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentCourseSubjectAssessmentAttempt(ctx context.Context, guid valueobject.GUID) (StudentCourseSubjectAssessmentAttempt, error)
+	//GetStudentCourseSubjectSubmissionAttempt
+	//
+	//  SELECT guid, app_user_guid, course_subject_doc_guid, submission_status, files, meta, student_comment, teacher_comment, created_at, deleted_at
+	//  FROM student_course_subject_submission_attempt
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentCourseSubjectSubmissionAttempt(ctx context.Context, guid valueobject.GUID) (StudentCourseSubjectSubmissionAttempt, error)
+	//GetStudentGlobalStats
+	//
+	//  SELECT app_user_guid, level, other_experience, money, money_earned, subjects_completed, assessments_completed, assessments_failed, assessments_terminated, works_submitted, items_collected, items_used, items_sold, items_exchanged, boxes_opened, max_daily_streak, messages_sent, created_at, deleted_at
+	//  FROM student_global_stats
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGlobalStats(ctx context.Context, appUserGuid valueobject.GUID) (StudentGlobalStat, error)
+	//GetStudentGroup
+	//
+	//  SELECT guid, title, description, enable_gamification, created_at, deleted_at
+	//  FROM student_group
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGroup(ctx context.Context, guid valueobject.GUID) (StudentGroup, error)
+	//GetStudentGroupClass
+	//
+	//  SELECT guid, student_group_guid, title, start_time, end_time, objectives, attestation_assessments_enabled, attendance_closed_at, marks_approved_at, totp_secret, room, class_type, created_at, deleted_at
+	//  FROM student_group_class
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGroupClass(ctx context.Context, guid valueobject.GUID) (StudentGroupClass, error)
+	//GetStudentGroupCourse
+	//
+	//  SELECT guid, student_group_guid, course_guid, full_access, close_submissions, created_at, deleted_at
+	//  FROM student_group_course
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGroupCourse(ctx context.Context, guid valueobject.GUID) (StudentGroupCourse, error)
+	//GetStudentGroupMember
+	//
+	//  SELECT guid, app_user_guid, student_group_guid, student_role, notes, team, team_responsibilities, created_at, deleted_at
+	//  FROM student_group_member
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGroupMember(ctx context.Context, guid valueobject.GUID) (StudentGroupMember, error)
+	//GetStudentGroupMemberClassAttendance
+	//
+	//  SELECT guid, student_group_member_guid, student_group_class_guid, first_seen_at, last_seen_at, present_at, objectives_completion, comment, grade, created_at, deleted_at
+	//  FROM student_group_member_class_attendance
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetStudentGroupMemberClassAttendance(ctx context.Context, guid valueobject.GUID) (StudentGroupMemberClassAttendance, error)
+	//GetTOTPSecret
+	//
+	//  SELECT app_user_guid, secret_base32, last_used_at, created_at, deleted_at
+	//  FROM totp_secret
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetTOTPSecret(ctx context.Context, appUserGuid valueobject.GUID) (TOTPSecret, error)
+	//GetTeacher
+	//
+	//  SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	//  FROM teacher
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetTeacher(ctx context.Context, appUserGuid valueobject.GUID) (Teacher, error)
+	//GetTeacherGroup
+	//
+	//  SELECT guid, teacher_guid, student_group_guid, active_since, manage_attendance, manage_results, manage_students, manage_achievements, teacher_until, created_at, deleted_at
+	//  FROM teacher_group
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  LIMIT 1
+	GetTeacherGroup(ctx context.Context, guid valueobject.GUID) (TeacherGroup, error)
 	//IsDeletedAppUser
 	//
 	//  SELECT coalesce(deleted_at IS NOT NULL, false)::boolean
@@ -427,6 +1446,36 @@ type Querier interface {
 	//  FROM app_user_session
 	//  WHERE guid = $1
 	IsDeletedAppUserSession(ctx context.Context, guid valueobject.GUID) (bool, error)
+	//SaveAchievement
+	//
+	//  INSERT INTO achievement (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      resource_url,
+	//      is_hidden,
+	//      meta,
+	//      conditions,
+	//      reward_experience,
+	//      reward_money,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      resource_url = EXCLUDED.resource_url,
+	//      is_hidden = EXCLUDED.is_hidden,
+	//      meta = EXCLUDED.meta,
+	//      conditions = EXCLUDED.conditions,
+	//      reward_experience = EXCLUDED.reward_experience,
+	//      reward_money = EXCLUDED.reward_money,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, is_hidden, meta, conditions, reward_experience, reward_money, published_at, created_at, deleted_at
+	SaveAchievement(ctx context.Context, arg SaveAchievementParams) (Achievement, error)
 	//SaveAppUser
 	//
 	//  INSERT INTO app_user (
@@ -593,6 +1642,922 @@ type Querier interface {
 	//  WHERE deleted_at IS NULL
 	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 	SaveAppUserSessionBatch(ctx context.Context, arg []SaveAppUserSessionBatchParams) *SaveAppUserSessionBatchBatchResults
+	//SaveAppUserSuspension
+	//
+	//  INSERT INTO app_user_suspension (
+	//      guid,
+	//      app_user_guid,
+	//      reason,
+	//      expire_at,
+	//      expired_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      reason = EXCLUDED.reason,
+	//      expire_at = EXCLUDED.expire_at,
+	//      expired_at = EXCLUDED.expired_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, reason, expire_at, expired_at, created_at, deleted_at
+	SaveAppUserSuspension(ctx context.Context, arg SaveAppUserSuspensionParams) (AppUserSuspension, error)
+	//SaveChat
+	//
+	//  INSERT INTO chat (
+	//      guid,
+	//      title,
+	//      topic,
+	//      avatar_url,
+	//      students_can_text,
+	//      students_see_members,
+	//      preserve_messages,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      title = EXCLUDED.title,
+	//      topic = EXCLUDED.topic,
+	//      avatar_url = EXCLUDED.avatar_url,
+	//      students_can_text = EXCLUDED.students_can_text,
+	//      students_see_members = EXCLUDED.students_see_members,
+	//      preserve_messages = EXCLUDED.preserve_messages,
+	//      meta = EXCLUDED.meta
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, title, topic, avatar_url, students_can_text, students_see_members, preserve_messages, meta, created_at, deleted_at
+	SaveChat(ctx context.Context, arg SaveChatParams) (Chat, error)
+	//SaveChatMember
+	//
+	//  INSERT INTO chat_member (
+	//      guid,
+	//      app_user_guid,
+	//      chat_guid,
+	//      chat_role,
+	//      name,
+	//      custom_role_name,
+	//      left_at,
+	//      seen_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      chat_guid = EXCLUDED.chat_guid,
+	//      chat_role = EXCLUDED.chat_role,
+	//      name = EXCLUDED.name,
+	//      custom_role_name = EXCLUDED.custom_role_name,
+	//      left_at = EXCLUDED.left_at,
+	//      seen_at = EXCLUDED.seen_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, chat_guid, chat_role, name, custom_role_name, left_at, seen_at, created_at, deleted_at
+	SaveChatMember(ctx context.Context, arg SaveChatMemberParams) (ChatMember, error)
+	//SaveCourse
+	//
+	//  INSERT INTO course (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      style,
+	//      meta,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      style = EXCLUDED.style,
+	//      meta = EXCLUDED.meta,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+	SaveCourse(ctx context.Context, arg SaveCourseParams) (Course, error)
+	//SaveCourseLanguage
+	//
+	//  INSERT INTO course_language (
+	//      guid,
+	//      course_guid,
+	//      language_guid,
+	//      calculated_support_percentage,
+	//      is_beta,
+	//      is_new
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_guid = EXCLUDED.course_guid,
+	//      language_guid = EXCLUDED.language_guid,
+	//      calculated_support_percentage = EXCLUDED.calculated_support_percentage,
+	//      is_beta = EXCLUDED.is_beta,
+	//      is_new = EXCLUDED.is_new
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_guid, language_guid, calculated_support_percentage, is_beta, is_new, created_at, deleted_at
+	SaveCourseLanguage(ctx context.Context, arg SaveCourseLanguageParams) (CourseLanguage, error)
+	//SaveCourseSubject
+	//
+	//  INSERT INTO course_subject (
+	//      guid,
+	//      course_guid,
+	//      parent_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      reward_experience,
+	//      completion_condition,
+	//      hide_children,
+	//      style,
+	//      meta,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_guid = EXCLUDED.course_guid,
+	//      parent_guid = EXCLUDED.parent_guid,
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      reward_experience = EXCLUDED.reward_experience,
+	//      completion_condition = EXCLUDED.completion_condition,
+	//      hide_children = EXCLUDED.hide_children,
+	//      style = EXCLUDED.style,
+	//      meta = EXCLUDED.meta,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_guid, parent_guid, title_i18n, description_i18n, reward_experience, completion_condition, hide_children, style, meta, published_at, created_at, deleted_at
+	SaveCourseSubject(ctx context.Context, arg SaveCourseSubjectParams) (CourseSubject, error)
+	//SaveCourseSubjectAssessment
+	//
+	//  INSERT INTO course_subject_assessment (
+	//      guid,
+	//      course_subject_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      is_attestation,
+	//      hide_answers,
+	//      hide_answer_validity,
+	//      hide_score,
+	//      use_timed_questions,
+	//      max_time,
+	//      max_attempts,
+	//      scoring_method,
+	//      required_score,
+	//      short_questions_count,
+	//      normal_questions_count,
+	//      long_questions_count,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_guid = EXCLUDED.course_subject_guid,
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      is_attestation = EXCLUDED.is_attestation,
+	//      hide_answers = EXCLUDED.hide_answers,
+	//      hide_answer_validity = EXCLUDED.hide_answer_validity,
+	//      hide_score = EXCLUDED.hide_score,
+	//      use_timed_questions = EXCLUDED.use_timed_questions,
+	//      max_time = EXCLUDED.max_time,
+	//      max_attempts = EXCLUDED.max_attempts,
+	//      scoring_method = EXCLUDED.scoring_method,
+	//      required_score = EXCLUDED.required_score,
+	//      short_questions_count = EXCLUDED.short_questions_count,
+	//      normal_questions_count = EXCLUDED.normal_questions_count,
+	//      long_questions_count = EXCLUDED.long_questions_count,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, is_attestation, hide_answers, hide_answer_validity, hide_score, use_timed_questions, max_time, max_attempts, scoring_method, required_score, short_questions_count, normal_questions_count, long_questions_count, published_at, created_at, deleted_at
+	SaveCourseSubjectAssessment(ctx context.Context, arg SaveCourseSubjectAssessmentParams) (CourseSubjectAssessment, error)
+	//SaveCourseSubjectAssessmentPass
+	//
+	//  INSERT INTO course_subject_assessment_pass (
+	//      guid,
+	//      course_subject_assessment_guid,
+	//      app_user_guid,
+	//      is_active,
+	//      attempts_left,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      is_active = EXCLUDED.is_active,
+	//      attempts_left = EXCLUDED.attempts_left,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	SaveCourseSubjectAssessmentPass(ctx context.Context, arg SaveCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
+	//SaveCourseSubjectAssessmentQuestion
+	//
+	//  INSERT INTO course_subject_assessment_question (
+	//      guid,
+	//      course_subject_assessment_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      question_type,
+	//      attachment_url,
+	//      options,
+	//      correct_options,
+	//      max_correct_options,
+	//      is_multiple_choice,
+	//      max_options,
+	//      max_answer_time,
+	//      use_text_answer,
+	//      correct_text_answer,
+	//      example_url,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      question_type = EXCLUDED.question_type,
+	//      attachment_url = EXCLUDED.attachment_url,
+	//      options = EXCLUDED.options,
+	//      correct_options = EXCLUDED.correct_options,
+	//      max_correct_options = EXCLUDED.max_correct_options,
+	//      is_multiple_choice = EXCLUDED.is_multiple_choice,
+	//      max_options = EXCLUDED.max_options,
+	//      max_answer_time = EXCLUDED.max_answer_time,
+	//      use_text_answer = EXCLUDED.use_text_answer,
+	//      correct_text_answer = EXCLUDED.correct_text_answer,
+	//      example_url = EXCLUDED.example_url,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_assessment_guid, title_i18n, description_i18n, question_type, attachment_url, options, correct_options, max_correct_options, is_multiple_choice, max_options, max_answer_time, use_text_answer, correct_text_answer, example_url, published_at, created_at, deleted_at
+	SaveCourseSubjectAssessmentQuestion(ctx context.Context, arg SaveCourseSubjectAssessmentQuestionParams) (CourseSubjectAssessmentQuestion, error)
+	//SaveCourseSubjectDoc
+	//
+	//  INSERT INTO course_subject_doc (
+	//      guid,
+	//      course_subject_guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      subject_doc_type,
+	//      example_meta,
+	//      submission_meta,
+	//      literature_meta,
+	//      doc_index,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_guid = EXCLUDED.course_subject_guid,
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      subject_doc_type = EXCLUDED.subject_doc_type,
+	//      example_meta = EXCLUDED.example_meta,
+	//      submission_meta = EXCLUDED.submission_meta,
+	//      literature_meta = EXCLUDED.literature_meta,
+	//      doc_index = EXCLUDED.doc_index,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, subject_doc_type, example_meta, submission_meta, literature_meta, doc_index, published_at, created_at, deleted_at
+	SaveCourseSubjectDoc(ctx context.Context, arg SaveCourseSubjectDocParams) (CourseSubjectDoc, error)
+	//SaveCourseSubjectDocMd
+	//
+	//  INSERT INTO course_subject_doc_md (
+	//      guid,
+	//      course_subject_doc_guid,
+	//      language_code,
+	//      md,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_doc_guid = EXCLUDED.course_subject_doc_guid,
+	//      language_code = EXCLUDED.language_code,
+	//      md = EXCLUDED.md,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_doc_guid, language_code, md, published_at, created_at, deleted_at
+	SaveCourseSubjectDocMd(ctx context.Context, arg SaveCourseSubjectDocMdParams) (CourseSubjectDocMd, error)
+	//SaveCourseSubjectItem
+	//
+	//  INSERT INTO course_subject_item (
+	//      guid,
+	//      course_subject_guid,
+	//      item_guid,
+	//      amount
+	//  ) VALUES (
+	//      $1, $2, $3, $4
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      course_subject_guid = EXCLUDED.course_subject_guid,
+	//      item_guid = EXCLUDED.item_guid,
+	//      amount = EXCLUDED.amount
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, item_guid, amount, created_at, deleted_at
+	SaveCourseSubjectItem(ctx context.Context, arg SaveCourseSubjectItemParams) (CourseSubjectItem, error)
+	//SaveDailyActivity
+	//
+	//  INSERT INTO daily_activity (
+	//      guid,
+	//      app_user_guid,
+	//      day,
+	//      experience_earned,
+	//      levels_earned,
+	//      subjects_completed,
+	//      assessments_completed,
+	//      practices_completed
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      day = EXCLUDED.day,
+	//      experience_earned = EXCLUDED.experience_earned,
+	//      levels_earned = EXCLUDED.levels_earned,
+	//      subjects_completed = EXCLUDED.subjects_completed,
+	//      assessments_completed = EXCLUDED.assessments_completed,
+	//      practices_completed = EXCLUDED.practices_completed
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, day, experience_earned, levels_earned, subjects_completed, assessments_completed, practices_completed, created_at, deleted_at
+	SaveDailyActivity(ctx context.Context, arg SaveDailyActivityParams) (DailyActivity, error)
+	//SaveInventory
+	//
+	//  INSERT INTO inventory (
+	//      app_user_guid,
+	//      max_slots
+	//  ) VALUES (
+	//      $1, $2
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      max_slots = EXCLUDED.max_slots
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, max_slots, created_at, deleted_at
+	SaveInventory(ctx context.Context, arg SaveInventoryParams) (Inventory, error)
+	//SaveInventorySlot
+	//
+	//  INSERT INTO inventory_slot (
+	//      guid,
+	//      inventory_guid,
+	//      item_guid,
+	//      amount,
+	//      amount_in_exchange,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      inventory_guid = EXCLUDED.inventory_guid,
+	//      item_guid = EXCLUDED.item_guid,
+	//      amount = EXCLUDED.amount,
+	//      amount_in_exchange = EXCLUDED.amount_in_exchange,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, inventory_guid, item_guid, amount, amount_in_exchange, expire_at, created_at, deleted_at
+	SaveInventorySlot(ctx context.Context, arg SaveInventorySlotParams) (InventorySlot, error)
+	//SaveItem
+	//
+	//  INSERT INTO item (
+	//      guid,
+	//      title_i18n,
+	//      description_i18n,
+	//      resource_url,
+	//      meta,
+	//      stack_size,
+	//      rarity,
+	//      allow_exchange,
+	//      shop_price,
+	//      one_time_purchase,
+	//      shop_quantity,
+	//      level_required,
+	//      on_sale_since,
+	//      on_sale_until,
+	//      published_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      description_i18n = EXCLUDED.description_i18n,
+	//      resource_url = EXCLUDED.resource_url,
+	//      meta = EXCLUDED.meta,
+	//      stack_size = EXCLUDED.stack_size,
+	//      rarity = EXCLUDED.rarity,
+	//      allow_exchange = EXCLUDED.allow_exchange,
+	//      shop_price = EXCLUDED.shop_price,
+	//      one_time_purchase = EXCLUDED.one_time_purchase,
+	//      shop_quantity = EXCLUDED.shop_quantity,
+	//      level_required = EXCLUDED.level_required,
+	//      on_sale_since = EXCLUDED.on_sale_since,
+	//      on_sale_until = EXCLUDED.on_sale_until,
+	//      published_at = EXCLUDED.published_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, meta, stack_size, rarity, allow_exchange, shop_price, one_time_purchase, shop_quantity, level_required, on_sale_since, on_sale_until, published_at, created_at, deleted_at
+	SaveItem(ctx context.Context, arg SaveItemParams) (Item, error)
+	//SaveLanguage
+	//
+	//  INSERT INTO language (
+	//      guid,
+	//      language_code,
+	//      english_title,
+	//      local_title,
+	//      emoji,
+	//      is_supported,
+	//      is_beta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      language_code = EXCLUDED.language_code,
+	//      english_title = EXCLUDED.english_title,
+	//      local_title = EXCLUDED.local_title,
+	//      emoji = EXCLUDED.emoji,
+	//      is_supported = EXCLUDED.is_supported,
+	//      is_beta = EXCLUDED.is_beta
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, language_code, english_title, local_title, emoji, is_supported, is_beta, created_at, deleted_at
+	SaveLanguage(ctx context.Context, arg SaveLanguageParams) (Language, error)
+	//SaveMessage
+	//
+	//  INSERT INTO message (
+	//      guid,
+	//      chat_member_guid,
+	//      chat_guid,
+	//      resource_url,
+	//      content,
+	//      urgency,
+	//      meta,
+	//      seen_by,
+	//      edited_at,
+	//      pinned_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      chat_member_guid = EXCLUDED.chat_member_guid,
+	//      chat_guid = EXCLUDED.chat_guid,
+	//      resource_url = EXCLUDED.resource_url,
+	//      content = EXCLUDED.content,
+	//      urgency = EXCLUDED.urgency,
+	//      meta = EXCLUDED.meta,
+	//      seen_by = EXCLUDED.seen_by,
+	//      edited_at = EXCLUDED.edited_at,
+	//      pinned_at = EXCLUDED.pinned_at,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, chat_member_guid, chat_guid, resource_url, content, urgency, meta, seen_by, edited_at, pinned_at, expire_at, created_at, deleted_at
+	SaveMessage(ctx context.Context, arg SaveMessageParams) (Message, error)
+	//SaveNotification
+	//
+	//  INSERT INTO notification (
+	//      guid,
+	//      app_user_guid,
+	//      title_i18n,
+	//      content_i18n,
+	//      resource_url,
+	//      urgency,
+	//      meta,
+	//      seen_at,
+	//      expire_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      title_i18n = EXCLUDED.title_i18n,
+	//      content_i18n = EXCLUDED.content_i18n,
+	//      resource_url = EXCLUDED.resource_url,
+	//      urgency = EXCLUDED.urgency,
+	//      meta = EXCLUDED.meta,
+	//      seen_at = EXCLUDED.seen_at,
+	//      expire_at = EXCLUDED.expire_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, title_i18n, content_i18n, resource_url, urgency, meta, seen_at, expire_at, created_at, deleted_at
+	SaveNotification(ctx context.Context, arg SaveNotificationParams) (Notification, error)
+	//SaveRegistrationInvite
+	//
+	//  INSERT INTO registration_invite (
+	//      app_user_guid,
+	//      invited_by_app_user_guid,
+	//      invite_code,
+	//      email,
+	//      message,
+	//      name,
+	//      surname,
+	//      patronymic,
+	//      nickname,
+	//      username,
+	//      student_groups,
+	//      teacher_groups,
+	//      chats,
+	//      expire_at,
+	//      used_at
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      invited_by_app_user_guid = EXCLUDED.invited_by_app_user_guid,
+	//      invite_code = EXCLUDED.invite_code,
+	//      email = EXCLUDED.email,
+	//      message = EXCLUDED.message,
+	//      name = EXCLUDED.name,
+	//      surname = EXCLUDED.surname,
+	//      patronymic = EXCLUDED.patronymic,
+	//      nickname = EXCLUDED.nickname,
+	//      username = EXCLUDED.username,
+	//      student_groups = EXCLUDED.student_groups,
+	//      teacher_groups = EXCLUDED.teacher_groups,
+	//      chats = EXCLUDED.chats,
+	//      expire_at = EXCLUDED.expire_at,
+	//      used_at = EXCLUDED.used_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, invited_by_app_user_guid, invite_code, email, message, name, surname, patronymic, nickname, username, student_groups, teacher_groups, chats, expire_at, used_at, created_at, deleted_at
+	SaveRegistrationInvite(ctx context.Context, arg SaveRegistrationInviteParams) (RegistrationInvite, error)
+	//SaveStudentAchievement
+	//
+	//  INSERT INTO student_achievement (
+	//      guid,
+	//      app_user_guid,
+	//      achievement_guid
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      achievement_guid = EXCLUDED.achievement_guid
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, achievement_guid, created_at, deleted_at
+	SaveStudentAchievement(ctx context.Context, arg SaveStudentAchievementParams) (StudentAchievement, error)
+	//SaveStudentCourseStats
+	//
+	//  INSERT INTO student_course_stats (
+	//      guid,
+	//      app_user_guid,
+	//      course_guid,
+	//      experience,
+	//      level,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      course_guid = EXCLUDED.course_guid,
+	//      experience = EXCLUDED.experience,
+	//      level = EXCLUDED.level,
+	//      meta = EXCLUDED.meta
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_guid, experience, level, meta, created_at, deleted_at
+	SaveStudentCourseStats(ctx context.Context, arg SaveStudentCourseStatsParams) (StudentCourseStat, error)
+	//SaveStudentCourseSubject
+	//
+	//  INSERT INTO student_course_subject (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_guid,
+	//      completed_at,
+	//      subject_status,
+	//      is_favorite,
+	//      meta
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      course_subject_guid = EXCLUDED.course_subject_guid,
+	//      completed_at = EXCLUDED.completed_at,
+	//      subject_status = EXCLUDED.subject_status,
+	//      is_favorite = EXCLUDED.is_favorite,
+	//      meta = EXCLUDED.meta
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_guid, completed_at, subject_status, is_favorite, meta, created_at, deleted_at
+	SaveStudentCourseSubject(ctx context.Context, arg SaveStudentCourseSubjectParams) (StudentCourseSubject, error)
+	//SaveStudentCourseSubjectAssessmentAttempt
+	//
+	//  INSERT INTO student_course_subject_assessment_attempt (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_assessment_guid,
+	//      attempt_status,
+	//      score,
+	//      is_success,
+	//      answers
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
+	//      attempt_status = EXCLUDED.attempt_status,
+	//      score = EXCLUDED.score,
+	//      is_success = EXCLUDED.is_success,
+	//      answers = EXCLUDED.answers
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_assessment_guid, attempt_status, score, is_success, answers, created_at, deleted_at
+	SaveStudentCourseSubjectAssessmentAttempt(ctx context.Context, arg SaveStudentCourseSubjectAssessmentAttemptParams) (StudentCourseSubjectAssessmentAttempt, error)
+	//SaveStudentCourseSubjectSubmissionAttempt
+	//
+	//  INSERT INTO student_course_subject_submission_attempt (
+	//      guid,
+	//      app_user_guid,
+	//      course_subject_doc_guid,
+	//      submission_status,
+	//      files,
+	//      meta,
+	//      student_comment,
+	//      teacher_comment
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      course_subject_doc_guid = EXCLUDED.course_subject_doc_guid,
+	//      submission_status = EXCLUDED.submission_status,
+	//      files = EXCLUDED.files,
+	//      meta = EXCLUDED.meta,
+	//      student_comment = EXCLUDED.student_comment,
+	//      teacher_comment = EXCLUDED.teacher_comment
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_doc_guid, submission_status, files, meta, student_comment, teacher_comment, created_at, deleted_at
+	SaveStudentCourseSubjectSubmissionAttempt(ctx context.Context, arg SaveStudentCourseSubjectSubmissionAttemptParams) (StudentCourseSubjectSubmissionAttempt, error)
+	//SaveStudentGlobalStats
+	//
+	//  INSERT INTO student_global_stats (
+	//      app_user_guid,
+	//      level,
+	//      other_experience,
+	//      money,
+	//      money_earned,
+	//      subjects_completed,
+	//      assessments_completed,
+	//      assessments_failed,
+	//      assessments_terminated,
+	//      works_submitted,
+	//      items_collected,
+	//      items_used,
+	//      items_sold,
+	//      items_exchanged,
+	//      boxes_opened,
+	//      max_daily_streak,
+	//      messages_sent
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      level = EXCLUDED.level,
+	//      other_experience = EXCLUDED.other_experience,
+	//      money = EXCLUDED.money,
+	//      money_earned = EXCLUDED.money_earned,
+	//      subjects_completed = EXCLUDED.subjects_completed,
+	//      assessments_completed = EXCLUDED.assessments_completed,
+	//      assessments_failed = EXCLUDED.assessments_failed,
+	//      assessments_terminated = EXCLUDED.assessments_terminated,
+	//      works_submitted = EXCLUDED.works_submitted,
+	//      items_collected = EXCLUDED.items_collected,
+	//      items_used = EXCLUDED.items_used,
+	//      items_sold = EXCLUDED.items_sold,
+	//      items_exchanged = EXCLUDED.items_exchanged,
+	//      boxes_opened = EXCLUDED.boxes_opened,
+	//      max_daily_streak = EXCLUDED.max_daily_streak,
+	//      messages_sent = EXCLUDED.messages_sent
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, level, other_experience, money, money_earned, subjects_completed, assessments_completed, assessments_failed, assessments_terminated, works_submitted, items_collected, items_used, items_sold, items_exchanged, boxes_opened, max_daily_streak, messages_sent, created_at, deleted_at
+	SaveStudentGlobalStats(ctx context.Context, arg SaveStudentGlobalStatsParams) (StudentGlobalStat, error)
+	//SaveStudentGroup
+	//
+	//  INSERT INTO student_group (
+	//      guid,
+	//      title,
+	//      description,
+	//      enable_gamification
+	//  ) VALUES (
+	//      $1, $2, $3, $4
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      title = EXCLUDED.title,
+	//      description = EXCLUDED.description,
+	//      enable_gamification = EXCLUDED.enable_gamification
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, title, description, enable_gamification, created_at, deleted_at
+	SaveStudentGroup(ctx context.Context, arg SaveStudentGroupParams) (StudentGroup, error)
+	//SaveStudentGroupClass
+	//
+	//  INSERT INTO student_group_class (
+	//      guid,
+	//      student_group_guid,
+	//      title,
+	//      start_time,
+	//      end_time,
+	//      objectives,
+	//      attestation_assessments_enabled,
+	//      attendance_closed_at,
+	//      marks_approved_at,
+	//      totp_secret,
+	//      room,
+	//      class_type
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      student_group_guid = EXCLUDED.student_group_guid,
+	//      title = EXCLUDED.title,
+	//      start_time = EXCLUDED.start_time,
+	//      end_time = EXCLUDED.end_time,
+	//      objectives = EXCLUDED.objectives,
+	//      attestation_assessments_enabled = EXCLUDED.attestation_assessments_enabled,
+	//      attendance_closed_at = EXCLUDED.attendance_closed_at,
+	//      marks_approved_at = EXCLUDED.marks_approved_at,
+	//      totp_secret = EXCLUDED.totp_secret,
+	//      room = EXCLUDED.room,
+	//      class_type = EXCLUDED.class_type
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, student_group_guid, title, start_time, end_time, objectives, attestation_assessments_enabled, attendance_closed_at, marks_approved_at, totp_secret, room, class_type, created_at, deleted_at
+	SaveStudentGroupClass(ctx context.Context, arg SaveStudentGroupClassParams) (StudentGroupClass, error)
+	//SaveStudentGroupCourse
+	//
+	//  INSERT INTO student_group_course (
+	//      guid,
+	//      student_group_guid,
+	//      course_guid,
+	//      full_access,
+	//      close_submissions
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      student_group_guid = EXCLUDED.student_group_guid,
+	//      course_guid = EXCLUDED.course_guid,
+	//      full_access = EXCLUDED.full_access,
+	//      close_submissions = EXCLUDED.close_submissions
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, student_group_guid, course_guid, full_access, close_submissions, created_at, deleted_at
+	SaveStudentGroupCourse(ctx context.Context, arg SaveStudentGroupCourseParams) (StudentGroupCourse, error)
+	//SaveStudentGroupMember
+	//
+	//  INSERT INTO student_group_member (
+	//      guid,
+	//      app_user_guid,
+	//      student_group_guid,
+	//      student_role,
+	//      notes,
+	//      team,
+	//      team_responsibilities
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      student_group_guid = EXCLUDED.student_group_guid,
+	//      student_role = EXCLUDED.student_role,
+	//      notes = EXCLUDED.notes,
+	//      team = EXCLUDED.team,
+	//      team_responsibilities = EXCLUDED.team_responsibilities
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, student_group_guid, student_role, notes, team, team_responsibilities, created_at, deleted_at
+	SaveStudentGroupMember(ctx context.Context, arg SaveStudentGroupMemberParams) (StudentGroupMember, error)
+	//SaveStudentGroupMemberClassAttendance
+	//
+	//  INSERT INTO student_group_member_class_attendance (
+	//      guid,
+	//      student_group_member_guid,
+	//      student_group_class_guid,
+	//      first_seen_at,
+	//      last_seen_at,
+	//      present_at,
+	//      objectives_completion,
+	//      comment,
+	//      grade
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      student_group_member_guid = EXCLUDED.student_group_member_guid,
+	//      student_group_class_guid = EXCLUDED.student_group_class_guid,
+	//      first_seen_at = EXCLUDED.first_seen_at,
+	//      last_seen_at = EXCLUDED.last_seen_at,
+	//      present_at = EXCLUDED.present_at,
+	//      objectives_completion = EXCLUDED.objectives_completion,
+	//      comment = EXCLUDED.comment,
+	//      grade = EXCLUDED.grade
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, student_group_member_guid, student_group_class_guid, first_seen_at, last_seen_at, present_at, objectives_completion, comment, grade, created_at, deleted_at
+	SaveStudentGroupMemberClassAttendance(ctx context.Context, arg SaveStudentGroupMemberClassAttendanceParams) (StudentGroupMemberClassAttendance, error)
+	//SaveTOTPSecret
+	//
+	//  INSERT INTO totp_secret (
+	//      app_user_guid,
+	//      secret_base32,
+	//      last_used_at
+	//  ) VALUES (
+	//      $1, $2, $3
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      secret_base32 = EXCLUDED.secret_base32,
+	//      last_used_at = EXCLUDED.last_used_at
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, secret_base32, last_used_at, created_at, deleted_at
+	SaveTOTPSecret(ctx context.Context, arg SaveTOTPSecretParams) (TOTPSecret, error)
+	//SaveTeacher
+	//
+	//  INSERT INTO teacher (
+	//      app_user_guid,
+	//      active_since,
+	//      manage_students,
+	//      manage_attendance,
+	//      manage_results,
+	//      manage_courses,
+	//      is_admin,
+	//      contact_info
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//  )
+	//  ON CONFLICT (app_user_guid) DO UPDATE
+	//  SET
+	//      active_since = EXCLUDED.active_since,
+	//      manage_students = EXCLUDED.manage_students,
+	//      manage_attendance = EXCLUDED.manage_attendance,
+	//      manage_results = EXCLUDED.manage_results,
+	//      manage_courses = EXCLUDED.manage_courses,
+	//      is_admin = EXCLUDED.is_admin,
+	//      contact_info = EXCLUDED.contact_info
+	//  WHERE deleted_at IS NULL
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	SaveTeacher(ctx context.Context, arg SaveTeacherParams) (Teacher, error)
+	//SaveTeacherGroup
+	//
+	//  INSERT INTO teacher_group (
+	//      guid,
+	//      teacher_guid,
+	//      student_group_guid,
+	//      active_since,
+	//      manage_attendance,
+	//      manage_results,
+	//      manage_students,
+	//      manage_achievements,
+	//      teacher_until
+	//  ) VALUES (
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
+	//  )
+	//  ON CONFLICT (guid) DO UPDATE
+	//  SET
+	//      teacher_guid = EXCLUDED.teacher_guid,
+	//      student_group_guid = EXCLUDED.student_group_guid,
+	//      active_since = EXCLUDED.active_since,
+	//      manage_attendance = EXCLUDED.manage_attendance,
+	//      manage_results = EXCLUDED.manage_results,
+	//      manage_students = EXCLUDED.manage_students,
+	//      manage_achievements = EXCLUDED.manage_achievements,
+	//      teacher_until = EXCLUDED.teacher_until
+	//  WHERE deleted_at IS NULL
+	//  RETURNING guid, teacher_guid, student_group_guid, active_since, manage_attendance, manage_results, manage_students, manage_achievements, teacher_until, created_at, deleted_at
+	SaveTeacherGroup(ctx context.Context, arg SaveTeacherGroupParams) (TeacherGroup, error)
+	//UpdateAchievement
+	//
+	//  UPDATE achievement
+	//  SET
+	//      title_i18n = $2,
+	//      description_i18n = $3,
+	//      resource_url = $4,
+	//      is_hidden = $5,
+	//      meta = $6,
+	//      conditions = $7,
+	//      reward_experience = $8,
+	//      reward_money = $9,
+	//      published_at = $10
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, is_hidden, meta, conditions, reward_experience, reward_money, published_at, created_at, deleted_at
+	UpdateAchievement(ctx context.Context, arg UpdateAchievementParams) (Achievement, error)
 	//UpdateAppUser
 	//
 	//  UPDATE app_user
@@ -687,6 +2652,490 @@ type Querier interface {
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  RETURNING guid, app_user_guid, last_ipv4, last_ipv6, last_agent, last_seen_at, expire_at, created_at, deleted_at
 	UpdateAppUserSessionBatch(ctx context.Context, arg []UpdateAppUserSessionBatchParams) *UpdateAppUserSessionBatchBatchResults
+	//UpdateAppUserSuspension
+	//
+	//  UPDATE app_user_suspension
+	//  SET
+	//      app_user_guid = $2,
+	//      reason = $3,
+	//      expire_at = $4,
+	//      expired_at = $5
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, reason, expire_at, expired_at, created_at, deleted_at
+	UpdateAppUserSuspension(ctx context.Context, arg UpdateAppUserSuspensionParams) (AppUserSuspension, error)
+	//UpdateChat
+	//
+	//  UPDATE chat
+	//  SET
+	//      title = $2,
+	//      topic = $3,
+	//      avatar_url = $4,
+	//      students_can_text = $5,
+	//      students_see_members = $6,
+	//      preserve_messages = $7,
+	//      meta = $8
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, title, topic, avatar_url, students_can_text, students_see_members, preserve_messages, meta, created_at, deleted_at
+	UpdateChat(ctx context.Context, arg UpdateChatParams) (Chat, error)
+	//UpdateChatMember
+	//
+	//  UPDATE chat_member
+	//  SET
+	//      app_user_guid = $2,
+	//      chat_guid = $3,
+	//      chat_role = $4,
+	//      name = $5,
+	//      custom_role_name = $6,
+	//      left_at = $7,
+	//      seen_at = $8
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, chat_guid, chat_role, name, custom_role_name, left_at, seen_at, created_at, deleted_at
+	UpdateChatMember(ctx context.Context, arg UpdateChatMemberParams) (ChatMember, error)
+	//UpdateCourse
+	//
+	//  UPDATE course
+	//  SET
+	//      title_i18n = $2,
+	//      description_i18n = $3,
+	//      style = $4,
+	//      meta = $5,
+	//      published_at = $6
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, style, meta, published_at, created_at, deleted_at
+	UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error)
+	//UpdateCourseLanguage
+	//
+	//  UPDATE course_language
+	//  SET
+	//      course_guid = $2,
+	//      language_guid = $3,
+	//      calculated_support_percentage = $4,
+	//      is_beta = $5,
+	//      is_new = $6
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_guid, language_guid, calculated_support_percentage, is_beta, is_new, created_at, deleted_at
+	UpdateCourseLanguage(ctx context.Context, arg UpdateCourseLanguageParams) (CourseLanguage, error)
+	//UpdateCourseSubject
+	//
+	//  UPDATE course_subject
+	//  SET
+	//      course_guid = $2,
+	//      parent_guid = $3,
+	//      title_i18n = $4,
+	//      description_i18n = $5,
+	//      reward_experience = $6,
+	//      completion_condition = $7,
+	//      hide_children = $8,
+	//      style = $9,
+	//      meta = $10,
+	//      published_at = $11
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_guid, parent_guid, title_i18n, description_i18n, reward_experience, completion_condition, hide_children, style, meta, published_at, created_at, deleted_at
+	UpdateCourseSubject(ctx context.Context, arg UpdateCourseSubjectParams) (CourseSubject, error)
+	//UpdateCourseSubjectAssessment
+	//
+	//  UPDATE course_subject_assessment
+	//  SET
+	//      course_subject_guid = $2,
+	//      title_i18n = $3,
+	//      description_i18n = $4,
+	//      is_attestation = $5,
+	//      hide_answers = $6,
+	//      hide_answer_validity = $7,
+	//      hide_score = $8,
+	//      use_timed_questions = $9,
+	//      max_time = $10,
+	//      max_attempts = $11,
+	//      scoring_method = $12,
+	//      required_score = $13,
+	//      short_questions_count = $14,
+	//      normal_questions_count = $15,
+	//      long_questions_count = $16,
+	//      published_at = $17
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, is_attestation, hide_answers, hide_answer_validity, hide_score, use_timed_questions, max_time, max_attempts, scoring_method, required_score, short_questions_count, normal_questions_count, long_questions_count, published_at, created_at, deleted_at
+	UpdateCourseSubjectAssessment(ctx context.Context, arg UpdateCourseSubjectAssessmentParams) (CourseSubjectAssessment, error)
+	//UpdateCourseSubjectAssessmentPass
+	//
+	//  UPDATE course_subject_assessment_pass
+	//  SET
+	//      course_subject_assessment_guid = $2,
+	//      app_user_guid = $3,
+	//      is_active = $4,
+	//      attempts_left = $5,
+	//      expire_at = $6
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	UpdateCourseSubjectAssessmentPass(ctx context.Context, arg UpdateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
+	//UpdateCourseSubjectAssessmentQuestion
+	//
+	//  UPDATE course_subject_assessment_question
+	//  SET
+	//      course_subject_assessment_guid = $2,
+	//      title_i18n = $3,
+	//      description_i18n = $4,
+	//      question_type = $5,
+	//      attachment_url = $6,
+	//      options = $7,
+	//      correct_options = $8,
+	//      max_correct_options = $9,
+	//      is_multiple_choice = $10,
+	//      max_options = $11,
+	//      max_answer_time = $12,
+	//      use_text_answer = $13,
+	//      correct_text_answer = $14,
+	//      example_url = $15,
+	//      published_at = $16
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_assessment_guid, title_i18n, description_i18n, question_type, attachment_url, options, correct_options, max_correct_options, is_multiple_choice, max_options, max_answer_time, use_text_answer, correct_text_answer, example_url, published_at, created_at, deleted_at
+	UpdateCourseSubjectAssessmentQuestion(ctx context.Context, arg UpdateCourseSubjectAssessmentQuestionParams) (CourseSubjectAssessmentQuestion, error)
+	//UpdateCourseSubjectDoc
+	//
+	//  UPDATE course_subject_doc
+	//  SET
+	//      course_subject_guid = $2,
+	//      title_i18n = $3,
+	//      description_i18n = $4,
+	//      subject_doc_type = $5,
+	//      example_meta = $6,
+	//      submission_meta = $7,
+	//      literature_meta = $8,
+	//      doc_index = $9,
+	//      published_at = $10
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, title_i18n, description_i18n, subject_doc_type, example_meta, submission_meta, literature_meta, doc_index, published_at, created_at, deleted_at
+	UpdateCourseSubjectDoc(ctx context.Context, arg UpdateCourseSubjectDocParams) (CourseSubjectDoc, error)
+	//UpdateCourseSubjectDocMd
+	//
+	//  UPDATE course_subject_doc_md
+	//  SET
+	//      course_subject_doc_guid = $2,
+	//      language_code = $3,
+	//      md = $4,
+	//      published_at = $5
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_doc_guid, language_code, md, published_at, created_at, deleted_at
+	UpdateCourseSubjectDocMd(ctx context.Context, arg UpdateCourseSubjectDocMdParams) (CourseSubjectDocMd, error)
+	//UpdateCourseSubjectItem
+	//
+	//  UPDATE course_subject_item
+	//  SET
+	//      course_subject_guid = $2,
+	//      item_guid = $3,
+	//      amount = $4
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, course_subject_guid, item_guid, amount, created_at, deleted_at
+	UpdateCourseSubjectItem(ctx context.Context, arg UpdateCourseSubjectItemParams) (CourseSubjectItem, error)
+	//UpdateDailyActivity
+	//
+	//  UPDATE daily_activity
+	//  SET
+	//      app_user_guid = $2,
+	//      day = $3,
+	//      experience_earned = $4,
+	//      levels_earned = $5,
+	//      subjects_completed = $6,
+	//      assessments_completed = $7,
+	//      practices_completed = $8
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, day, experience_earned, levels_earned, subjects_completed, assessments_completed, practices_completed, created_at, deleted_at
+	UpdateDailyActivity(ctx context.Context, arg UpdateDailyActivityParams) (DailyActivity, error)
+	//UpdateInventory
+	//
+	//  UPDATE inventory
+	//  SET
+	//      max_slots = $2
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, max_slots, created_at, deleted_at
+	UpdateInventory(ctx context.Context, arg UpdateInventoryParams) (Inventory, error)
+	//UpdateInventorySlot
+	//
+	//  UPDATE inventory_slot
+	//  SET
+	//      inventory_guid = $2,
+	//      item_guid = $3,
+	//      amount = $4,
+	//      amount_in_exchange = $5,
+	//      expire_at = $6
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, inventory_guid, item_guid, amount, amount_in_exchange, expire_at, created_at, deleted_at
+	UpdateInventorySlot(ctx context.Context, arg UpdateInventorySlotParams) (InventorySlot, error)
+	//UpdateItem
+	//
+	//  UPDATE item
+	//  SET
+	//      title_i18n = $2,
+	//      description_i18n = $3,
+	//      resource_url = $4,
+	//      meta = $5,
+	//      stack_size = $6,
+	//      rarity = $7,
+	//      allow_exchange = $8,
+	//      shop_price = $9,
+	//      one_time_purchase = $10,
+	//      shop_quantity = $11,
+	//      level_required = $12,
+	//      on_sale_since = $13,
+	//      on_sale_until = $14,
+	//      published_at = $15
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, title_i18n, description_i18n, resource_url, meta, stack_size, rarity, allow_exchange, shop_price, one_time_purchase, shop_quantity, level_required, on_sale_since, on_sale_until, published_at, created_at, deleted_at
+	UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error)
+	//UpdateLanguage
+	//
+	//  UPDATE language
+	//  SET
+	//      language_code = $2,
+	//      english_title = $3,
+	//      local_title = $4,
+	//      emoji = $5,
+	//      is_supported = $6,
+	//      is_beta = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, language_code, english_title, local_title, emoji, is_supported, is_beta, created_at, deleted_at
+	UpdateLanguage(ctx context.Context, arg UpdateLanguageParams) (Language, error)
+	//UpdateMessage
+	//
+	//  UPDATE message
+	//  SET
+	//      chat_member_guid = $2,
+	//      chat_guid = $3,
+	//      resource_url = $4,
+	//      content = $5,
+	//      urgency = $6,
+	//      meta = $7,
+	//      seen_by = $8,
+	//      edited_at = $9,
+	//      pinned_at = $10,
+	//      expire_at = $11
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, chat_member_guid, chat_guid, resource_url, content, urgency, meta, seen_by, edited_at, pinned_at, expire_at, created_at, deleted_at
+	UpdateMessage(ctx context.Context, arg UpdateMessageParams) (Message, error)
+	//UpdateNotification
+	//
+	//  UPDATE notification
+	//  SET
+	//      app_user_guid = $2,
+	//      title_i18n = $3,
+	//      content_i18n = $4,
+	//      resource_url = $5,
+	//      urgency = $6,
+	//      meta = $7,
+	//      seen_at = $8,
+	//      expire_at = $9
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, title_i18n, content_i18n, resource_url, urgency, meta, seen_at, expire_at, created_at, deleted_at
+	UpdateNotification(ctx context.Context, arg UpdateNotificationParams) (Notification, error)
+	//UpdateRegistrationInvite
+	//
+	//  UPDATE registration_invite
+	//  SET
+	//      invited_by_app_user_guid = $2,
+	//      invite_code = $3,
+	//      email = $4,
+	//      message = $5,
+	//      name = $6,
+	//      surname = $7,
+	//      patronymic = $8,
+	//      nickname = $9,
+	//      username = $10,
+	//      student_groups = $11,
+	//      teacher_groups = $12,
+	//      chats = $13,
+	//      expire_at = $14,
+	//      used_at = $15
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, invited_by_app_user_guid, invite_code, email, message, name, surname, patronymic, nickname, username, student_groups, teacher_groups, chats, expire_at, used_at, created_at, deleted_at
+	UpdateRegistrationInvite(ctx context.Context, arg UpdateRegistrationInviteParams) (RegistrationInvite, error)
+	//UpdateStudentAchievement
+	//
+	//  UPDATE student_achievement
+	//  SET
+	//      app_user_guid = $2,
+	//      achievement_guid = $3
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, achievement_guid, created_at, deleted_at
+	UpdateStudentAchievement(ctx context.Context, arg UpdateStudentAchievementParams) (StudentAchievement, error)
+	//UpdateStudentCourseStats
+	//
+	//  UPDATE student_course_stats
+	//  SET
+	//      app_user_guid = $2,
+	//      course_guid = $3,
+	//      experience = $4,
+	//      level = $5,
+	//      meta = $6
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_guid, experience, level, meta, created_at, deleted_at
+	UpdateStudentCourseStats(ctx context.Context, arg UpdateStudentCourseStatsParams) (StudentCourseStat, error)
+	//UpdateStudentCourseSubject
+	//
+	//  UPDATE student_course_subject
+	//  SET
+	//      app_user_guid = $2,
+	//      course_subject_guid = $3,
+	//      completed_at = $4,
+	//      subject_status = $5,
+	//      is_favorite = $6,
+	//      meta = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_guid, completed_at, subject_status, is_favorite, meta, created_at, deleted_at
+	UpdateStudentCourseSubject(ctx context.Context, arg UpdateStudentCourseSubjectParams) (StudentCourseSubject, error)
+	//UpdateStudentCourseSubjectAssessmentAttempt
+	//
+	//  UPDATE student_course_subject_assessment_attempt
+	//  SET
+	//      app_user_guid = $2,
+	//      course_subject_assessment_guid = $3,
+	//      attempt_status = $4,
+	//      score = $5,
+	//      is_success = $6,
+	//      answers = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_assessment_guid, attempt_status, score, is_success, answers, created_at, deleted_at
+	UpdateStudentCourseSubjectAssessmentAttempt(ctx context.Context, arg UpdateStudentCourseSubjectAssessmentAttemptParams) (StudentCourseSubjectAssessmentAttempt, error)
+	//UpdateStudentCourseSubjectSubmissionAttempt
+	//
+	//  UPDATE student_course_subject_submission_attempt
+	//  SET
+	//      app_user_guid = $2,
+	//      course_subject_doc_guid = $3,
+	//      submission_status = $4,
+	//      files = $5,
+	//      meta = $6,
+	//      student_comment = $7,
+	//      teacher_comment = $8
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, course_subject_doc_guid, submission_status, files, meta, student_comment, teacher_comment, created_at, deleted_at
+	UpdateStudentCourseSubjectSubmissionAttempt(ctx context.Context, arg UpdateStudentCourseSubjectSubmissionAttemptParams) (StudentCourseSubjectSubmissionAttempt, error)
+	//UpdateStudentGlobalStats
+	//
+	//  UPDATE student_global_stats
+	//  SET
+	//      level = $2,
+	//      other_experience = $3,
+	//      money = $4,
+	//      money_earned = $5,
+	//      subjects_completed = $6,
+	//      assessments_completed = $7,
+	//      assessments_failed = $8,
+	//      assessments_terminated = $9,
+	//      works_submitted = $10,
+	//      items_collected = $11,
+	//      items_used = $12,
+	//      items_sold = $13,
+	//      items_exchanged = $14,
+	//      boxes_opened = $15,
+	//      max_daily_streak = $16,
+	//      messages_sent = $17
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, level, other_experience, money, money_earned, subjects_completed, assessments_completed, assessments_failed, assessments_terminated, works_submitted, items_collected, items_used, items_sold, items_exchanged, boxes_opened, max_daily_streak, messages_sent, created_at, deleted_at
+	UpdateStudentGlobalStats(ctx context.Context, arg UpdateStudentGlobalStatsParams) (StudentGlobalStat, error)
+	//UpdateStudentGroup
+	//
+	//  UPDATE student_group
+	//  SET
+	//      title = $2,
+	//      description = $3,
+	//      enable_gamification = $4
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, title, description, enable_gamification, created_at, deleted_at
+	UpdateStudentGroup(ctx context.Context, arg UpdateStudentGroupParams) (StudentGroup, error)
+	//UpdateStudentGroupClass
+	//
+	//  UPDATE student_group_class
+	//  SET
+	//      student_group_guid = $2,
+	//      title = $3,
+	//      start_time = $4,
+	//      end_time = $5,
+	//      objectives = $6,
+	//      attestation_assessments_enabled = $7,
+	//      attendance_closed_at = $8,
+	//      marks_approved_at = $9,
+	//      totp_secret = $10,
+	//      room = $11,
+	//      class_type = $12
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, student_group_guid, title, start_time, end_time, objectives, attestation_assessments_enabled, attendance_closed_at, marks_approved_at, totp_secret, room, class_type, created_at, deleted_at
+	UpdateStudentGroupClass(ctx context.Context, arg UpdateStudentGroupClassParams) (StudentGroupClass, error)
+	//UpdateStudentGroupCourse
+	//
+	//  UPDATE student_group_course
+	//  SET
+	//      student_group_guid = $2,
+	//      course_guid = $3,
+	//      full_access = $4,
+	//      close_submissions = $5
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, student_group_guid, course_guid, full_access, close_submissions, created_at, deleted_at
+	UpdateStudentGroupCourse(ctx context.Context, arg UpdateStudentGroupCourseParams) (StudentGroupCourse, error)
+	//UpdateStudentGroupMember
+	//
+	//  UPDATE student_group_member
+	//  SET
+	//      app_user_guid = $2,
+	//      student_group_guid = $3,
+	//      student_role = $4,
+	//      notes = $5,
+	//      team = $6,
+	//      team_responsibilities = $7
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, app_user_guid, student_group_guid, student_role, notes, team, team_responsibilities, created_at, deleted_at
+	UpdateStudentGroupMember(ctx context.Context, arg UpdateStudentGroupMemberParams) (StudentGroupMember, error)
+	//UpdateStudentGroupMemberClassAttendance
+	//
+	//  UPDATE student_group_member_class_attendance
+	//  SET
+	//      student_group_member_guid = $2,
+	//      student_group_class_guid = $3,
+	//      first_seen_at = $4,
+	//      last_seen_at = $5,
+	//      present_at = $6,
+	//      objectives_completion = $7,
+	//      comment = $8,
+	//      grade = $9
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, student_group_member_guid, student_group_class_guid, first_seen_at, last_seen_at, present_at, objectives_completion, comment, grade, created_at, deleted_at
+	UpdateStudentGroupMemberClassAttendance(ctx context.Context, arg UpdateStudentGroupMemberClassAttendanceParams) (StudentGroupMemberClassAttendance, error)
+	//UpdateTOTPSecret
+	//
+	//  UPDATE totp_secret
+	//  SET
+	//      secret_base32 = $2,
+	//      last_used_at = $3
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, secret_base32, last_used_at, created_at, deleted_at
+	UpdateTOTPSecret(ctx context.Context, arg UpdateTOTPSecretParams) (TOTPSecret, error)
+	//UpdateTeacher
+	//
+	//  UPDATE teacher
+	//  SET
+	//      active_since = $2,
+	//      manage_students = $3,
+	//      manage_attendance = $4,
+	//      manage_results = $5,
+	//      manage_courses = $6,
+	//      is_admin = $7,
+	//      contact_info = $8
+	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	UpdateTeacher(ctx context.Context, arg UpdateTeacherParams) (Teacher, error)
+	//UpdateTeacherGroup
+	//
+	//  UPDATE teacher_group
+	//  SET
+	//      teacher_guid = $2,
+	//      student_group_guid = $3,
+	//      active_since = $4,
+	//      manage_attendance = $5,
+	//      manage_results = $6,
+	//      manage_students = $7,
+	//      manage_achievements = $8,
+	//      teacher_until = $9
+	//  WHERE guid = $1 AND deleted_at IS NULL
+	//  RETURNING guid, teacher_guid, student_group_guid, active_since, manage_attendance, manage_results, manage_students, manage_achievements, teacher_until, created_at, deleted_at
+	UpdateTeacherGroup(ctx context.Context, arg UpdateTeacherGroupParams) (TeacherGroup, error)
 }
 
 var _ Querier = (*Queries)(nil)

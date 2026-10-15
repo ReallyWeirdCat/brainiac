@@ -28,7 +28,7 @@ type TeacherGroup struct {
 	TeacherGUID        valueobject.GUID `json:"teacher_guid"`
 	StudentGroupGUID   valueobject.GUID `json:"student_group_guid"`
 	ActiveSince        *time.Time       `json:"active_since,omitempty"`
-	ManageAttendace    bool             `json:"manage_attendance"`
+	ManageAttendance   bool             `json:"manage_attendance"`
 	ManageResults      bool             `json:"manage_results"`
 	ManageStudents     bool             `json:"manage_students"`
 	ManageAchievements bool             `json:"manage_achievements"`

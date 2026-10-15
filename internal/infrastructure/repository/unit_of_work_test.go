@@ -130,16 +130,18 @@ func TestUnitOfWork_Rollback(t *testing.T) {
 func TestUnitOfWork_RepositoryGetters(t *testing.T) {
 	uow := NewUnitOfWork(&generated.Queries{}, nil).(*UnitOfWork)
 
-	if uow.AppUsers() == nil {
-		t.Error("AppUsers() should not return nil")
+	if uow.AppUser() == nil {
+		t.Error("AppUser() should not return nil")
 	}
-	if uow.AppUserCredentials() == nil {
-		t.Error("AppUserCredentials() should not return nil")
+	if uow.AppUserCredential() == nil {
+		t.Error("AppUserCredential() should not return nil")
 	}
-	if uow.AppUserProfiles() == nil {
-		t.Error("AppUserProfiles() should not return nil")
+	if uow.AppUserProfile() == nil {
+		t.Error("AppUserProfile() should not return nil")
 	}
-	// TODO: check other repos
+	if uow.Course() == nil {
+		t.Error("Course() should not return nil")
+	}
 }
 
 func TestNewUnitOfWork(t *testing.T) {

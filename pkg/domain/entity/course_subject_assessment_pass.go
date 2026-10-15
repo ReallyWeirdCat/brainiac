@@ -28,16 +28,16 @@ type CourseSubjectAssessmentPass struct {
 	CourseSubjectAssessmentGUID valueobject.GUID `json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `json:"app_user_guid"`
 	IsActive                    bool             `json:"is_active"`
-	AttemptsLeft                int16            `json:"attempts_left"`
+	AttemptsLeft                *int16           `json:"attempts_left"`
 	ExpireAt                    *time.Time       `json:"expire_at,omitempty"`
-	CreatedAt                   *time.Time       `json:"created_at,omitempty"`
+	CreatedAt                   time.Time        `json:"created_at,omitempty"`
 	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`
 }
 
 var _ Entity = &CourseSubjectAssessmentPass{}
 
 func (c *CourseSubjectAssessmentPass) IsValid() bool {
-	if c.AttemptsLeft < 0 {
+	if c.AttemptsLeft != nil && *c.AttemptsLeft < 0 {
 		return false
 	}
 	return c.GUID.IsValid() && c.CourseSubjectAssessmentGUID.IsValid()

@@ -52,42 +52,175 @@ func (u *UnitOfWorkProvider) New(ctx context.Context) (ports.UnitOfWork, error) 
 
 var _ ports.UnitOfWorkProvider = &UnitOfWorkProvider{}
 
+// UnitOfWork binds every repository to one *generated.Queries. Repositories are
+// constructed lazily by their accessors; each is a tiny handle around queries.
 type UnitOfWork struct {
-	queries            *generated.Queries
-	tx                 pgx.Tx
-	committed          bool
-	appUsers           repository.AppUserRepository
-	appUserCredentials repository.AppUserCredentialRepository
-	appUserProfiles    repository.AppUserProfileRepository
-	appUserSessions    repository.AppUserSessionRepository
+	queries   *generated.Queries
+	tx        pgx.Tx
+	committed bool
 }
 
 func NewUnitOfWork(queries *generated.Queries, tx pgx.Tx) ports.UnitOfWork {
-	uow := &UnitOfWork{
+	return &UnitOfWork{
 		queries: queries,
 		tx:      tx,
 	}
-	uow.appUsers = newPgAppUserRepo(queries)
-	uow.appUserCredentials = newPgAppUserCredentialRepo(queries)
-	uow.appUserProfiles = newPgAppUserProfileRepo(queries)
-	uow.appUserSessions = newPgAppUserSessionRepo(queries)
-	return uow
 }
 
-func (u *UnitOfWork) AppUserCredentials() repository.AppUserCredentialRepository {
-	return u.appUserCredentials
+func (u *UnitOfWork) Achievement() repository.AchievementRepository {
+	return newPgAchievementRepo(u.queries)
 }
 
-func (u *UnitOfWork) AppUserProfiles() repository.AppUserProfileRepository {
-	return u.appUserProfiles
+func (u *UnitOfWork) AppUser() repository.AppUserRepository {
+	return newPgAppUserRepo(u.queries)
 }
 
-func (u *UnitOfWork) AppUsers() repository.AppUserRepository {
-	return u.appUsers
+func (u *UnitOfWork) AppUserCredential() repository.AppUserCredentialRepository {
+	return newPgAppUserCredentialRepo(u.queries)
 }
 
-func (u *UnitOfWork) AppUserSessions() repository.AppUserSessionRepository {
-	return u.appUserSessions
+func (u *UnitOfWork) AppUserProfile() repository.AppUserProfileRepository {
+	return newPgAppUserProfileRepo(u.queries)
+}
+
+func (u *UnitOfWork) AppUserSession() repository.AppUserSessionRepository {
+	return newPgAppUserSessionRepo(u.queries)
+}
+
+func (u *UnitOfWork) AppUserSuspension() repository.AppUserSuspensionRepository {
+	return newPgAppUserSuspensionRepo(u.queries)
+}
+
+func (u *UnitOfWork) Chat() repository.ChatRepository {
+	return newPgChatRepo(u.queries)
+}
+
+func (u *UnitOfWork) ChatMember() repository.ChatMemberRepository {
+	return newPgChatMemberRepo(u.queries)
+}
+
+func (u *UnitOfWork) Course() repository.CourseRepository {
+	return newPgCourseRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseLanguage() repository.CourseLanguageRepository {
+	return newPgCourseLanguageRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubject() repository.CourseSubjectRepository {
+	return newPgCourseSubjectRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectAssessment() repository.CourseSubjectAssessmentRepository {
+	return newPgCourseSubjectAssessmentRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectAssessmentPass() repository.CourseSubjectAssessmentPassRepository {
+	return newPgCourseSubjectAssessmentPassRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectAssessmentQuestion() repository.CourseSubjectAssessmentQuestionRepository {
+	return newPgCourseSubjectAssessmentQuestionRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectDoc() repository.CourseSubjectDocRepository {
+	return newPgCourseSubjectDocRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectDocMd() repository.CourseSubjectDocMdRepository {
+	return newPgCourseSubjectDocMdRepo(u.queries)
+}
+
+func (u *UnitOfWork) CourseSubjectItem() repository.CourseSubjectItemRepository {
+	return newPgCourseSubjectItemRepo(u.queries)
+}
+
+func (u *UnitOfWork) DailyActivity() repository.DailyActivityRepository {
+	return newPgDailyActivityRepo(u.queries)
+}
+
+func (u *UnitOfWork) Inventory() repository.InventoryRepository {
+	return newPgInventoryRepo(u.queries)
+}
+
+func (u *UnitOfWork) InventorySlot() repository.InventorySlotRepository {
+	return newPgInventorySlotRepo(u.queries)
+}
+
+func (u *UnitOfWork) Item() repository.ItemRepository {
+	return newPgItemRepo(u.queries)
+}
+
+func (u *UnitOfWork) Language() repository.LanguageRepository {
+	return newPgLanguageRepo(u.queries)
+}
+
+func (u *UnitOfWork) Message() repository.MessageRepository {
+	return newPgMessageRepo(u.queries)
+}
+
+func (u *UnitOfWork) Notification() repository.NotificationRepository {
+	return newPgNotificationRepo(u.queries)
+}
+
+func (u *UnitOfWork) RegistrationInvite() repository.RegistrationInviteRepository {
+	return newPgRegistrationInviteRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentAchievement() repository.StudentAchievementRepository {
+	return newPgStudentAchievementRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentCourseStats() repository.StudentCourseStatsRepository {
+	return newPgStudentCourseStatsRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentCourseSubject() repository.StudentCourseSubjectRepository {
+	return newPgStudentCourseSubjectRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentCourseSubjectAssessmentAttempt() repository.StudentCourseSubjectAssessmentAttemptRepository {
+	return newPgStudentCourseSubjectAssessmentAttemptRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentCourseSubjectSubmissionAttempt() repository.StudentCourseSubjectSubmissionAttemptRepository {
+	return newPgStudentCourseSubjectSubmissionAttemptRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGlobalStats() repository.StudentGlobalStatsRepository {
+	return newPgStudentGlobalStatsRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGroup() repository.StudentGroupRepository {
+	return newPgStudentGroupRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGroupClass() repository.StudentGroupClassRepository {
+	return newPgStudentGroupClassRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGroupCourse() repository.StudentGroupCourseRepository {
+	return newPgStudentGroupCourseRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGroupMember() repository.StudentGroupMemberRepository {
+	return newPgStudentGroupMemberRepo(u.queries)
+}
+
+func (u *UnitOfWork) StudentGroupMemberClassAttendance() repository.StudentGroupMemberClassAttendanceRepository {
+	return newPgStudentGroupMemberClassAttendanceRepo(u.queries)
+}
+
+func (u *UnitOfWork) TOTPSecret() repository.TOTPSecretRepository {
+	return newPgTOTPSecretRepo(u.queries)
+}
+
+func (u *UnitOfWork) Teacher() repository.TeacherRepository {
+	return newPgTeacherRepo(u.queries)
+}
+
+func (u *UnitOfWork) TeacherGroup() repository.TeacherGroupRepository {
+	return newPgTeacherGroupRepo(u.queries)
 }
 
 func (u *UnitOfWork) Commit(ctx context.Context) error {
