@@ -36,6 +36,7 @@ func (r *pgTeacherRepo) Create(ctx context.Context, obj *entity.Teacher) (*entit
 		ManageResults:    obj.ManageResults,
 		ManageCourses:    obj.ManageCourses,
 		IsAdmin:          obj.IsAdmin,
+		Title:            obj.Title,
 		ContactInfo:      obj.ContactInfo,
 	})
 	if err != nil {
@@ -53,6 +54,7 @@ func (r *pgTeacherRepo) Save(ctx context.Context, obj *entity.Teacher) (*entity.
 		ManageResults:    obj.ManageResults,
 		ManageCourses:    obj.ManageCourses,
 		IsAdmin:          obj.IsAdmin,
+		Title:            obj.Title,
 		ContactInfo:      obj.ContactInfo,
 	})
 	if err != nil {
@@ -70,6 +72,7 @@ func (r *pgTeacherRepo) Update(ctx context.Context, obj *entity.Teacher) (*entit
 		ManageResults:    obj.ManageResults,
 		ManageCourses:    obj.ManageCourses,
 		IsAdmin:          obj.IsAdmin,
+		Title:            obj.Title,
 		ContactInfo:      obj.ContactInfo,
 	})
 	if err != nil {

@@ -114,6 +114,12 @@ sql:
               type: "HttpUrl"
               pointer: true
 
+          - column: "teacher.title"
+            go_type:
+              import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
+              type: "Bio"
+              pointer: true
+
           - column: "notification.title_i18n"
             go_type:
               import: "github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"

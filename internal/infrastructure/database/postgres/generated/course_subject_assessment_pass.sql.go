@@ -17,19 +17,21 @@ INSERT INTO course_subject_assessment_pass (
     guid,
     course_subject_assessment_guid,
     app_user_guid,
+    enable_text_obfuscation,
     is_active,
     attempts_left,
     expire_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7
 )
-RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 `
 
 type CreateCourseSubjectAssessmentPassParams struct {
 	GUID                        valueobject.GUID `db:"guid" json:"guid"`
 	CourseSubjectAssessmentGUID valueobject.GUID `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	EnableTextObfuscation       bool             `db:"enable_text_obfuscation" json:"enable_text_obfuscation"`
 	IsActive                    bool             `db:"is_active" json:"is_active"`
 	AttemptsLeft                *int16           `db:"attempts_left" json:"attempts_left"`
 	ExpireAt                    *time.Time       `db:"expire_at" json:"expire_at"`
@@ -41,18 +43,20 @@ type CreateCourseSubjectAssessmentPassParams struct {
 //	    guid,
 //	    course_subject_assessment_guid,
 //	    app_user_guid,
+//	    enable_text_obfuscation,
 //	    is_active,
 //	    attempts_left,
 //	    expire_at
 //	) VALUES (
-//	    $1, $2, $3, $4, $5, $6
+//	    $1, $2, $3, $4, $5, $6, $7
 //	)
-//	RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+//	RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 func (q *Queries) CreateCourseSubjectAssessmentPass(ctx context.Context, arg CreateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error) {
 	row := q.db.QueryRow(ctx, createCourseSubjectAssessmentPass,
 		arg.GUID,
 		arg.CourseSubjectAssessmentGUID,
 		arg.AppUserGUID,
+		arg.EnableTextObfuscation,
 		arg.IsActive,
 		arg.AttemptsLeft,
 		arg.ExpireAt,
@@ -62,6 +66,7 @@ func (q *Queries) CreateCourseSubjectAssessmentPass(ctx context.Context, arg Cre
 		&i.GUID,
 		&i.CourseSubjectAssessmentGUID,
 		&i.AppUserGUID,
+		&i.EnableTextObfuscation,
 		&i.IsActive,
 		&i.AttemptsLeft,
 		&i.ExpireAt,
@@ -88,7 +93,7 @@ func (q *Queries) DeleteCourseSubjectAssessmentPass(ctx context.Context, guid va
 }
 
 const getCourseSubjectAssessmentPass = `-- name: GetCourseSubjectAssessmentPass :one
-SELECT guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+SELECT guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 FROM course_subject_assessment_pass
 WHERE guid = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -96,7 +101,7 @@ LIMIT 1
 
 // GetCourseSubjectAssessmentPass
 //
-//	SELECT guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+//	SELECT guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 //	FROM course_subject_assessment_pass
 //	WHERE guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
@@ -107,6 +112,7 @@ func (q *Queries) GetCourseSubjectAssessmentPass(ctx context.Context, guid value
 		&i.GUID,
 		&i.CourseSubjectAssessmentGUID,
 		&i.AppUserGUID,
+		&i.EnableTextObfuscation,
 		&i.IsActive,
 		&i.AttemptsLeft,
 		&i.ExpireAt,
@@ -121,27 +127,30 @@ INSERT INTO course_subject_assessment_pass (
     guid,
     course_subject_assessment_guid,
     app_user_guid,
+    enable_text_obfuscation,
     is_active,
     attempts_left,
     expire_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7
 )
 ON CONFLICT (guid) DO UPDATE
 SET
     course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
     app_user_guid = EXCLUDED.app_user_guid,
+    enable_text_obfuscation = EXCLUDED.enable_text_obfuscation,
     is_active = EXCLUDED.is_active,
     attempts_left = EXCLUDED.attempts_left,
     expire_at = EXCLUDED.expire_at
 WHERE deleted_at IS NULL
-RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 `
 
 type SaveCourseSubjectAssessmentPassParams struct {
 	GUID                        valueobject.GUID `db:"guid" json:"guid"`
 	CourseSubjectAssessmentGUID valueobject.GUID `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	EnableTextObfuscation       bool             `db:"enable_text_obfuscation" json:"enable_text_obfuscation"`
 	IsActive                    bool             `db:"is_active" json:"is_active"`
 	AttemptsLeft                *int16           `db:"attempts_left" json:"attempts_left"`
 	ExpireAt                    *time.Time       `db:"expire_at" json:"expire_at"`
@@ -153,26 +162,29 @@ type SaveCourseSubjectAssessmentPassParams struct {
 //	    guid,
 //	    course_subject_assessment_guid,
 //	    app_user_guid,
+//	    enable_text_obfuscation,
 //	    is_active,
 //	    attempts_left,
 //	    expire_at
 //	) VALUES (
-//	    $1, $2, $3, $4, $5, $6
+//	    $1, $2, $3, $4, $5, $6, $7
 //	)
 //	ON CONFLICT (guid) DO UPDATE
 //	SET
 //	    course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
 //	    app_user_guid = EXCLUDED.app_user_guid,
+//	    enable_text_obfuscation = EXCLUDED.enable_text_obfuscation,
 //	    is_active = EXCLUDED.is_active,
 //	    attempts_left = EXCLUDED.attempts_left,
 //	    expire_at = EXCLUDED.expire_at
 //	WHERE deleted_at IS NULL
-//	RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+//	RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 func (q *Queries) SaveCourseSubjectAssessmentPass(ctx context.Context, arg SaveCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error) {
 	row := q.db.QueryRow(ctx, saveCourseSubjectAssessmentPass,
 		arg.GUID,
 		arg.CourseSubjectAssessmentGUID,
 		arg.AppUserGUID,
+		arg.EnableTextObfuscation,
 		arg.IsActive,
 		arg.AttemptsLeft,
 		arg.ExpireAt,
@@ -182,6 +194,7 @@ func (q *Queries) SaveCourseSubjectAssessmentPass(ctx context.Context, arg SaveC
 		&i.GUID,
 		&i.CourseSubjectAssessmentGUID,
 		&i.AppUserGUID,
+		&i.EnableTextObfuscation,
 		&i.IsActive,
 		&i.AttemptsLeft,
 		&i.ExpireAt,
@@ -196,17 +209,19 @@ UPDATE course_subject_assessment_pass
 SET
     course_subject_assessment_guid = $2,
     app_user_guid = $3,
-    is_active = $4,
-    attempts_left = $5,
-    expire_at = $6
+    enable_text_obfuscation = $4,
+    is_active = $5,
+    attempts_left = $6,
+    expire_at = $7
 WHERE guid = $1 AND deleted_at IS NULL
-RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 `
 
 type UpdateCourseSubjectAssessmentPassParams struct {
 	GUID                        valueobject.GUID `db:"guid" json:"guid"`
 	CourseSubjectAssessmentGUID valueobject.GUID `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	EnableTextObfuscation       bool             `db:"enable_text_obfuscation" json:"enable_text_obfuscation"`
 	IsActive                    bool             `db:"is_active" json:"is_active"`
 	AttemptsLeft                *int16           `db:"attempts_left" json:"attempts_left"`
 	ExpireAt                    *time.Time       `db:"expire_at" json:"expire_at"`
@@ -218,16 +233,18 @@ type UpdateCourseSubjectAssessmentPassParams struct {
 //	SET
 //	    course_subject_assessment_guid = $2,
 //	    app_user_guid = $3,
-//	    is_active = $4,
-//	    attempts_left = $5,
-//	    expire_at = $6
+//	    enable_text_obfuscation = $4,
+//	    is_active = $5,
+//	    attempts_left = $6,
+//	    expire_at = $7
 //	WHERE guid = $1 AND deleted_at IS NULL
-//	RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+//	RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 func (q *Queries) UpdateCourseSubjectAssessmentPass(ctx context.Context, arg UpdateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error) {
 	row := q.db.QueryRow(ctx, updateCourseSubjectAssessmentPass,
 		arg.GUID,
 		arg.CourseSubjectAssessmentGUID,
 		arg.AppUserGUID,
+		arg.EnableTextObfuscation,
 		arg.IsActive,
 		arg.AttemptsLeft,
 		arg.ExpireAt,
@@ -237,6 +254,7 @@ func (q *Queries) UpdateCourseSubjectAssessmentPass(ctx context.Context, arg Upd
 		&i.GUID,
 		&i.CourseSubjectAssessmentGUID,
 		&i.AppUserGUID,
+		&i.EnableTextObfuscation,
 		&i.IsActive,
 		&i.AttemptsLeft,
 		&i.ExpireAt,

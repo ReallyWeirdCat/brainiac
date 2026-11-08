@@ -21,11 +21,12 @@ INSERT INTO teacher (
     manage_results,
     manage_courses,
     is_admin,
+    title,
     contact_info
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
-RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 `
 
 type CreateTeacherParams struct {
@@ -36,6 +37,7 @@ type CreateTeacherParams struct {
 	ManageResults    bool                 `db:"manage_results" json:"manage_results"`
 	ManageCourses    bool                 `db:"manage_courses" json:"manage_courses"`
 	IsAdmin          bool                 `db:"is_admin" json:"is_admin"`
+	Title            *valueobject.Bio     `db:"title" json:"title"`
 	ContactInfo      valueobject.Metadata `db:"contact_info" json:"contact_info"`
 }
 
@@ -49,11 +51,12 @@ type CreateTeacherParams struct {
 //	    manage_results,
 //	    manage_courses,
 //	    is_admin,
+//	    title,
 //	    contact_info
 //	) VALUES (
-//	    $1, $2, $3, $4, $5, $6, $7, $8
+//	    $1, $2, $3, $4, $5, $6, $7, $8, $9
 //	)
-//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 func (q *Queries) CreateTeacher(ctx context.Context, arg CreateTeacherParams) (Teacher, error) {
 	row := q.db.QueryRow(ctx, createTeacher,
 		arg.AppUserGUID,
@@ -63,6 +66,7 @@ func (q *Queries) CreateTeacher(ctx context.Context, arg CreateTeacherParams) (T
 		arg.ManageResults,
 		arg.ManageCourses,
 		arg.IsAdmin,
+		arg.Title,
 		arg.ContactInfo,
 	)
 	var i Teacher
@@ -74,6 +78,7 @@ func (q *Queries) CreateTeacher(ctx context.Context, arg CreateTeacherParams) (T
 		&i.ManageResults,
 		&i.ManageCourses,
 		&i.IsAdmin,
+		&i.Title,
 		&i.ContactInfo,
 		&i.CreatedAt,
 		&i.DeletedAt,
@@ -98,7 +103,7 @@ func (q *Queries) DeleteTeacher(ctx context.Context, appUserGuid valueobject.GUI
 }
 
 const getTeacher = `-- name: GetTeacher :one
-SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 FROM teacher
 WHERE app_user_guid = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -106,7 +111,7 @@ LIMIT 1
 
 // GetTeacher
 //
-//	SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+//	SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 //	FROM teacher
 //	WHERE app_user_guid = $1 AND deleted_at IS NULL
 //	LIMIT 1
@@ -121,6 +126,7 @@ func (q *Queries) GetTeacher(ctx context.Context, appUserGuid valueobject.GUID) 
 		&i.ManageResults,
 		&i.ManageCourses,
 		&i.IsAdmin,
+		&i.Title,
 		&i.ContactInfo,
 		&i.CreatedAt,
 		&i.DeletedAt,
@@ -137,9 +143,10 @@ INSERT INTO teacher (
     manage_results,
     manage_courses,
     is_admin,
+    title,
     contact_info
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
 ON CONFLICT (app_user_guid) DO UPDATE
 SET
@@ -149,9 +156,10 @@ SET
     manage_results = EXCLUDED.manage_results,
     manage_courses = EXCLUDED.manage_courses,
     is_admin = EXCLUDED.is_admin,
+    title = EXCLUDED.title,
     contact_info = EXCLUDED.contact_info
 WHERE deleted_at IS NULL
-RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 `
 
 type SaveTeacherParams struct {
@@ -162,6 +170,7 @@ type SaveTeacherParams struct {
 	ManageResults    bool                 `db:"manage_results" json:"manage_results"`
 	ManageCourses    bool                 `db:"manage_courses" json:"manage_courses"`
 	IsAdmin          bool                 `db:"is_admin" json:"is_admin"`
+	Title            *valueobject.Bio     `db:"title" json:"title"`
 	ContactInfo      valueobject.Metadata `db:"contact_info" json:"contact_info"`
 }
 
@@ -175,9 +184,10 @@ type SaveTeacherParams struct {
 //	    manage_results,
 //	    manage_courses,
 //	    is_admin,
+//	    title,
 //	    contact_info
 //	) VALUES (
-//	    $1, $2, $3, $4, $5, $6, $7, $8
+//	    $1, $2, $3, $4, $5, $6, $7, $8, $9
 //	)
 //	ON CONFLICT (app_user_guid) DO UPDATE
 //	SET
@@ -187,9 +197,10 @@ type SaveTeacherParams struct {
 //	    manage_results = EXCLUDED.manage_results,
 //	    manage_courses = EXCLUDED.manage_courses,
 //	    is_admin = EXCLUDED.is_admin,
+//	    title = EXCLUDED.title,
 //	    contact_info = EXCLUDED.contact_info
 //	WHERE deleted_at IS NULL
-//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 func (q *Queries) SaveTeacher(ctx context.Context, arg SaveTeacherParams) (Teacher, error) {
 	row := q.db.QueryRow(ctx, saveTeacher,
 		arg.AppUserGUID,
@@ -199,6 +210,7 @@ func (q *Queries) SaveTeacher(ctx context.Context, arg SaveTeacherParams) (Teach
 		arg.ManageResults,
 		arg.ManageCourses,
 		arg.IsAdmin,
+		arg.Title,
 		arg.ContactInfo,
 	)
 	var i Teacher
@@ -210,6 +222,7 @@ func (q *Queries) SaveTeacher(ctx context.Context, arg SaveTeacherParams) (Teach
 		&i.ManageResults,
 		&i.ManageCourses,
 		&i.IsAdmin,
+		&i.Title,
 		&i.ContactInfo,
 		&i.CreatedAt,
 		&i.DeletedAt,
@@ -226,9 +239,10 @@ SET
     manage_results = $5,
     manage_courses = $6,
     is_admin = $7,
-    contact_info = $8
+    title = $8,
+    contact_info = $9
 WHERE app_user_guid = $1 AND deleted_at IS NULL
-RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 `
 
 type UpdateTeacherParams struct {
@@ -239,6 +253,7 @@ type UpdateTeacherParams struct {
 	ManageResults    bool                 `db:"manage_results" json:"manage_results"`
 	ManageCourses    bool                 `db:"manage_courses" json:"manage_courses"`
 	IsAdmin          bool                 `db:"is_admin" json:"is_admin"`
+	Title            *valueobject.Bio     `db:"title" json:"title"`
 	ContactInfo      valueobject.Metadata `db:"contact_info" json:"contact_info"`
 }
 
@@ -252,9 +267,10 @@ type UpdateTeacherParams struct {
 //	    manage_results = $5,
 //	    manage_courses = $6,
 //	    is_admin = $7,
-//	    contact_info = $8
+//	    title = $8,
+//	    contact_info = $9
 //	WHERE app_user_guid = $1 AND deleted_at IS NULL
-//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+//	RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 func (q *Queries) UpdateTeacher(ctx context.Context, arg UpdateTeacherParams) (Teacher, error) {
 	row := q.db.QueryRow(ctx, updateTeacher,
 		arg.AppUserGUID,
@@ -264,6 +280,7 @@ func (q *Queries) UpdateTeacher(ctx context.Context, arg UpdateTeacherParams) (T
 		arg.ManageResults,
 		arg.ManageCourses,
 		arg.IsAdmin,
+		arg.Title,
 		arg.ContactInfo,
 	)
 	var i Teacher
@@ -275,6 +292,7 @@ func (q *Queries) UpdateTeacher(ctx context.Context, arg UpdateTeacherParams) (T
 		&i.ManageResults,
 		&i.ManageCourses,
 		&i.IsAdmin,
+		&i.Title,
 		&i.ContactInfo,
 		&i.CreatedAt,
 		&i.DeletedAt,

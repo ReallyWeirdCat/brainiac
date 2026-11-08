@@ -278,13 +278,14 @@ type Querier interface {
 	//      guid,
 	//      course_subject_assessment_guid,
 	//      app_user_guid,
+	//      enable_text_obfuscation,
 	//      is_active,
 	//      attempts_left,
 	//      expire_at
 	//  ) VALUES (
-	//      $1, $2, $3, $4, $5, $6
+	//      $1, $2, $3, $4, $5, $6, $7
 	//  )
-	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 	CreateCourseSubjectAssessmentPass(ctx context.Context, arg CreateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
 	//CreateCourseSubjectAssessmentQuestion
 	//
@@ -684,11 +685,12 @@ type Querier interface {
 	//      manage_results,
 	//      manage_courses,
 	//      is_admin,
+	//      title,
 	//      contact_info
 	//  ) VALUES (
-	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
 	//  )
-	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 	CreateTeacher(ctx context.Context, arg CreateTeacherParams) (Teacher, error)
 	//CreateTeacherGroup
 	//
@@ -1235,7 +1237,7 @@ type Querier interface {
 	GetCourseSubjectAssessment(ctx context.Context, guid valueobject.GUID) (CourseSubjectAssessment, error)
 	//GetCourseSubjectAssessmentPass
 	//
-	//  SELECT guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	//  SELECT guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 	//  FROM course_subject_assessment_pass
 	//  WHERE guid = $1 AND deleted_at IS NULL
 	//  LIMIT 1
@@ -1410,7 +1412,7 @@ type Querier interface {
 	GetTOTPSecret(ctx context.Context, appUserGuid valueobject.GUID) (TOTPSecret, error)
 	//GetTeacher
 	//
-	//  SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	//  SELECT app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 	//  FROM teacher
 	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
 	//  LIMIT 1
@@ -1840,21 +1842,23 @@ type Querier interface {
 	//      guid,
 	//      course_subject_assessment_guid,
 	//      app_user_guid,
+	//      enable_text_obfuscation,
 	//      is_active,
 	//      attempts_left,
 	//      expire_at
 	//  ) VALUES (
-	//      $1, $2, $3, $4, $5, $6
+	//      $1, $2, $3, $4, $5, $6, $7
 	//  )
 	//  ON CONFLICT (guid) DO UPDATE
 	//  SET
 	//      course_subject_assessment_guid = EXCLUDED.course_subject_assessment_guid,
 	//      app_user_guid = EXCLUDED.app_user_guid,
+	//      enable_text_obfuscation = EXCLUDED.enable_text_obfuscation,
 	//      is_active = EXCLUDED.is_active,
 	//      attempts_left = EXCLUDED.attempts_left,
 	//      expire_at = EXCLUDED.expire_at
 	//  WHERE deleted_at IS NULL
-	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 	SaveCourseSubjectAssessmentPass(ctx context.Context, arg SaveCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
 	//SaveCourseSubjectAssessmentQuestion
 	//
@@ -2498,9 +2502,10 @@ type Querier interface {
 	//      manage_results,
 	//      manage_courses,
 	//      is_admin,
+	//      title,
 	//      contact_info
 	//  ) VALUES (
-	//      $1, $2, $3, $4, $5, $6, $7, $8
+	//      $1, $2, $3, $4, $5, $6, $7, $8, $9
 	//  )
 	//  ON CONFLICT (app_user_guid) DO UPDATE
 	//  SET
@@ -2510,9 +2515,10 @@ type Querier interface {
 	//      manage_results = EXCLUDED.manage_results,
 	//      manage_courses = EXCLUDED.manage_courses,
 	//      is_admin = EXCLUDED.is_admin,
+	//      title = EXCLUDED.title,
 	//      contact_info = EXCLUDED.contact_info
 	//  WHERE deleted_at IS NULL
-	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 	SaveTeacher(ctx context.Context, arg SaveTeacherParams) (Teacher, error)
 	//SaveTeacherGroup
 	//
@@ -2761,11 +2767,12 @@ type Querier interface {
 	//  SET
 	//      course_subject_assessment_guid = $2,
 	//      app_user_guid = $3,
-	//      is_active = $4,
-	//      attempts_left = $5,
-	//      expire_at = $6
+	//      enable_text_obfuscation = $4,
+	//      is_active = $5,
+	//      attempts_left = $6,
+	//      expire_at = $7
 	//  WHERE guid = $1 AND deleted_at IS NULL
-	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, is_active, attempts_left, expire_at, created_at, deleted_at
+	//  RETURNING guid, course_subject_assessment_guid, app_user_guid, enable_text_obfuscation, is_active, attempts_left, expire_at, created_at, deleted_at
 	UpdateCourseSubjectAssessmentPass(ctx context.Context, arg UpdateCourseSubjectAssessmentPassParams) (CourseSubjectAssessmentPass, error)
 	//UpdateCourseSubjectAssessmentQuestion
 	//
@@ -3117,9 +3124,10 @@ type Querier interface {
 	//      manage_results = $5,
 	//      manage_courses = $6,
 	//      is_admin = $7,
-	//      contact_info = $8
+	//      title = $8,
+	//      contact_info = $9
 	//  WHERE app_user_guid = $1 AND deleted_at IS NULL
-	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, contact_info, created_at, deleted_at
+	//  RETURNING app_user_guid, active_since, manage_students, manage_attendance, manage_results, manage_courses, is_admin, title, contact_info, created_at, deleted_at
 	UpdateTeacher(ctx context.Context, arg UpdateTeacherParams) (Teacher, error)
 	//UpdateTeacherGroup
 	//

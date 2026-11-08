@@ -97,7 +97,7 @@ var specs = []entitySpec{
 	{
 		Name:     "CourseSubjectAssessmentPass",
 		File:     "course_subject_assessment_pass",
-		Writable: []string{"GUID", "CourseSubjectAssessmentGUID", "AppUserGUID", "IsActive", "AttemptsLeft", "ExpireAt"},
+		Writable: []string{"GUID", "CourseSubjectAssessmentGUID", "AppUserGUID", "EnableTextObfuscation", "IsActive", "AttemptsLeft", "ExpireAt"},
 	},
 	{
 		Name:     "CourseSubjectAssessmentQuestion",
@@ -224,7 +224,7 @@ var specs = []entitySpec{
 	{
 		Name:     "Teacher",
 		File:     "teacher",
-		Writable: []string{"AppUserGUID", "ActiveSince", "ManageStudents", "ManageAttendance", "ManageResults", "ManageCourses", "IsAdmin", "ContactInfo"},
+		Writable: []string{"AppUserGUID", "ActiveSince", "ManageStudents", "ManageAttendance", "ManageResults", "ManageCourses", "IsAdmin", "Title", "ContactInfo"},
 	},
 	{
 		Name:     "TeacherGroup",

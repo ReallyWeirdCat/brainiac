@@ -169,6 +169,7 @@ type CourseSubjectAssessmentPass struct {
 	GUID                        valueobject.GUID `db:"guid" json:"guid"`
 	CourseSubjectAssessmentGUID valueobject.GUID `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	EnableTextObfuscation       bool             `db:"enable_text_obfuscation" json:"enable_text_obfuscation"`
 	IsActive                    bool             `db:"is_active" json:"is_active"`
 	AttemptsLeft                *int16           `db:"attempts_left" json:"attempts_left"`
 	ExpireAt                    *time.Time       `db:"expire_at" json:"expire_at"`
@@ -500,6 +501,7 @@ type Teacher struct {
 	ManageResults    bool                 `db:"manage_results" json:"manage_results"`
 	ManageCourses    bool                 `db:"manage_courses" json:"manage_courses"`
 	IsAdmin          bool                 `db:"is_admin" json:"is_admin"`
+	Title            *valueobject.Bio     `db:"title" json:"title"`
 	ContactInfo      valueobject.Metadata `db:"contact_info" json:"contact_info"`
 	CreatedAt        time.Time            `db:"created_at" json:"created_at"`
 	DeletedAt        *time.Time           `db:"deleted_at" json:"deleted_at"`

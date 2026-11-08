@@ -7,9 +7,10 @@ INSERT INTO teacher (
     manage_results,
     manage_courses,
     is_admin,
+    title,
     contact_info
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
 RETURNING *;
 
@@ -22,7 +23,8 @@ SET
     manage_results = $5,
     manage_courses = $6,
     is_admin = $7,
-    contact_info = $8
+    title = $8,
+    contact_info = $9
 WHERE app_user_guid = $1 AND deleted_at IS NULL
 RETURNING *;
 
@@ -35,9 +37,10 @@ INSERT INTO teacher (
     manage_results,
     manage_courses,
     is_admin,
+    title,
     contact_info
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
 ON CONFLICT (app_user_guid) DO UPDATE
 SET
@@ -47,6 +50,7 @@ SET
     manage_results = EXCLUDED.manage_results,
     manage_courses = EXCLUDED.manage_courses,
     is_admin = EXCLUDED.is_admin,
+    title = EXCLUDED.title,
     contact_info = EXCLUDED.contact_info
 WHERE deleted_at IS NULL
 RETURNING *;

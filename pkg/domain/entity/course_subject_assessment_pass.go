@@ -27,9 +27,9 @@ type CourseSubjectAssessmentPass struct {
 	GUID                        valueobject.GUID `json:"guid"`
 	CourseSubjectAssessmentGUID valueobject.GUID `json:"course_subject_assessment_guid"`
 	AppUserGUID                 valueobject.GUID `json:"app_user_guid"`
-	IsActive                    bool             `json:"is_active"`
-	AttemptsLeft                *int16            `json:"attempts_left"`
 	EnableTextObfuscation       bool             `json:"enable_text_obfuscation"`
+	IsActive                    bool             `json:"is_active"`
+	AttemptsLeft                *int16           `json:"attempts_left"`
 	ExpireAt                    *time.Time       `json:"expire_at,omitempty"`
 	CreatedAt                   time.Time        `json:"created_at,omitempty"`
 	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`
