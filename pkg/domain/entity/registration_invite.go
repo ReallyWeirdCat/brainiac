@@ -25,7 +25,7 @@ import (
 
 type RegistrationInvite struct {
 	AppUserGUID          valueobject.GUID      `json:"app_user_guid"`
-	InvitedByAppUserGUID *valueobject.GUID     `json:"invited_by_app_user_guid,omitempty"`
+	InvitedByAppUserGUID valueobject.GUID      `json:"invited_by_app_user_guid,omitempty"`
 	InviteCode           valueobject.GUID      `json:"invite_code"`
 	Email                *valueobject.Email    `json:"email,omitempty"`
 	Message              *string               `json:"message,omitempty"`
@@ -37,7 +37,7 @@ type RegistrationInvite struct {
 	StudentGroups        *valueobject.Metadata `json:"student_groups,omitempty"`
 	TeacherGroups        *valueobject.Metadata `json:"teacher_groups,omitempty"`
 	Chats                *valueobject.Metadata `json:"chats,omitempty"`
-	ExpireAt             *time.Time            `json:"expire_at,omitempty"`
+	ExpireAt             time.Time             `json:"expire_at,omitempty"`
 	UsedAt               *time.Time            `json:"used_at,omitempty"`
 	CreatedAt            time.Time             `json:"created_at"`
 	DeletedAt            *time.Time            `json:"deleted_at,omitempty"`
@@ -55,7 +55,7 @@ func (r *RegistrationInvite) IsValid() bool {
 	if r.Email != nil && !r.Email.IsValid() {
 		return false
 	}
-	if r.InvitedByAppUserGUID != nil && !(*r.InvitedByAppUserGUID).IsValid() {
+	if !r.InvitedByAppUserGUID.IsValid() {
 		return false
 	}
 	if r.Name != nil && !r.Name.IsValid() {

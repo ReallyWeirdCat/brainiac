@@ -19,8 +19,9 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/app/ports"
@@ -99,7 +100,7 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 	}
 	defer uow.Rollback(ctx)
 
-	usernameTaken, err := uow.AppUsers().ExistsByUsername(ctx, username)
+	usernameTaken, err := uow.AppUser().ExistsByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 		return nil, ErrUsernameTaken
 	}
 
-	existingCredential, err := uow.AppUserCredentials().GetByEmail(ctx, email)
+	existingCredential, err := uow.AppUserCredential().GetByEmail(ctx, email)
 	if err != nil && !errors.Is(err, repository.ErrEntityNotFound) {
 		return nil, err
 	}
@@ -158,8 +159,12 @@ func (r *RegistrationBeginUsecase) Execute(ctx context.Context, req Registration
 }
 
 func randDelay(ctx context.Context) {
+	n, err := rand.Int(rand.Reader, big.NewInt(3))
+	if err != nil {
+		return
+	}
 	select {
-	case <-time.After(time.Duration(rand.Intn(3)+1) * time.Second):
+	case <-time.After(time.Duration(n.Int64()+1) * time.Second):
 	case <-ctx.Done():
 	}
 }

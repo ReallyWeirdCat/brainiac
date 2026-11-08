@@ -27,6 +27,7 @@ import (
 type StudentGroupMemberClassAttendance struct {
 	GUID                   valueobject.GUID      `json:"guid"`
 	StudentGroupMemberGUID valueobject.GUID      `json:"student_group_member_guid"`
+	StudentGroupClassGUID  valueobject.GUID      `json:"student_group_class_guid"`
 	FirstSeenAt            *time.Time            `json:"first_seen_at,omitempty"`
 	LastSeenAt             *time.Time            `json:"last_seen_at,omitempty"`
 	PresentAt              *time.Time            `json:"present_at,omitempty"`

@@ -26,6 +26,7 @@ import (
 
 type CourseSubjectAssessment struct {
 	GUID                 valueobject.GUID       `json:"guid"`
+	CourseSubjectGUID    valueobject.GUID       `json:"course_subject_guid"`
 	TitleI18n            *valueobject.I18nText  `json:"title_i18n,omitempty"`
 	DescriptionI18n      *valueobject.I18nText  `json:"description_i18n,omitempty"`
 	IsAttestation        bool                   `json:"is_attestation"`
@@ -36,7 +37,7 @@ type CourseSubjectAssessment struct {
 	MaxTime              int16                  `json:"max_time"`
 	MaxAttempts          int16                  `json:"max_attempts"`
 	ScoringMethod        enum.ScoringMethodEnum `json:"scoring_method"`
-	RequiredScore        int8                   `json:"required_score"`
+	RequiredScore        int16                  `json:"required_score"`
 	ShortQuestionsCount  int16                  `json:"short_questions_count"`
 	NormalQuestionsCount int16                  `json:"normal_questions_count"`
 	LongQuestionsCount   int16                  `json:"long_questions_count"`

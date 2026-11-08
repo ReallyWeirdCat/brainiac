@@ -27,7 +27,7 @@ type Chat struct {
 	GUID               valueobject.GUID      `json:"guid"`
 	Title              string                `json:"title"`
 	Topic              *string               `json:"topic,omitempty"`
-	AvatarURL          *valueobject.HttpUrl  `json:"avatar_url,omitempty"`
+	AvatarUrl          *valueobject.HttpUrl  `json:"avatar_url,omitempty"`
 	StudentsCanText    bool                  `json:"students_can_text"`
 	StudentsSeeMembers bool                  `json:"students_see_members"`
 	PreserveMessages   bool                  `json:"preserve_messages"`
@@ -45,7 +45,7 @@ func (c *Chat) IsValid() bool {
 	if c.Topic != nil && len(*c.Topic) > 50 {
 		return false
 	}
-	if c.AvatarURL != nil && !c.AvatarURL.IsValid() {
+	if c.AvatarUrl != nil && !c.AvatarUrl.IsValid() {
 		return false
 	}
 	if c.Meta != nil && !c.Meta.IsValid() {

@@ -27,7 +27,7 @@ type Achievement struct {
 	GUID             valueobject.GUID      `json:"guid"`
 	TitleI18n        valueobject.I18nText  `json:"title_i18n"`
 	DescriptionI18n  *valueobject.I18nText `json:"description_i18n,omitempty"`
-	ResourceURL      *valueobject.HttpUrl  `json:"resource_url,omitempty"`
+	ResourceUrl      *valueobject.HttpUrl  `json:"resource_url,omitempty"`
 	IsHidden         bool                  `json:"is_hidden"`
 	Meta             *valueobject.Metadata `json:"meta,omitempty"`
 	Conditions       *valueobject.Metadata `json:"conditions,omitempty"`
@@ -50,7 +50,7 @@ func (a *Achievement) IsValid() bool {
 	if a.DescriptionI18n != nil && !a.DescriptionI18n.IsValid() {
 		return false
 	}
-	if a.ResourceURL != nil && !a.ResourceURL.IsValid() {
+	if a.ResourceUrl != nil && !a.ResourceUrl.IsValid() {
 		return false
 	}
 	if a.Meta != nil && !a.Meta.IsValid() {

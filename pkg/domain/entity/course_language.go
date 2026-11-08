@@ -25,8 +25,9 @@ import (
 
 type CourseLanguage struct {
 	GUID                        valueobject.GUID `json:"guid"`
+	CourseGUID                  valueobject.GUID `json:"course_guid"`
 	LanguageGUID                valueobject.GUID `json:"language_guid"`
-	CalculatedSupportPercentage int16            `json:"calculated_support_percentage"`
+	CalculatedSupportPercentage *int16           `json:"calculated_support_percentage"`
 	IsBeta                      bool             `json:"is_beta"`
 	IsNew                       bool             `json:"is_new"`
 	CreatedAt                   time.Time        `json:"created_at"`
@@ -37,7 +38,7 @@ var _ Entity = &CourseLanguage{}
 
 func (c *CourseLanguage) IsValid() bool {
 
-	if c.CalculatedSupportPercentage < 0 || c.CalculatedSupportPercentage > 100 {
+	if c.CalculatedSupportPercentage != nil && (*c.CalculatedSupportPercentage < 0 || *c.CalculatedSupportPercentage > 100) {
 		return false
 	}
 

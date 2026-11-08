@@ -11,6 +11,21 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
+type Achievement struct {
+	GUID             valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n        valueobject.I18nText  `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n  *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	ResourceUrl      *valueobject.HttpUrl  `db:"resource_url" json:"resource_url"`
+	IsHidden         bool                  `db:"is_hidden" json:"is_hidden"`
+	Meta             *valueobject.Metadata `db:"meta" json:"meta"`
+	Conditions       *valueobject.Metadata `db:"conditions" json:"conditions"`
+	RewardExperience int64                 `db:"reward_experience" json:"reward_experience"`
+	RewardMoney      int64                 `db:"reward_money" json:"reward_money"`
+	PublishedAt      *time.Time            `db:"published_at" json:"published_at"`
+	CreatedAt        time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt        *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
 type AppUser struct {
 	GUID        valueobject.GUID     `db:"guid" json:"guid"`
 	Username    valueobject.Username `db:"username" json:"username"`
@@ -54,6 +69,42 @@ type AppUserSession struct {
 	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
 }
 
+type AppUserSuspension struct {
+	GUID        valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	Reason      string           `db:"reason" json:"reason"`
+	ExpireAt    *time.Time       `db:"expire_at" json:"expire_at"`
+	ExpiredAt   *time.Time       `db:"expired_at" json:"expired_at"`
+	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type Chat struct {
+	GUID               valueobject.GUID      `db:"guid" json:"guid"`
+	Title              string                `db:"title" json:"title"`
+	Topic              *string               `db:"topic" json:"topic"`
+	AvatarUrl          *valueobject.HttpUrl  `db:"avatar_url" json:"avatar_url"`
+	StudentsCanText    bool                  `db:"students_can_text" json:"students_can_text"`
+	StudentsSeeMembers bool                  `db:"students_see_members" json:"students_see_members"`
+	PreserveMessages   bool                  `db:"preserve_messages" json:"preserve_messages"`
+	Meta               *valueobject.Metadata `db:"meta" json:"meta"`
+	CreatedAt          time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt          *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type ChatMember struct {
+	GUID           valueobject.GUID  `db:"guid" json:"guid"`
+	AppUserGUID    valueobject.GUID  `db:"app_user_guid" json:"app_user_guid"`
+	ChatGUID       valueobject.GUID  `db:"chat_guid" json:"chat_guid"`
+	ChatRole       enum.ChatRoleEnum `db:"chat_role" json:"chat_role"`
+	Name           *string           `db:"name" json:"name"`
+	CustomRoleName *string           `db:"custom_role_name" json:"custom_role_name"`
+	LeftAt         *time.Time        `db:"left_at" json:"left_at"`
+	SeenAt         *time.Time        `db:"seen_at" json:"seen_at"`
+	CreatedAt      time.Time         `db:"created_at" json:"created_at"`
+	DeletedAt      *time.Time        `db:"deleted_at" json:"deleted_at"`
+}
+
 type Course struct {
 	GUID            valueobject.GUID      `db:"guid" json:"guid"`
 	TitleI18n       *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
@@ -63,4 +114,407 @@ type Course struct {
 	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
 	CreatedAt       time.Time             `db:"created_at" json:"created_at"`
 	DeletedAt       *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseLanguage struct {
+	GUID                        valueobject.GUID `db:"guid" json:"guid"`
+	CourseGUID                  valueobject.GUID `db:"course_guid" json:"course_guid"`
+	LanguageGUID                valueobject.GUID `db:"language_guid" json:"language_guid"`
+	CalculatedSupportPercentage *int16           `db:"calculated_support_percentage" json:"calculated_support_percentage"`
+	IsBeta                      bool             `db:"is_beta" json:"is_beta"`
+	IsNew                       bool             `db:"is_new" json:"is_new"`
+	CreatedAt                   time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt                   *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubject struct {
+	GUID                valueobject.GUID             `db:"guid" json:"guid"`
+	CourseGUID          valueobject.GUID             `db:"course_guid" json:"course_guid"`
+	ParentGUID          *valueobject.GUID            `db:"parent_guid" json:"parent_guid"`
+	TitleI18n           *valueobject.I18nText        `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n     *valueobject.I18nText        `db:"description_i18n" json:"description_i18n"`
+	RewardExperience    int64                        `db:"reward_experience" json:"reward_experience"`
+	CompletionCondition enum.CompletionConditionEnum `db:"completion_condition" json:"completion_condition"`
+	HideChildren        bool                         `db:"hide_children" json:"hide_children"`
+	Style               *valueobject.Metadata        `db:"style" json:"style"`
+	Meta                *valueobject.Metadata        `db:"meta" json:"meta"`
+	PublishedAt         *time.Time                   `db:"published_at" json:"published_at"`
+	CreatedAt           time.Time                    `db:"created_at" json:"created_at"`
+	DeletedAt           *time.Time                   `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectAssessment struct {
+	GUID                 valueobject.GUID       `db:"guid" json:"guid"`
+	CourseSubjectGUID    valueobject.GUID       `db:"course_subject_guid" json:"course_subject_guid"`
+	TitleI18n            *valueobject.I18nText  `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n      *valueobject.I18nText  `db:"description_i18n" json:"description_i18n"`
+	IsAttestation        bool                   `db:"is_attestation" json:"is_attestation"`
+	HideAnswers          bool                   `db:"hide_answers" json:"hide_answers"`
+	HideAnswerValidity   bool                   `db:"hide_answer_validity" json:"hide_answer_validity"`
+	HideScore            bool                   `db:"hide_score" json:"hide_score"`
+	UseTimedQuestions    bool                   `db:"use_timed_questions" json:"use_timed_questions"`
+	MaxTime              int16                  `db:"max_time" json:"max_time"`
+	MaxAttempts          int16                  `db:"max_attempts" json:"max_attempts"`
+	ScoringMethod        enum.ScoringMethodEnum `db:"scoring_method" json:"scoring_method"`
+	RequiredScore        int16                  `db:"required_score" json:"required_score"`
+	ShortQuestionsCount  int16                  `db:"short_questions_count" json:"short_questions_count"`
+	NormalQuestionsCount int16                  `db:"normal_questions_count" json:"normal_questions_count"`
+	LongQuestionsCount   int16                  `db:"long_questions_count" json:"long_questions_count"`
+	PublishedAt          *time.Time             `db:"published_at" json:"published_at"`
+	CreatedAt            time.Time              `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time             `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectAssessmentPass struct {
+	GUID                        valueobject.GUID `db:"guid" json:"guid"`
+	CourseSubjectAssessmentGUID valueobject.GUID `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
+	AppUserGUID                 valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	IsActive                    bool             `db:"is_active" json:"is_active"`
+	AttemptsLeft                *int16           `db:"attempts_left" json:"attempts_left"`
+	ExpireAt                    *time.Time       `db:"expire_at" json:"expire_at"`
+	CreatedAt                   time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt                   *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectAssessmentQuestion struct {
+	GUID                        valueobject.GUID      `db:"guid" json:"guid"`
+	CourseSubjectAssessmentGUID valueobject.GUID      `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
+	TitleI18n                   *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n             *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	QuestionType                enum.QuestionTypeEnum `db:"question_type" json:"question_type"`
+	AttachmentUrl               *valueobject.HttpUrl  `db:"attachment_url" json:"attachment_url"`
+	Options                     *valueobject.I18nText `db:"options" json:"options"`
+	CorrectOptions              *valueobject.I18nText `db:"correct_options" json:"correct_options"`
+	MaxCorrectOptions           *int16                `db:"max_correct_options" json:"max_correct_options"`
+	IsMultipleChoice            bool                  `db:"is_multiple_choice" json:"is_multiple_choice"`
+	MaxOptions                  int16                 `db:"max_options" json:"max_options"`
+	MaxAnswerTime               int16                 `db:"max_answer_time" json:"max_answer_time"`
+	UseTextAnswer               bool                  `db:"use_text_answer" json:"use_text_answer"`
+	CorrectTextAnswer           *valueobject.I18nText `db:"correct_text_answer" json:"correct_text_answer"`
+	ExampleUrl                  *valueobject.HttpUrl  `db:"example_url" json:"example_url"`
+	PublishedAt                 *time.Time            `db:"published_at" json:"published_at"`
+	CreatedAt                   time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt                   *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectDoc struct {
+	GUID              valueobject.GUID        `db:"guid" json:"guid"`
+	CourseSubjectGUID valueobject.GUID        `db:"course_subject_guid" json:"course_subject_guid"`
+	TitleI18n         *valueobject.I18nText   `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n   *valueobject.I18nText   `db:"description_i18n" json:"description_i18n"`
+	SubjectDocType    enum.SubjectDocTypeEnum `db:"subject_doc_type" json:"subject_doc_type"`
+	ExampleMeta       *valueobject.Metadata   `db:"example_meta" json:"example_meta"`
+	SubmissionMeta    *valueobject.Metadata   `db:"submission_meta" json:"submission_meta"`
+	LiteratureMeta    *valueobject.Metadata   `db:"literature_meta" json:"literature_meta"`
+	DocIndex          int16                   `db:"doc_index" json:"doc_index"`
+	PublishedAt       *time.Time              `db:"published_at" json:"published_at"`
+	CreatedAt         time.Time               `db:"created_at" json:"created_at"`
+	DeletedAt         *time.Time              `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectDocMd struct {
+	GUID                 valueobject.GUID         `db:"guid" json:"guid"`
+	CourseSubjectDocGUID valueobject.GUID         `db:"course_subject_doc_guid" json:"course_subject_doc_guid"`
+	LanguageCode         valueobject.LanguageCode `db:"language_code" json:"language_code"`
+	Md                   []byte                   `db:"md" json:"md"`
+	PublishedAt          *time.Time               `db:"published_at" json:"published_at"`
+	CreatedAt            time.Time                `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time               `db:"deleted_at" json:"deleted_at"`
+}
+
+type CourseSubjectItem struct {
+	GUID              valueobject.GUID `db:"guid" json:"guid"`
+	CourseSubjectGUID valueobject.GUID `db:"course_subject_guid" json:"course_subject_guid"`
+	ItemGUID          valueobject.GUID `db:"item_guid" json:"item_guid"`
+	Amount            int16            `db:"amount" json:"amount"`
+	CreatedAt         time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt         *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type DailyActivity struct {
+	GUID                 valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID          valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	Day                  time.Time        `db:"day" json:"day"`
+	ExperienceEarned     int64            `db:"experience_earned" json:"experience_earned"`
+	LevelsEarned         int16            `db:"levels_earned" json:"levels_earned"`
+	SubjectsCompleted    int16            `db:"subjects_completed" json:"subjects_completed"`
+	AssessmentsCompleted int16            `db:"assessments_completed" json:"assessments_completed"`
+	PracticesCompleted   int16            `db:"practices_completed" json:"practices_completed"`
+	CreatedAt            time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type Inventory struct {
+	AppUserGUID valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	MaxSlots    int16            `db:"max_slots" json:"max_slots"`
+	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type InventorySlot struct {
+	GUID             valueobject.GUID `db:"guid" json:"guid"`
+	InventoryGUID    valueobject.GUID `db:"inventory_guid" json:"inventory_guid"`
+	ItemGUID         valueobject.GUID `db:"item_guid" json:"item_guid"`
+	Amount           int16            `db:"amount" json:"amount"`
+	AmountInExchange int16            `db:"amount_in_exchange" json:"amount_in_exchange"`
+	ExpireAt         *time.Time       `db:"expire_at" json:"expire_at"`
+	CreatedAt        time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt        *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type Item struct {
+	GUID            valueobject.GUID      `db:"guid" json:"guid"`
+	TitleI18n       valueobject.I18nText  `db:"title_i18n" json:"title_i18n"`
+	DescriptionI18n *valueobject.I18nText `db:"description_i18n" json:"description_i18n"`
+	ResourceUrl     *valueobject.HttpUrl  `db:"resource_url" json:"resource_url"`
+	Meta            valueobject.Metadata  `db:"meta" json:"meta"`
+	StackSize       int16                 `db:"stack_size" json:"stack_size"`
+	Rarity          enum.RarityEnum       `db:"rarity" json:"rarity"`
+	AllowExchange   bool                  `db:"allow_exchange" json:"allow_exchange"`
+	ShopPrice       *int64                `db:"shop_price" json:"shop_price"`
+	OneTimePurchase bool                  `db:"one_time_purchase" json:"one_time_purchase"`
+	ShopQuantity    *int16                `db:"shop_quantity" json:"shop_quantity"`
+	LevelRequired   *int16                `db:"level_required" json:"level_required"`
+	OnSaleSince     *time.Time            `db:"on_sale_since" json:"on_sale_since"`
+	OnSaleUntil     *time.Time            `db:"on_sale_until" json:"on_sale_until"`
+	PublishedAt     *time.Time            `db:"published_at" json:"published_at"`
+	CreatedAt       time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt       *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type Language struct {
+	GUID         valueobject.GUID         `db:"guid" json:"guid"`
+	LanguageCode valueobject.LanguageCode `db:"language_code" json:"language_code"`
+	EnglishTitle string                   `db:"english_title" json:"english_title"`
+	LocalTitle   string                   `db:"local_title" json:"local_title"`
+	Emoji        *string                  `db:"emoji" json:"emoji"`
+	IsSupported  bool                     `db:"is_supported" json:"is_supported"`
+	IsBeta       bool                     `db:"is_beta" json:"is_beta"`
+	CreatedAt    time.Time                `db:"created_at" json:"created_at"`
+	DeletedAt    *time.Time               `db:"deleted_at" json:"deleted_at"`
+}
+
+type Message struct {
+	GUID           valueobject.GUID      `db:"guid" json:"guid"`
+	ChatMemberGUID valueobject.GUID      `db:"chat_member_guid" json:"chat_member_guid"`
+	ChatGUID       valueobject.GUID      `db:"chat_guid" json:"chat_guid"`
+	ResourceUrl    *valueobject.HttpUrl  `db:"resource_url" json:"resource_url"`
+	Content        *string               `db:"content" json:"content"`
+	Urgency        enum.UrgencyEnum      `db:"urgency" json:"urgency"`
+	Meta           *valueobject.Metadata `db:"meta" json:"meta"`
+	SeenBy         *valueobject.Metadata `db:"seen_by" json:"seen_by"`
+	EditedAt       *time.Time            `db:"edited_at" json:"edited_at"`
+	PinnedAt       *time.Time            `db:"pinned_at" json:"pinned_at"`
+	ExpireAt       *time.Time            `db:"expire_at" json:"expire_at"`
+	CreatedAt      time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt      *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type Notification struct {
+	GUID        valueobject.GUID      `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID      `db:"app_user_guid" json:"app_user_guid"`
+	TitleI18n   *valueobject.I18nText `db:"title_i18n" json:"title_i18n"`
+	ContentI18n *valueobject.I18nText `db:"content_i18n" json:"content_i18n"`
+	ResourceUrl *valueobject.HttpUrl  `db:"resource_url" json:"resource_url"`
+	Urgency     enum.UrgencyEnum      `db:"urgency" json:"urgency"`
+	Meta        *valueobject.Metadata `db:"meta" json:"meta"`
+	SeenAt      *time.Time            `db:"seen_at" json:"seen_at"`
+	ExpireAt    *time.Time            `db:"expire_at" json:"expire_at"`
+	CreatedAt   time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type RegistrationInvite struct {
+	AppUserGUID          valueobject.GUID      `db:"app_user_guid" json:"app_user_guid"`
+	InvitedByAppUserGUID valueobject.GUID      `db:"invited_by_app_user_guid" json:"invited_by_app_user_guid"`
+	InviteCode           valueobject.GUID      `db:"invite_code" json:"invite_code"`
+	Email                *valueobject.Email    `db:"email" json:"email"`
+	Message              *string               `db:"message" json:"message"`
+	Name                 *valueobject.Name     `db:"name" json:"name"`
+	Surname              *valueobject.Name     `db:"surname" json:"surname"`
+	Patronymic           *valueobject.Name     `db:"patronymic" json:"patronymic"`
+	Nickname             *valueobject.Nickname `db:"nickname" json:"nickname"`
+	Username             *valueobject.Username `db:"username" json:"username"`
+	StudentGroups        *valueobject.Metadata `db:"student_groups" json:"student_groups"`
+	TeacherGroups        *valueobject.Metadata `db:"teacher_groups" json:"teacher_groups"`
+	Chats                *valueobject.Metadata `db:"chats" json:"chats"`
+	ExpireAt             time.Time             `db:"expire_at" json:"expire_at"`
+	UsedAt               *time.Time            `db:"used_at" json:"used_at"`
+	CreatedAt            time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentAchievement struct {
+	GUID            valueobject.GUID `db:"guid" json:"guid"`
+	AppUserGUID     valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	AchievementGUID valueobject.GUID `db:"achievement_guid" json:"achievement_guid"`
+	CreatedAt       time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt       *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentCourseStat struct {
+	GUID        valueobject.GUID      `db:"guid" json:"guid"`
+	AppUserGUID valueobject.GUID      `db:"app_user_guid" json:"app_user_guid"`
+	CourseGUID  valueobject.GUID      `db:"course_guid" json:"course_guid"`
+	Experience  int64                 `db:"experience" json:"experience"`
+	Level       int16                 `db:"level" json:"level"`
+	Meta        *valueobject.Metadata `db:"meta" json:"meta"`
+	CreatedAt   time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt   *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentCourseSubject struct {
+	GUID              valueobject.GUID       `db:"guid" json:"guid"`
+	AppUserGUID       valueobject.GUID       `db:"app_user_guid" json:"app_user_guid"`
+	CourseSubjectGUID valueobject.GUID       `db:"course_subject_guid" json:"course_subject_guid"`
+	CompletedAt       *time.Time             `db:"completed_at" json:"completed_at"`
+	SubjectStatus     enum.SubjectStatusEnum `db:"subject_status" json:"subject_status"`
+	IsFavorite        bool                   `db:"is_favorite" json:"is_favorite"`
+	Meta              *valueobject.Metadata  `db:"meta" json:"meta"`
+	CreatedAt         time.Time              `db:"created_at" json:"created_at"`
+	DeletedAt         *time.Time             `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentCourseSubjectAssessmentAttempt struct {
+	GUID                        valueobject.GUID       `db:"guid" json:"guid"`
+	AppUserGUID                 valueobject.GUID       `db:"app_user_guid" json:"app_user_guid"`
+	CourseSubjectAssessmentGUID valueobject.GUID       `db:"course_subject_assessment_guid" json:"course_subject_assessment_guid"`
+	AttemptStatus               enum.AttemptStatusEnum `db:"attempt_status" json:"attempt_status"`
+	Score                       int16                  `db:"score" json:"score"`
+	IsSuccess                   bool                   `db:"is_success" json:"is_success"`
+	Answers                     valueobject.Metadata   `db:"answers" json:"answers"`
+	CreatedAt                   time.Time              `db:"created_at" json:"created_at"`
+	DeletedAt                   *time.Time             `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentCourseSubjectSubmissionAttempt struct {
+	GUID                 valueobject.GUID          `db:"guid" json:"guid"`
+	AppUserGUID          valueobject.GUID          `db:"app_user_guid" json:"app_user_guid"`
+	CourseSubjectDocGUID valueobject.GUID          `db:"course_subject_doc_guid" json:"course_subject_doc_guid"`
+	SubmissionStatus     enum.SubmissionStatusEnum `db:"submission_status" json:"submission_status"`
+	Files                *valueobject.Metadata     `db:"files" json:"files"`
+	Meta                 *valueobject.Metadata     `db:"meta" json:"meta"`
+	StudentComment       *string                   `db:"student_comment" json:"student_comment"`
+	TeacherComment       *string                   `db:"teacher_comment" json:"teacher_comment"`
+	CreatedAt            time.Time                 `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time                `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGlobalStat struct {
+	AppUserGUID           valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	Level                 int16            `db:"level" json:"level"`
+	OtherExperience       int64            `db:"other_experience" json:"other_experience"`
+	Money                 int64            `db:"money" json:"money"`
+	MoneyEarned           int64            `db:"money_earned" json:"money_earned"`
+	SubjectsCompleted     int32            `db:"subjects_completed" json:"subjects_completed"`
+	AssessmentsCompleted  int32            `db:"assessments_completed" json:"assessments_completed"`
+	AssessmentsFailed     int32            `db:"assessments_failed" json:"assessments_failed"`
+	AssessmentsTerminated int32            `db:"assessments_terminated" json:"assessments_terminated"`
+	WorksSubmitted        int32            `db:"works_submitted" json:"works_submitted"`
+	ItemsCollected        int32            `db:"items_collected" json:"items_collected"`
+	ItemsUsed             int32            `db:"items_used" json:"items_used"`
+	ItemsSold             int32            `db:"items_sold" json:"items_sold"`
+	ItemsExchanged        int32            `db:"items_exchanged" json:"items_exchanged"`
+	BoxesOpened           int32            `db:"boxes_opened" json:"boxes_opened"`
+	MaxDailyStreak        int32            `db:"max_daily_streak" json:"max_daily_streak"`
+	MessagesSent          int32            `db:"messages_sent" json:"messages_sent"`
+	CreatedAt             time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt             *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGroup struct {
+	GUID               valueobject.GUID `db:"guid" json:"guid"`
+	Title              string           `db:"title" json:"title"`
+	Description        *string          `db:"description" json:"description"`
+	EnableGamification bool             `db:"enable_gamification" json:"enable_gamification"`
+	CreatedAt          time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt          *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGroupClass struct {
+	GUID                          valueobject.GUID      `db:"guid" json:"guid"`
+	StudentGroupGUID              valueobject.GUID      `db:"student_group_guid" json:"student_group_guid"`
+	Title                         string                `db:"title" json:"title"`
+	StartTime                     time.Time             `db:"start_time" json:"start_time"`
+	EndTime                       time.Time             `db:"end_time" json:"end_time"`
+	Objectives                    *valueobject.Metadata `db:"objectives" json:"objectives"`
+	AttestationAssessmentsEnabled bool                  `db:"attestation_assessments_enabled" json:"attestation_assessments_enabled"`
+	AttendanceClosedAt            *time.Time            `db:"attendance_closed_at" json:"attendance_closed_at"`
+	MarksApprovedAt               *time.Time            `db:"marks_approved_at" json:"marks_approved_at"`
+	TOTPSecret                    []byte                `db:"totp_secret" json:"totp_secret"`
+	Room                          *string               `db:"room" json:"room"`
+	ClassType                     enum.ClassTypeEnum    `db:"class_type" json:"class_type"`
+	CreatedAt                     time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt                     *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGroupCourse struct {
+	GUID             valueobject.GUID `db:"guid" json:"guid"`
+	StudentGroupGUID valueobject.GUID `db:"student_group_guid" json:"student_group_guid"`
+	CourseGUID       valueobject.GUID `db:"course_guid" json:"course_guid"`
+	FullAccess       bool             `db:"full_access" json:"full_access"`
+	CloseSubmissions bool             `db:"close_submissions" json:"close_submissions"`
+	CreatedAt        time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt        *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGroupMember struct {
+	GUID                 valueobject.GUID      `db:"guid" json:"guid"`
+	AppUserGUID          valueobject.GUID      `db:"app_user_guid" json:"app_user_guid"`
+	StudentGroupGUID     valueobject.GUID      `db:"student_group_guid" json:"student_group_guid"`
+	StudentRole          enum.StudentRoleEnum  `db:"student_role" json:"student_role"`
+	Notes                *string               `db:"notes" json:"notes"`
+	Team                 *string               `db:"team" json:"team"`
+	TeamResponsibilities *valueobject.Metadata `db:"team_responsibilities" json:"team_responsibilities"`
+	CreatedAt            time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt            *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type StudentGroupMemberClassAttendance struct {
+	GUID                   valueobject.GUID      `db:"guid" json:"guid"`
+	StudentGroupMemberGUID valueobject.GUID      `db:"student_group_member_guid" json:"student_group_member_guid"`
+	StudentGroupClassGUID  valueobject.GUID      `db:"student_group_class_guid" json:"student_group_class_guid"`
+	FirstSeenAt            *time.Time            `db:"first_seen_at" json:"first_seen_at"`
+	LastSeenAt             *time.Time            `db:"last_seen_at" json:"last_seen_at"`
+	PresentAt              *time.Time            `db:"present_at" json:"present_at"`
+	ObjectivesCompletion   *valueobject.Metadata `db:"objectives_completion" json:"objectives_completion"`
+	Comment                *string               `db:"comment" json:"comment"`
+	Grade                  enum.GradeEnum        `db:"grade" json:"grade"`
+	CreatedAt              time.Time             `db:"created_at" json:"created_at"`
+	DeletedAt              *time.Time            `db:"deleted_at" json:"deleted_at"`
+}
+
+type TOTPSecret struct {
+	AppUserGUID  valueobject.GUID `db:"app_user_guid" json:"app_user_guid"`
+	SecretBase32 string           `db:"secret_base32" json:"secret_base32"`
+	LastUsedAt   *time.Time       `db:"last_used_at" json:"last_used_at"`
+	CreatedAt    time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt    *time.Time       `db:"deleted_at" json:"deleted_at"`
+}
+
+type Teacher struct {
+	AppUserGUID      valueobject.GUID     `db:"app_user_guid" json:"app_user_guid"`
+	ActiveSince      *time.Time           `db:"active_since" json:"active_since"`
+	ManageStudents   bool                 `db:"manage_students" json:"manage_students"`
+	ManageAttendance bool                 `db:"manage_attendance" json:"manage_attendance"`
+	ManageResults    bool                 `db:"manage_results" json:"manage_results"`
+	ManageCourses    bool                 `db:"manage_courses" json:"manage_courses"`
+	IsAdmin          bool                 `db:"is_admin" json:"is_admin"`
+	ContactInfo      valueobject.Metadata `db:"contact_info" json:"contact_info"`
+	CreatedAt        time.Time            `db:"created_at" json:"created_at"`
+	DeletedAt        *time.Time           `db:"deleted_at" json:"deleted_at"`
+}
+
+type TeacherGroup struct {
+	GUID               valueobject.GUID `db:"guid" json:"guid"`
+	TeacherGUID        valueobject.GUID `db:"teacher_guid" json:"teacher_guid"`
+	StudentGroupGUID   valueobject.GUID `db:"student_group_guid" json:"student_group_guid"`
+	ActiveSince        *time.Time       `db:"active_since" json:"active_since"`
+	ManageAttendance   bool             `db:"manage_attendance" json:"manage_attendance"`
+	ManageResults      bool             `db:"manage_results" json:"manage_results"`
+	ManageStudents     bool             `db:"manage_students" json:"manage_students"`
+	ManageAchievements bool             `db:"manage_achievements" json:"manage_achievements"`
+	TeacherUntil       *time.Time       `db:"teacher_until" json:"teacher_until"`
+	CreatedAt          time.Time        `db:"created_at" json:"created_at"`
+	DeletedAt          *time.Time       `db:"deleted_at" json:"deleted_at"`
 }

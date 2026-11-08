@@ -18,8 +18,6 @@
 package config
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"time"
 )
@@ -68,6 +66,13 @@ type AppConfig struct {
 		InMemory bool   `yaml:"in_memory" envconfig:"CACHE_IN_MEMORY"`
 		URI      string `yaml:"uri" envconfig:"CACHE_URI"`
 	} `yaml:"cache"`
+	Server struct {
+		Addr string `yaml:"addr" envconfig:"SERVER_ADDR"`
+	} `yaml:"server"`
+	Storage struct {
+		Root    string `yaml:"root" envconfig:"STORAGE_ROOT"`
+		BaseURL string `yaml:"base_url" envconfig:"STORAGE_BASE_URL"`
+	} `yaml:"storage"`
 }
 
 func (a *AppConfig) Validate() error {
@@ -134,7 +139,11 @@ func (a *AppConfig) SetDefault() {
 	a.Security.Passwords.Compromised.RepoURL = ""
 
 	a.Security.JWT.Issuer = "brainiac"
-	a.Security.JWT.Secret = defaultJWTSecret()
+	// No default secret. Validate() rejects an empty/short secret, so the
+	// operator must provide one explicitly. This keeps defaults deterministic
+	// (testable) and avoids silently generating a secret that would invalidate
+	// every token when config.yaml is not persisted across restarts.
+	a.Security.JWT.Secret = ""
 	a.Security.JWT.TOTPTokenTTL = time.Minute * 10
 	a.Security.JWT.AccessTokenTTL = time.Minute * 3
 	a.Security.JWT.RefreshTokenTTL = time.Hour * 24 * 7
@@ -151,13 +160,9 @@ func (a *AppConfig) SetDefault() {
 
 	a.Cache.InMemory = true
 	a.Cache.URI = "redis://user:password@localhost:6379/0"
-}
 
-func defaultJWTSecret() string {
-	secret := base64.URLEncoding.EncodeToString(func() []byte {
-		b := make([]byte, 32)
-		rand.Read(b)
-		return b
-	}())
-	return secret
+	a.Server.Addr = ":8080"
+
+	a.Storage.Root = "./storage"
+	a.Storage.BaseURL = ""
 }

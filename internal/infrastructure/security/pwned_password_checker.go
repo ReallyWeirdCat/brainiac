@@ -28,7 +28,7 @@ import (
 	"github.com/ReallyWeirdCat/brainiac/pkg/domain/valueobject"
 )
 
-const maxFileCapacity = 800 * 1024 * 1024 // 800MB
+const maxLineLength = 1024 * 1024 // 1MB max single line (passwords are short)
 
 // PwnedPasswordChecker checks passwords against a local rockyou.txt file.
 type PwnedPasswordChecker struct {
@@ -65,9 +65,10 @@ func (p *PwnedPasswordChecker) load() {
 
 	p.compromised = make(map[string]struct{})
 	scanner := bufio.NewScanner(file)
-	// Increase buffer if lines are long (most passwords are short)
-	buf := make([]byte, maxFileCapacity)
-	scanner.Buffer(buf, maxFileCapacity)
+	// Increase buffer if lines are long (most passwords are short).
+	// Allocate a small initial buffer and grow up to maxLineLength.
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, maxLineLength)
 
 	for scanner.Scan() {
 		pass := strings.TrimSpace(scanner.Text())

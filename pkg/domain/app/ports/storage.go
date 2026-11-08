@@ -23,36 +23,28 @@ import (
 	"time"
 )
 
-type Storage interface {
-	// Upload stores content from reader at the given path.
-	// Returns the file identifier used to download the file.
-	Upload(ctx context.Context, path string, reader io.Reader, size int64, contentType string) (string, error)
+// ObjectStore is the minimal object-store capability: put, get, delete.
+// A local filesystem backend implements this fully; an S3/Garage backend can
+// implement the same contract later without changing consumers.
+type ObjectStore interface {
+	// Put writes a file and returns its storage key.
+	Put(ctx context.Context, key string, r io.Reader, size int64, contentType string) (string, error)
 
-	// Download retrieves the content stored at path.
-	Download(ctx context.Context, id string) (io.ReadCloser, error)
+	// Get opens a file for reading. The caller must close it.
+	Get(ctx context.Context, key string) (io.ReadCloser, error)
 
-	// Delete removes the content stored by id.
-	Delete(ctx context.Context, id string) error
+	// Delete removes a file. Deleting a missing key is a no-op.
+	Delete(ctx context.Context, key string) error
 }
 
-// URLProvider combines all URL generation capabilities.
-type URLProvider interface {
-	PublicURLProvider
-	SignedURLProvider
-	UploadURLProvider
+// UrlSigner is an optional capability for backends that can produce URLs
+// (public or presigned). Backends that cannot (e.g. local disk) do not
+// implement it; consumers should type-assert for it.
+type UrlSigner interface {
+	PublicURL(ctx context.Context, key string) (string, error)
+	SignedURL(ctx context.Context, key string, expiry time.Duration) (string, error)
+	UploadURL(ctx context.Context, key, contentType string, expiry time.Duration) (string, error)
 }
 
-// PublicURLProvider can generate a permanent public URL for a file.
-type PublicURLProvider interface {
-	GetPublicURL(ctx context.Context, path string) (string, error)
-}
-
-// SignedURLProvider can generate a temporary signed URL for downloading a file.
-type SignedURLProvider interface {
-	GetSignedURL(ctx context.Context, path string, expiry time.Duration) (string, error)
-}
-
-// UploadURLProvider can generate a temporary signed URL for direct client uploads.
-type UploadURLProvider interface {
-	GenerateUploadURL(ctx context.Context, path string, contentType string, expiry time.Duration) (string, error)
-}
+// Storage is a backwards-compatible alias for ObjectStore.
+type Storage = ObjectStore

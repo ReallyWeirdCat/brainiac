@@ -340,7 +340,7 @@ CREATE TABLE student_group_member_class_attendance (
 CREATE TABLE course_subject (
     guid UUID PRIMARY KEY,
     course_guid UUID NOT NULL REFERENCES course(guid),
-    parent UUID NULL REFERENCES course_subject(guid),
+    parent_guid UUID NULL REFERENCES course_subject(guid),
     title_i18n JSONB NULL,
     description_i18n JSONB NULL,
     reward_experience BIGINT NOT NULL DEFAULT 0,
@@ -353,7 +353,7 @@ CREATE TABLE course_subject (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE INDEX idx_coursesubject_parent_not_deleted ON course_subject (parent) WHERE deleted_at IS NULL;
+CREATE INDEX idx_coursesubject_parent_not_deleted ON course_subject (parent_guid) WHERE deleted_at IS NULL;
 
 -- 22. course_subject_doc
 CREATE TABLE course_subject_doc (
@@ -428,7 +428,7 @@ CREATE TABLE course_subject_assessment_question (
     published_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL,
-    CONSTRAINT check_max_answer_time CHECK (max_answer_time > 10)
+    CONSTRAINT check_max_answer_time CHECK (max_answer_time > 0)
 );
 
 -- 26. course_subject_assessment_pass

@@ -27,6 +27,7 @@ import (
 type StudentGroupMember struct {
 	GUID                 valueobject.GUID      `json:"guid"`
 	AppUserGUID          valueobject.GUID      `json:"app_user_guid"`
+	StudentGroupGUID     valueobject.GUID      `json:"student_group_guid"`
 	StudentRole          enum.StudentRoleEnum  `json:"student_role"`
 	Notes                *string               `json:"notes,omitempty"`
 	Team                 *string               `json:"team,omitempty"`

@@ -34,7 +34,7 @@ type ChatMember struct {
 	LeftAt         *time.Time        `json:"left_at,omitempty"`
 	SeenAt         *time.Time        `json:"seen_at,omitempty"`
 	CreatedAt      time.Time         `json:"created_at"`
-	DeletedAt      time.Time         `json:"deleted_at"`
+	DeletedAt      *time.Time        `json:"deleted_at"`
 }
 
 var _ Entity = &ChatMember{}

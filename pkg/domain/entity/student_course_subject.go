@@ -26,6 +26,7 @@ import (
 
 type StudentCourseSubject struct {
 	GUID              valueobject.GUID       `json:"guid"`
+	AppUserGUID       valueobject.GUID       `json:"app_user_guid"`
 	CourseSubjectGUID valueobject.GUID       `json:"course_subject_guid"`
 	CompletedAt       *time.Time             `json:"completed_at,omitempty"`
 	SubjectStatus     enum.SubjectStatusEnum `json:"subject_status"`
