@@ -69,8 +69,8 @@ Business rules live in [DOMAIN.md](./DOMAIN.md). Read it before changing any dom
 |---|---|
 | Build | `go build ./...` |
 | Test | `go test ./...` |
-| Lint | TODO |
-| Regenerate SQLC | TODO (e.g. `sqlc generate`) |
+| Lint | `go fmt ./...` |
+| Regenerate SQLC | `sqlc generate` |
 | Run migrations | TODO |
 | Run locally (DB, Redis, RustFS) | TODO |
 | Build frontend | TODO |
@@ -81,6 +81,16 @@ Business rules live in [DOMAIN.md](./DOMAIN.md). Read it before changing any dom
 - Document through readable code and good names. Add comments only where the *why* is not obvious.
 - Every non-generated code file starts with the GPL license header.
 - Wrap and propagate errors using the types in `pkg/domain/errors`. TODO: document the wrapping pattern and how errors map to HTTP status codes.
+
+Commits are done strictly in English language in the following format:
+```
+feat: implement feature;
+refactor: restructure object;
+fix: page does not open correctly;
+docs: update readme;
+experiment: try a new approach.
+```
+One change per line with a marker feat/refactor/fix/docs/experiment, devided by semicolon, period at the last line.
 
 ## Testing
 
