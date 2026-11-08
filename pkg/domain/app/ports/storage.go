@@ -24,22 +24,35 @@ import (
 )
 
 type Storage interface {
-	// Uploads a file to the specified path with the given content type.
-	// Returns file identifier.
+	// Upload stores content from reader at the given path.
+	// Returns the file identifier used to download the file.
 	Upload(ctx context.Context, path string, reader io.Reader, size int64, contentType string) (string, error)
 
-	// Retrieves a file from storage.
-	Download(ctx context.Context, path string) (io.ReadCloser, error)
+	// Download retrieves the content stored at path.
+	Download(ctx context.Context, id string) (io.ReadCloser, error)
 
-	// Removes a file from storage.
-	Delete(ctx context.Context, path string) error
+	// Delete removes the content stored by id.
+	Delete(ctx context.Context, id string) error
+}
 
-	// Returns the public URL for a file.
+// URLProvider combines all URL generation capabilities.
+type URLProvider interface {
+	PublicURLProvider
+	SignedURLProvider
+	UploadURLProvider
+}
+
+// PublicURLProvider can generate a permanent public URL for a file.
+type PublicURLProvider interface {
 	GetPublicURL(ctx context.Context, path string) (string, error)
+}
 
-	// Returns a presigned URL for a file with an expiration time.
+// SignedURLProvider can generate a temporary signed URL for downloading a file.
+type SignedURLProvider interface {
 	GetSignedURL(ctx context.Context, path string, expiry time.Duration) (string, error)
+}
 
-	// Generates a presigned URL for direct client uploads.
+// UploadURLProvider can generate a temporary signed URL for direct client uploads.
+type UploadURLProvider interface {
 	GenerateUploadURL(ctx context.Context, path string, contentType string, expiry time.Duration) (string, error)
 }
