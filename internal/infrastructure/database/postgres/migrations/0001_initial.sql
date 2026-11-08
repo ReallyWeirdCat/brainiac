@@ -143,6 +143,7 @@ CREATE TABLE teacher (
     manage_results BOOLEAN NOT NULL DEFAULT false,
     manage_courses BOOLEAN NOT NULL DEFAULT false,
     is_admin BOOLEAN NOT NULL DEFAULT false,
+    title VARCHAR(175) NULL,
     contact_info JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ NULL
@@ -435,6 +436,7 @@ CREATE TABLE course_subject_assessment_pass (
     guid UUID PRIMARY KEY,
     course_subject_assessment_guid UUID NOT NULL REFERENCES course_subject_assessment(guid),
     app_user_guid UUID NOT NULL REFERENCES app_user(guid),
+    enable_text_obfuscation BOOLEAN NOT NULL DEFAULT false,
     is_active BOOLEAN NOT NULL DEFAULT true,
     attempts_left SMALLINT NULL,
     expire_at TIMESTAMPTZ NULL,

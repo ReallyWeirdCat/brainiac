@@ -29,6 +29,7 @@ type CourseSubjectAssessmentPass struct {
 	AppUserGUID                 valueobject.GUID `json:"app_user_guid"`
 	IsActive                    bool             `json:"is_active"`
 	AttemptsLeft                int16            `json:"attempts_left"`
+	EnableTextObfuscation       bool             `json:"enable_text_obfuscation"`
 	ExpireAt                    *time.Time       `json:"expire_at,omitempty"`
 	CreatedAt                   *time.Time       `json:"created_at,omitempty"`
 	DeletedAt                   *time.Time       `json:"deleted_at,omitempty"`

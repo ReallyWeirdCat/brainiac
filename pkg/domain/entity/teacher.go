@@ -31,6 +31,7 @@ type Teacher struct {
 	ManageResults    bool                 `json:"manage_results"`
 	ManageCourses    bool                 `json:"manage_courses"`
 	IsAdmin          bool                 `json:"is_admin"`
+	Title            valueobject.Bio      `json:"title"`
 	ContactInfo      valueobject.Metadata `json:"contact_info"`
 	CreatedAt        time.Time            `json:"created_at"`
 	DeletedAt        *time.Time           `json:"deleted_at,omitempty"`
