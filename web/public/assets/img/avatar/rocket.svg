@@ -1,0 +1,17 @@
+<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="34" height="34" rx="17" fill="#5941A9"/>
+<path d="M16.5143 16.5142L6.79999 16.5142" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M16.5143 16.5142L16.5143 21.3714L16.5143 26.7143" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M16.5143 16.5142L24.2857 7.77142" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<use xlink:href="#stroke0_13_424" fill="white"/>
+<mask id="stroke1_13_424" fill="white">
+<use xlink:href="#stroke0_13_424"/>
+</mask>
+<path d="M16.5143 29.6286C14.9047 29.6286 13.6 28.3238 13.6 26.7143C13.6 25.1048 14.9047 23.8 16.5143 23.8C18.1238 23.8 19.4285 25.1048 19.4285 26.7143C19.4285 28.3238 18.1238 29.6286 16.5143 29.6286Z" stroke-width="2" stroke="#5941A9" mask="url(#stroke1_13_424)"/>
+<rect x="4.38574" y="14.1" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<rect x="13.1" y="13.1" width="6.82857" height="6.82857" rx="3.41429" fill="#5941A9" stroke="white"/>
+<rect x="21.8715" y="5.35712" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<defs>
+<path id="stroke0_13_424" d="M13.6 26.7143C13.6 25.1048 14.9047 23.8 16.5143 23.8C18.1238 23.8 19.4285 25.1048 19.4285 26.7143C19.4285 28.3238 18.1238 29.6286 16.5143 29.6286C14.9047 29.6286 13.6 28.3238 13.6 26.7143Z"/>
+</defs>
+</svg>

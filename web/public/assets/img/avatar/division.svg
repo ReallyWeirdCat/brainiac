@@ -1,0 +1,26 @@
+<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="34" height="34" rx="17" fill="#5941A9"/>
+<path d="M25 23L8.99997 26" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M6.00002 17L16 17" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M20 6.99998L26 16" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M5.99995 17L11 8" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<use xlink:href="#stroke0_14_196" fill="white"/>
+<mask id="stroke1_14_196" fill="white">
+<use xlink:href="#stroke0_14_196"/>
+</mask>
+<path d="M10.9143 5.00001C9.30477 5.00001 8 6.30478 8 7.9143C8 9.52381 9.30477 10.8286 10.9143 10.8286C12.5238 10.8286 13.8286 9.52381 13.8286 7.9143C13.8286 6.30478 12.5238 5.00001 10.9143 5.00001Z" stroke-width="2" stroke="#5941A9" mask="url(#stroke1_14_196)"/>
+<use xlink:href="#stroke2_14_196" fill="white"/>
+<mask id="stroke3_14_196" fill="white">
+<use xlink:href="#stroke2_14_196"/>
+</mask>
+<path d="M24.9143 20C23.3048 20 22 21.3048 22 22.9143C22 24.5238 23.3048 25.8286 24.9143 25.8286C26.5238 25.8286 27.8286 24.5238 27.8286 22.9143C27.8286 21.3048 26.5238 20 24.9143 20Z" stroke-width="2" stroke="#5941A9" mask="url(#stroke3_14_196)"/>
+<rect x="23.5" y="13.5" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<rect x="3.5" y="14.5" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<rect x="13.5" y="14.5" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<rect x="6.5" y="23.5" width="4.82857" height="4.82857" rx="2.41429" fill="#5941A9" stroke="white"/>
+<rect x="16.5" y="3.50001" width="6.82857" height="6.82857" rx="3.41429" fill="#5941A9" stroke="white"/>
+<defs>
+<path id="stroke0_14_196" d="M8 7.9143C8 9.52381 9.30477 10.8286 10.9143 10.8286C12.5238 10.8286 13.8286 9.52381 13.8286 7.9143C13.8286 6.30478 12.5238 5.00001 10.9143 5.00001C9.30477 5.00001 8 6.30478 8 7.9143Z"/>
+<path id="stroke2_14_196" d="M22 22.9143C22 24.5238 23.3048 25.8286 24.9143 25.8286C26.5238 25.8286 27.8286 24.5238 27.8286 22.9143C27.8286 21.3048 26.5238 20 24.9143 20C23.3048 20 22 21.3048 22 22.9143Z"/>
+</defs>
+</svg>

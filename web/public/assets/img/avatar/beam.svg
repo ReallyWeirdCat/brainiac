@@ -1,0 +1,16 @@
+<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="34" height="34" rx="17" fill="#5941A9"/>
+<path d="M17 17L7 17" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M27.0001 17L17.0001 17" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M27 17L17 6" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M27 17L17 28" stroke-width="2" stroke-linecap="round" stroke="white"/>
+<path d="M24 17C24 15.3431 25.3431 14 27 14C28.6569 14 30 15.3431 30 17C30 18.6569 28.6569 20 27 20C25.3431 20 24 18.6569 24 17Z" fill="white"/>
+<mask id="stroke0_14_130" fill="white">
+<path d="M24 17C24 15.3431 25.3431 14 27 14C28.6569 14 30 15.3431 30 17C30 18.6569 28.6569 20 27 20C25.3431 20 24 18.6569 24 17Z"/>
+</mask>
+<path d="M27 20C25.3431 20 24 18.6569 24 17C24 15.3431 25.3431 14 27 14C28.6569 14 30 15.3431 30 17C30 18.6569 28.6569 20 27 20Z" stroke-width="2" stroke="#5941A9" mask="url(#stroke0_14_130)"/>
+<rect x="4.5" y="14.5" width="5" height="5" rx="2.5" fill="#5941A9" stroke="white"/>
+<rect x="13.5" y="13.5" width="7" height="7" rx="3.5" fill="#5941A9" stroke="white"/>
+<rect x="14.5" y="3.5" width="5" height="5" rx="2.5" fill="#5941A9" stroke="white"/>
+<rect x="14.5" y="25.5" width="5" height="5" rx="2.5" fill="#5941A9" stroke="white"/>
+</svg>
