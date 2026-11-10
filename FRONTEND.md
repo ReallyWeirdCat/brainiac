@@ -96,7 +96,7 @@ Drop this into every page. These values are canonical — the tokens below overr
 
 Preferred logo images are `./web/public/assets/img/logo/logo-varied-purple.svg` and `./web/public/assets/img/logo/favicon-varied-purple.svg` (For favicon only). Same logo images are used regardless of color scheme.
 
-Logo is followed by brand title "Brainiac" in Bricolage Grotesque 1.3 rem. There is a 8px gap between logo and text, logo height is 46px.
+Logo is followed by brand title "Brainiac" in Bricolage Grotesque 1.3 rem, with the black `--ink` color. There is a 8px gap between logo and text, logo height is 46px.
 
 Logo with text should always be wrapped into `a` tag, linking to the main page.
 
@@ -126,6 +126,11 @@ A five-track map needs five distinguishable fills, and the core palette has only
 Users have random avatars from `./web/public/assets/img/avatar/`, all files have colors #5941a9 (bg) a #ffffff (lines). Background colors for those avatars should be set randomly from `--t-*`.
 Preferred seed of a default avatar should be the user id (which uses uuid v4).
 
+### Icons
+
+For icons, use `./web/public/assets/icons/solar-line-duotone/`. Icons must be recolored for light and dark theme, respecting the allowed color palette.
+
+Use of square icons (e.g. `graph-square`, `cursor-square`, `key-square`) inside square shapes (e.g. colored icon squares inside cards) should be avoided.
 
 ### Header
 
@@ -364,6 +369,7 @@ Status vocabulary — use consistently for subjects, steps, and graph nodes:
 - Never signal state by colour alone. Pair it with a shape cue (check badge, padlock, dashed outline).
 - Legend swatches mirror the graph (Done = `--s` fill); status dots in lists use the dot rules above (Done = `--p` fill).
 - On the interactive graph the `--a` ring means *selected* or *keyboard-focused*, not "Current".
+- Dashed line should never be visible under a dashed square.
 Right-aligned meta text is always `--mut` at `.9rem`.
 
 ### 5.6 Tabs / filters
