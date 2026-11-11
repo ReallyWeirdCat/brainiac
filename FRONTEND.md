@@ -96,9 +96,11 @@ Drop this into every page. These values are canonical — the tokens below overr
 
 Preferred logo images are `./web/public/assets/img/logo/logo-varied-purple.svg` and `./web/public/assets/img/logo/favicon-varied-purple.svg` (For favicon only). Same logo images are used regardless of color scheme.
 
-Logo is followed by brand title "Brainiac" in Bricolage Grotesque 1.3 rem, with the black `--ink` color. There is a 8px gap between logo and text, logo height is 46px.
+Logo is followed by brand title "Brainiac" in Bricolage Grotesque 1.3 rem, with the black `--ink` color. There is a 8px gap between logo and text, logo height is 35px.
 
 Logo with text should always be wrapped into `a` tag, linking to the main page.
+
+Logo must not have an additional square background behind it.
 
 ### Track colours
 
