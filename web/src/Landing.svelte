@@ -3,6 +3,7 @@
   import SocialLinks from './lib/SocialLinks.svelte'
 
   const year = new Date().getFullYear()
+  const base = import.meta.env.BASE_URL
 </script>
 
 <a class="skip-link" href="#main">Skip to content</a>
@@ -11,7 +12,7 @@
   <div class="wrap nav-row">
     <a class="logo" href="#main" aria-label="Brainiac home">
       <span class="logo-mark">
-        <img src="/assets/img/logo/logo-varied-purple.svg" alt="" width="46" height="37" />
+        <img src={`${base}assets/img/logo/logo-varied-purple.svg`} alt="" width="46" height="37" />
       </span>
       <span class="logo-text">Brainiac</span>
     </a>
@@ -255,7 +256,7 @@
           <div class="profile-top">
             <span class="avatar">
               <img
-                src="/assets/img/avatar/crown.svg"
+                src={`${base}assets/img/avatar/crown.svg`}
                 alt=""
                 width="34"
                 height="34"
@@ -344,9 +345,9 @@
       <p>© {year} Brainiac · Free and open source</p>
       <!-- TODO: replace placeholder hrefs with the published legal documents. -->
       <nav class="legal-links" aria-label="Legal">
-        <a href="/legal/privacy" title="Coming soon">Privacy policy</a>
-        <a href="/legal/terms" title="Coming soon">Terms of service</a>
-        <a href="/legal/notice" title="Coming soon">Legal notice</a>
+        <a href={`${base}legal/privacy`} title="Coming soon">Privacy policy</a>
+        <a href={`${base}legal/terms`} title="Coming soon">Terms of service</a>
+        <a href={`${base}legal/notice`} title="Coming soon">Legal notice</a>
       </nav>
     </div>
     <div class="footer-actions">

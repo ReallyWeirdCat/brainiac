@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:pages": "vite build --base=/brainiac/",
     "preview": "vite preview"
   },
   "devDependencies": {

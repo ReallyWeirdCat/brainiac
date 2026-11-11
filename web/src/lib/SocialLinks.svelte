@@ -1,5 +1,7 @@
 <script lang="ts">
   import SocialIcon from './SocialIcon.svelte'
+
+  const base = import.meta.env.BASE_URL
 </script>
 
 <div class="social-links" role="group" aria-label="Project links">
@@ -24,7 +26,7 @@
   <!-- TODO: replace with the project Discord invite link. -->
   <a
     class="social-link"
-    href="/discord"
+    href={`${base}discord`}
     title="Discord invite coming soon"
     aria-label="Brainiac on Discord"
   >
